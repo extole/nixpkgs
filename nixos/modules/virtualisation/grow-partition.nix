@@ -34,6 +34,8 @@ with lib;
     '';
 
     boot.initrd.postDeviceCommands = ''
+      set -x
+      echo "boot.initrd.postDeviceCommands: running grow partition"
       rootDevice="${config.fileSystems."/".device}"
       if [ -e "$rootDevice" ]; then
         rootDevice="$(readlink -f "$rootDevice")"
