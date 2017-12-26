@@ -188,9 +188,11 @@ udevadm settle
 # XXX: Use case usb->lvm will still fail, usb->luks->lvm is covered
 @preLVMCommands@
 
-
+set -x
 echo "starting device mapper and LVM..."
 lvm vgchange -ay
+echo "exit status of vgchange is $?"
+set +x
 
 if test -n "$debug1devices"; then fail; fi
 
