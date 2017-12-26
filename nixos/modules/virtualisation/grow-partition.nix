@@ -42,7 +42,7 @@ with lib;
         parentDevice="$(lsblk -npo PKNAME "$rootDevice")"
         # support nvme style partitions on AWS
         if echo "$parentDevice" | grep nvme >/dev/null 2>&1; then
-          partitionNumber="''${rootDevice#${parentDevice}p}"
+          partitionNumber="''${rootDevice#''${parentDevice}p}"
         else
           partitionNumber="''${rootDevice#$parentDevice}"
         fi
