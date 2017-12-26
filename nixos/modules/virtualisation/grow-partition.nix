@@ -40,7 +40,13 @@ with lib;
       if [ -e "$rootDevice" ]; then
         rootDevice="$(readlink -f "$rootDevice")"
         parentDevice="$(lsblk -npo PKNAME "$rootDevice")"
-        TMPDIR=/run sh $(type -P growpart) "$parentDevice" "''${rootDevice#$parentDevice}"
+        # support nvme style partitions on AWS
+        if echo "$parentDevice" | grep nvme >/dev/null 2>&1; then
+          partitionNumber="''${rootDevice#${parentDevice}p}"
+        else
+          partitionNumber="''${rootDevice#$parentDevice}"
+        fi
+        TMPDIR=/run sh $(type -P growpart) "$parentDevice" "$partitionNumber"
         udevadm settle
       fi
     '';
