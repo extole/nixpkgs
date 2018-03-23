@@ -455,6 +455,7 @@ in {
           ExecStart = "${pkgs.pythonPackages.twisted}/bin/twistd ${carbonOpts name}";
           User = "graphite";
           Group = "graphite";
+          PermissionsStartOnly = "true";
           PIDFile="/run/${name}/${name}.pid";
         };
         preStart = mkPidFileDir name;
