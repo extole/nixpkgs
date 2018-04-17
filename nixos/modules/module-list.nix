@@ -389,6 +389,7 @@
   ./services/monitoring/fusion-inventory.nix
   ./services/monitoring/grafana.nix
   ./services/monitoring/graphite.nix
+  ./services/monitoring/graphite-ng.nix
   ./services/monitoring/hdaps.nix
   ./services/monitoring/heapster.nix
   ./services/monitoring/longview.nix

@@ -274,6 +274,7 @@ in rec {
   tests.gnome3-gdm = callTest tests/gnome3-gdm.nix {};
   tests.grafana = callTest tests/grafana.nix {};
   tests.graphite = callTest tests/graphite.nix {};
+  tests.graphite-ng = callTest tests/graphite-ng.nix {};
   tests.hardened = callTest tests/hardened.nix { };
   tests.hibernate = callTest tests/hibernate.nix {};
   tests.home-assistant = callTest tests/home-assistant.nix { };
