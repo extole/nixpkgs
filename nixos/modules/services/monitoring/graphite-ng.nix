@@ -146,9 +146,9 @@ in {
         environment = carbonEnv;
         serviceConfig = {
           ExecStart = "${pkgs.carbon-relay-ng}/bin/carbon-relay-ng ${carbonOpts name}";
-          Type=simple
-          Restart=on-failure
-          WorkingDirectory=/run/carbon-relay-ng
+          Type=simple;
+          Restart=on-failure;
+          WorkingDirectory=/run/carbon-relay-ng;
           User = "graphite";
           Group = "graphite";
           PIDFile="/run/${name}/${name}.pid";
