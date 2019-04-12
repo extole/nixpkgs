@@ -30,10 +30,14 @@ let
     text = cfg.logging;
   };
 
-  esPlugins = pkgs.buildEnv {
+  esPlugins = pkgs.stdenv.mkDerivation {
     name = "elasticsearch-plugins";
-    paths = cfg.plugins;
-    postBuild = "${pkgs.coreutils}/bin/mkdir -p $out/plugins";
+    buildCommand = ''
+      mkdir -p $out/plugins
+      for plugin in  ${concatStringsSep " " cfg.plugins}; do
+        cp -r $plugin/plugins/* $out/plugins
+      done
+    '';
   };
 
 in {
