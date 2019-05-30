@@ -8415,6 +8415,9 @@ in
   apacheKafka_2_0 = callPackage ../servers/apache-kafka { majorVersion = "2.0"; };
   apacheKafka_2_1 = callPackage ../servers/apache-kafka { majorVersion = "2.1"; };
 
+  apacheFlume = apacheFlume_1_9_0;
+  apacheFlume_1_9_0 = callPackage ../servers/apache-flume { majorVersion = "1.9.0"; };
+
   kt = callPackage ../tools/misc/kt {};
 
   arpa2cm = callPackage ../development/tools/build-managers/arpa2cm { };
