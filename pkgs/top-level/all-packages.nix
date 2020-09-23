@@ -10424,6 +10424,9 @@ in
   apacheKafka_2_2 = callPackage ../servers/apache-kafka { majorVersion = "2.2"; };
   apacheKafka_2_3 = callPackage ../servers/apache-kafka { majorVersion = "2.3"; };
   apacheKafka_2_4 = callPackage ../servers/apache-kafka { majorVersion = "2.4"; };
+  apacheKafka_2_5_0 = callPackage ../servers/apache-kafka { majorVersion = "2.5.0"; };
+  apacheKafka_2_5_1 = callPackage ../servers/apache-kafka { majorVersion = "2.5.1"; };
+  apacheKafka_2_6_0 = callPackage ../servers/apache-kafka { majorVersion = "2.6.0"; };
 
   kt = callPackage ../tools/misc/kt {};
 

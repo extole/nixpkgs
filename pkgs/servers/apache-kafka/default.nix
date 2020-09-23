@@ -53,6 +53,21 @@ let
       scalaVersion = "2.12";
       sha256 = "1vng5ipkjzqy0wijc706w2m1rjl5d0nsgbxiacci739y1jmjnn5r";
     };
+    "2.5.0" = {
+      kafkaVersion = "2.5.0";
+      scalaVersion = "2.13";
+      sha256 = "0w3g7ii8x63m2blv2a8c491d0diczpliaqm9f7w5yn98hikh0aqi";
+    };
+    "2.5.1" = {
+      kafkaVersion = "2.5.1";
+      scalaVersion = "2.13";
+      sha256 = "0j2xq1z9syswnnjlk6m25382nrg8dbza1zvsk6yhns0yy3d7ycnf";
+    };
+    "2.6.0" = {
+      kafkaVersion = "2.6.0";
+      scalaVersion = "2.13";
+      sha256 = "14pvn3kl3hfffy0wn84nxk7y4rklzyn0v3amllsxjm4nm3d9ly3w";
+    };
   };
 in
 
