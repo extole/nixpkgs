@@ -29,7 +29,11 @@ in {
 
   config = mkIf cfg.enable {
     systemd.services.ssm-agent = {
-      users.extraUsers.ssm-user = {};
+
+      users.users.ssm-user = {
+        description = "AWS SSM User";
+        isSystemUser = true;
+      };
 
       inherit (cfg.package.meta) description;
       after    = [ "network.target" ];
