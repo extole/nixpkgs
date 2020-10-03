@@ -28,12 +28,13 @@ in {
   };
 
   config = mkIf cfg.enable {
+    users.users.ssm-user = {
+      description = "AWS SSM User";
+      isSystemUser = true;
+      extraGroups = [ "wheel" "systemd-journal" ];
+    };
     systemd.services.ssm-agent = {
 
-      users.users.ssm-user = {
-        description = "AWS SSM User";
-        isSystemUser = true;
-      };
 
       inherit (cfg.package.meta) description;
       after    = [ "network.target" ];
@@ -41,6 +42,7 @@ in {
 
       path = [ fake-lsb-release pkgs.coreutils ];
       serviceConfig = {
+        User = "ssm-agent";
         ExecStart = "${cfg.package}/bin/amazon-ssm-agent";
         KillMode = "process";
         Restart = "on-failure";
