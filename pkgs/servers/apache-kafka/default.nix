@@ -2,25 +2,12 @@
   majorVersion ? "1.0" }:
 
 let
-  jre8 = jdk8_headless;
   jre11 = jdk11_headless;
   versionMap = {
-    "2.4" = {
-      kafkaVersion = "2.4.1";
-      scalaVersion = "2.12";
-      sha256 = "0ahsprmpjz026mhbr79187wfdrxcg352iipyfqfrx68q878wnxr1";
-      jre = jre8;
-    };
-    "2.5" = {
-      kafkaVersion = "2.5.1";
-      scalaVersion = "2.12";
-      sha256 = "1wn4iszrm2rvsfyyr515zx79k5m86davjkcwcwpxcgc4k3q0z7lv";
-      jre = jre8;
-    };
-    "2.6" = {
-      kafkaVersion = "2.6.1";
+    "2.8" = {
+      kafkaVersion = "2.8.1";
       scalaVersion = "2.13";
-      sha256 = "1a2kd4r6f8z7qf886nnq9f350sblzzdi230j2hll7x156888573y";
+      sha256 = "0fgil47hxdnc374k0p9sxv6b163xknp3pkihv3r99p977czb1228";
       jre = jre11;
     };
   };
