@@ -19,6 +19,7 @@ let
       name = "terraform-${version}";
 
       inherit vendorSha256;
+
       src = fetchFromGitHub {
         owner = "hashicorp";
         repo = "terraform";
@@ -65,6 +66,7 @@ let
         ];
       };
     } // attrs');
+
   pluggable = terraform:
     let
       withPlugins = plugins:
@@ -139,6 +141,7 @@ let
                 --set NIX_TERRAFORM_PLUGIN_DIR $out/plugins \
                 --prefix PATH : "${lib.makeBinPath wrapperInputs}"
             '';
+
             inherit passthru;
           });
     in
