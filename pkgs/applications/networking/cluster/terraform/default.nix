@@ -1,24 +1,15 @@
-{ stdenv
-, lib
-, buildGoModule
-, fetchFromGitHub
-, makeWrapper
-, coreutils
-, runCommand
-, runtimeShell
-, writeText
-, terraform-providers
-, fetchpatch
-}:
+{ stdenv, lib, buildEnv, buildGoPackage, fetchFromGitHub, makeWrapper, coreutils
+, runCommand, writeText, terraform-providers, fetchpatch }:
 
 let
-  generic = { version, sha256, vendorSha256 ? null, ... }@attrs:
-    let attrs' = builtins.removeAttrs attrs [ "version" "sha256" "vendorSha256" ];
-    in
-    buildGoModule ({
+  goPackagePath = "github.com/hashicorp/terraform";
+
+  generic = { version, sha256, ... }@attrs:
+    let attrs' = builtins.removeAttrs attrs [ "version" "sha256" ];
+    in buildGoPackage ({
       name = "terraform-${version}";
 
-      inherit vendorSha256;
+      inherit goPackagePath;
 
       src = fetchFromGitHub {
         owner = "hashicorp";
@@ -27,9 +18,7 @@ let
         inherit sha256;
       };
 
-      ldflags = [ "-s" "-w" ];
-
-      postConfigure = ''
+      postPatch = ''
         # speakeasy hardcodes /bin/stty https://github.com/bgentry/speakeasy/issues/22
         substituteInPlace vendor/github.com/bgentry/speakeasy/speakeasy_unix.go \
           --replace "/bin/stty" "${coreutils}/bin/stty"
@@ -45,27 +34,21 @@ let
       '';
 
       preCheck = ''
-        export HOME=$TMPDIR
-        export TF_SKIP_REMOTE_TESTS=1
+        export HOME=$TMP
       '';
 
-      subPackages = [ "." ];
-
-      meta = with lib; {
+      meta = with stdenv.lib; {
         description =
           "Tool for building, changing, and versioning infrastructure";
         homepage = "https://www.terraform.io/";
-        changelog = "https://github.com/hashicorp/terraform/blob/v${version}/CHANGELOG.md";
         license = licenses.mpl20;
         maintainers = with maintainers; [
-          Chili-Man
-          babariviere
+          zimbatm
+          peterhoeg
           kalbasit
           marsam
-          maxeaubrey
-          timstott
-          zimbatm
-          zowoq
+          babariviere
+          Chili-Man
         ];
       };
     } // attrs');
@@ -84,28 +67,9 @@ let
           passthru = {
             withPlugins = newplugins:
               withPlugins (x: newplugins x ++ actualPlugins);
-            full = withPlugins (p: lib.filter lib.isDerivation (lib.attrValues p));
+            full = withPlugins lib.attrValues;
 
-            # Expose wrappers around the override* functions of the terraform
-            # derivation.
-            #
-            # Note that this does not behave as anyone would expect if plugins
-            # are specified. The overrides are not on the user-visible wrapper
-            # derivation but instead on the function application that eventually
-            # generates the wrapper. This means:
-            #
-            # 1. When using overrideAttrs, only `passthru` attributes will
-            #    become visible on the wrapper derivation. Other overrides that
-            #    modify the derivation *may* still have an effect, but it can be
-            #    difficult to follow.
-            #
-            # 2. Other overrides may work if they modify the terraform
-            #    derivation, or they may have no effect, depending on what
-            #    exactly is being changed.
-            #
-            # 3. Specifying overrides on the wrapper is unsupported.
-            #
-            # See nixpkgs#158620 for details.
+            # Ouch
             overrideDerivation = f:
               (pluggable (terraform.overrideDerivation f)).withPlugins plugins;
             overrideAttrs = f:
@@ -115,115 +79,83 @@ let
           };
           # Don't bother wrapping unless we actually have plugins, since the wrapper will stop automatic downloading
           # of plugins, which might be counterintuitive if someone just wants a vanilla Terraform.
-        in
-        if actualPlugins == [ ] then
+        in if actualPlugins == [ ] then
           terraform.overrideAttrs
-            (orig: { passthru = orig.passthru // passthru; })
+          (orig: { passthru = orig.passthru // passthru; })
         else
           lib.appendToName "with-plugins" (stdenv.mkDerivation {
-            inherit (terraform) name meta;
-            nativeBuildInputs = [ makeWrapper ];
-
-            # Expose the passthru set with the override functions
-            # defined above, as well as any passthru values already
-            # set on `terraform` at this point (relevant in case a
-            # user overrides attributes).
-            passthru = terraform.passthru // passthru;
+            inherit (terraform) name;
+            buildInputs = [ makeWrapper ];
 
             buildCommand = ''
-              # Create wrappers for terraform plugins because Terraform only
-              # walks inside of a tree of files.
-              for providerDir in ${toString actualPlugins}
-              do
-                for file in $(find $providerDir/libexec/terraform-providers -type f)
-                do
-                  relFile=''${file#$providerDir/}
-                  mkdir -p $out/$(dirname $relFile)
-                  cat <<WRAPPER > $out/$relFile
-              #!${runtimeShell}
-              exec "$file" "$@"
-              WRAPPER
-                  chmod +x $out/$relFile
-                done
-              done
-              # Create a wrapper for terraform to point it to the plugins dir.
               mkdir -p $out/bin/
               makeWrapper "${terraform}/bin/terraform" "$out/bin/terraform" \
-                --set NIX_TERRAFORM_PLUGIN_DIR $out/libexec/terraform-providers \
+                --set NIX_TERRAFORM_PLUGIN_DIR "${
+                  buildEnv {
+                    name = "tf-plugin-env";
+                    paths = actualPlugins;
+                  }
+                }/bin" \
                 --prefix PATH : "${lib.makeBinPath wrapperInputs}"
             '';
+
+            inherit passthru;
           });
-    in
-    withPlugins (_: [ ]);
+    in withPlugins (_: [ ]);
 
   plugins = removeAttrs terraform-providers [
     "override"
     "overrideDerivation"
     "recurseForDerivations"
   ];
-in
-rec {
-  # Constructor for other terraform versions
-  mkTerraform = attrs: pluggable (generic attrs);
-
-  terraform_0_11 = mkTerraform {
+in rec {
+  terraform_0_11 = pluggable (generic {
     version = "0.11.15";
-    sha256 = "130ibb1pd60r2cycwpzs8qfwrz6knyc1a1849csxpipg5rs5q3jy";
+    sha256 = "15qs7zwz18cmp8xnkf9rwqmracy7va1n480apxiaijrgvai8sv8n";
     patches = [ ./provider-path.patch ];
     passthru = { inherit plugins; };
-  };
+  });
 
-  terraform_0_13 = mkTerraform {
-    version = "0.13.7";
-    sha256 = "1cahnmp66dk21g7ga6454yfhaqrxff7hpwpdgc87cswyq823fgjn";
+  terraform_0_11-full = terraform_0_11.full;
+
+  terraform_0_12 = pluggable (generic {
+    version = "0.12.29";
+    sha256 = "18i7vkvnvfybwzhww8d84cyh93xfbwswcnwfrgvcny1qwm8rsaj8";
+    patches = [
+        ./provider-path.patch
+        (fetchpatch {
+            name = "fix-mac-mojave-crashes.patch";
+            url = "https://github.com/hashicorp/terraform/commit/cd65b28da051174a13ac76e54b7bb95d3051255c.patch";
+            sha256 = "1k70kk4hli72x8gza6fy3vpckdm3sf881w61fmssrah3hgmfmbrs";
+        }) ];
+    passthru = { inherit plugins; };
+  });
+
+  terraform_0_13 = pluggable (generic {
+    version = "0.13.4";
+    sha256 = "1yvcz14q82v9jq4b9knn6wgnhlhrsz2ncvxv4lh9y1avn56chsqc";
     patches = [ ./provider-path.patch ];
     passthru = { inherit plugins; };
-  };
-
-  terraform_0_14 = mkTerraform {
-    version = "0.14.11";
-    sha256 = "1yi1jj3n61g1kn8klw6l78shd23q79llb7qqwigqrx3ki2mp279j";
-    vendorSha256 = "sha256-tWrSr6JCS9s+I0T1o3jgZ395u8IBmh73XGrnJidWI7U=";
-    patches = [ ./provider-path.patch ];
-    passthru = { inherit plugins; };
-  };
-
-  terraform_0_15 = mkTerraform {
-    version = "0.15.5";
-    sha256 = "18f4a6l24s3cym7gk40agxikd90i56q84wziskw1spy9rgv2yx6d";
-    vendorSha256 = "sha256-oFvoEsDunJR4IULdGwS6nHBKWEgUehgT+nNM41W/GYo=";
-    patches = [ ./provider-path-0_15.patch ];
-    passthru = { inherit plugins; };
-  };
-
-  terraform_1 = mkTerraform {
-    version = "1.1.5";
-    sha256 = "sha256-zIerP8v6ovIx+xwLsSmMFH41l140W9IwQMvomb/pk8E=";
-    vendorSha256 = "sha256-4ctuErxZIaESfIkS7BXI+eQcdatXE/1p20P9f890twM=";
-    patches = [ ./provider-path-0_15.patch ];
-    passthru = { inherit plugins; };
-  };
+  });
 
   # Tests that the plugins are being used. Terraform looks at the specific
   # file pattern and if the plugin is not found it will try to download it
   # from the Internet. With sandboxing enable this test will fail if that is
   # the case.
-  terraform_plugins_test =
-    let
-      mainTf = writeText "main.tf" ''
-        resource "random_id" "test" {}
+  terraform_plugins_test = let
+    mainTf = writeText "main.tf" ''
+      resource "random_id" "test" {}
+    '';
+    terraform = terraform_0_11.withPlugins (p: [ p.random ]);
+    test =
+      runCommand "terraform-plugin-test" { buildInputs = [ terraform ]; } ''
+        set -e
+        # make it fail outside of sandbox
+        export HTTP_PROXY=http://127.0.0.1:0 HTTPS_PROXY=https://127.0.0.1:0
+        cp ${mainTf} main.tf
+        terraform init
+        touch $out
       '';
-      terraform = terraform_1.withPlugins (p: [ p.random ]);
-      test =
-        runCommand "terraform-plugin-test" { buildInputs = [ terraform ]; } ''
-          set -e
-          # make it fail outside of sandbox
-          export HTTP_PROXY=http://127.0.0.1:0 HTTPS_PROXY=https://127.0.0.1:0
-          cp ${mainTf} main.tf
-          terraform init
-          touch $out
-        '';
-    in
-    test;
+  in test;
 
 }
