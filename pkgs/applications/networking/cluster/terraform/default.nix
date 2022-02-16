@@ -157,14 +157,12 @@ rec {
   # Constructor for other terraform versions
   mkTerraform = attrs: pluggable (generic attrs);
 
-  terraform_0_11 = pluggable (generic {
-    version = "0.11.14";
-    sha256 = "1bzz5wy13gh8j47mxxp6ij6yh20xmxd9n5lidaln3mf1bil19dmc";
+  terraform_0_11 = mkTerraform {
+    version = "0.11.15";
+    sha256 = "130ibb1pd60r2cycwpzs8qfwrz6knyc1a1849csxpipg5rs5q3jy";
     patches = [ ./provider-path.patch ];
     passthru = { inherit plugins; };
-  });
-
-  terraform_0_11-full = terraform_0_11.full;
+  };
 
   terraform_0_12 = mkTerraform {
     version = "0.12.31";
