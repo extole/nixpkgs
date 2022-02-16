@@ -10,12 +10,14 @@
 , terraform-providers
 , fetchpatch
 }:
+
 let
   generic = { version, sha256, vendorSha256 ? null, ... }@attrs:
     let attrs' = builtins.removeAttrs attrs [ "version" "sha256" "vendorSha256" ];
     in
     buildGoModule ({
       name = "terraform-${version}";
+
       inherit vendorSha256;
       src = fetchFromGitHub {
         owner = "hashicorp";
@@ -23,11 +25,13 @@ let
         rev = "v${version}";
         inherit sha256;
       };
+
       postConfigure = ''
         # speakeasy hardcodes /bin/stty https://github.com/bgentry/speakeasy/issues/22
         substituteInPlace vendor/github.com/bgentry/speakeasy/speakeasy_unix.go \
           --replace "/bin/stty" "${coreutils}/bin/stty"
       '';
+
       postInstall = ''
         # remove all plugins, they are part of the main binary now
         for i in $out/bin/*; do
@@ -36,11 +40,14 @@ let
           fi
         done
       '';
+
       preCheck = ''
         export HOME=$TMPDIR
         export TF_SKIP_REMOTE_TESTS=1
       '';
+
       subPackages = [ "." ];
+
       meta = with lib; {
         description =
           "Tool for building, changing, and versioning infrastructure";
@@ -63,15 +70,20 @@ let
       withPlugins = plugins:
         let
           actualPlugins = plugins terraform.plugins;
+
           # Make providers available in Terraform 0.13 and 0.12 search paths.
           pluginDir = lib.concatMapStrings
             (pl:
               let
                 inherit (pl) version GOOS GOARCH;
+
                 pname = pl.pname or (throw "${pl.name} is missing a pname attribute");
+
                 # This is just the name, without the terraform-provider- prefix
                 plugin_name = lib.removePrefix "terraform-provider-" pname;
+
                 slug = pl.passthru.provider-source-address or "registry.terraform.io/nixpkgs/${plugin_name}";
+
                 shim = writeText "shim" ''
                   #!${runtimeShell}
                   exec ${pl}/bin/${pname}_v${version} "$@"
@@ -80,22 +92,28 @@ let
               ''
                 TF_0_13_PROVIDER_PATH=$out/plugins/${slug}/${version}/${GOOS}_${GOARCH}/${pname}_v${version}
                 mkdir -p "$(dirname $TF_0_13_PROVIDER_PATH)"
+
                 cp ${shim} "$TF_0_13_PROVIDER_PATH"
                 chmod +x "$TF_0_13_PROVIDER_PATH"
+
                 TF_0_12_PROVIDER_PATH=$out/plugins/${pname}_v${version}
+
                 cp ${shim} "$TF_0_12_PROVIDER_PATH"
                 chmod +x "$TF_0_12_PROVIDER_PATH"
               ''
             )
             actualPlugins;
+
           # Wrap PATH of plugins propagatedBuildInputs, plugins may have runtime dependencies on external binaries
           wrapperInputs = lib.unique (lib.flatten
             (lib.catAttrs "propagatedBuildInputs"
               (builtins.filter (x: x != null) actualPlugins)));
+
           passthru = {
             withPlugins = newplugins:
               withPlugins (x: newplugins x ++ actualPlugins);
             full = withPlugins (p: lib.filter lib.isDerivation (lib.attrValues p));
+
             # Ouch
             overrideDerivation = f:
               (pluggable (terraform.overrideDerivation f)).withPlugins plugins;
@@ -114,6 +132,7 @@ let
           lib.appendToName "with-plugins" (stdenv.mkDerivation {
             inherit (terraform) name meta;
             nativeBuildInputs = [ makeWrapper ];
+
             buildCommand = pluginDir + ''
               mkdir -p $out/bin/
               makeWrapper "${terraform}/bin/terraform" "$out/bin/terraform" \
@@ -124,6 +143,7 @@ let
           });
     in
     withPlugins (_: [ ]);
+
   plugins = removeAttrs terraform-providers [
     "override"
     "overrideDerivation"
@@ -156,12 +176,14 @@ rec {
     ];
     passthru = { inherit plugins; };
   };
+
   terraform_0_13 = mkTerraform {
     version = "0.13.7";
     sha256 = "1cahnmp66dk21g7ga6454yfhaqrxff7hpwpdgc87cswyq823fgjn";
     patches = [ ./provider-path.patch ];
     passthru = { inherit plugins; };
   };
+
   terraform_0_14 = mkTerraform {
     version = "0.14.11";
     sha256 = "1yi1jj3n61g1kn8klw6l78shd23q79llb7qqwigqrx3ki2mp279j";
@@ -169,6 +191,7 @@ rec {
     patches = [ ./provider-path.patch ];
     passthru = { inherit plugins; };
   };
+
   terraform_0_15 = mkTerraform {
     version = "0.15.5";
     sha256 = "18f4a6l24s3cym7gk40agxikd90i56q84wziskw1spy9rgv2yx6d";
@@ -176,6 +199,7 @@ rec {
     patches = [ ./provider-path-0_15.patch ];
     passthru = { inherit plugins; };
   };
+
   terraform_1_0 = mkTerraform {
     version = "1.0.9";
     sha256 = "0g97l53xrcafjrzz5inij4q4aaadibn5ilr5j39a6569pkvcvsh3";
@@ -183,6 +207,7 @@ rec {
     patches = [ ./provider-path-0_15.patch ];
     passthru = { inherit plugins; };
   };
+
   # Tests that the plugins are being used. Terraform looks at the specific
   # file pattern and if the plugin is not found it will try to download it
   # from the Internet. With sandboxing enable this test will fail if that is
@@ -204,4 +229,5 @@ rec {
         '';
     in
     test;
+
 }
