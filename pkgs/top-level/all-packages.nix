@@ -12133,13 +12133,6 @@ with pkgs;
         openjfx = openjfx11;
         inherit (gnome2) GConf gnome_vfs;
       };
-  
-  openjdk12 =
-    callPackage ../development/compilers/openjdk/12.nix {
-      openjfx = openjfx11;
-      inherit (gnome2) GConf gnome_vfs;
-    };
-      
 
   openjdk11_headless =
     if stdenv.isDarwin then
