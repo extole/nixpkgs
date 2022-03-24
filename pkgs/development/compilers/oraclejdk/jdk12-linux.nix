@@ -18,6 +18,10 @@ let result = stdenv.mkDerivation rec {
     sha256 = "2dde6fda89a4ec6e6560ed464e917861c9e40bf576e7a64856dafc55abaaff51";
   };
 
+  buildInputs = lib.optionals stdenv.isLinux [
+    fontconfig
+  ];
+
   installPhase = ''
     mv ../$sourceRoot $out
 
@@ -28,6 +32,11 @@ let result = stdenv.mkDerivation rec {
     cat <<EOF >> $out/nix-support/setup-hook
     if [ -z "\''${JAVA_HOME-}" ]; then export JAVA_HOME=$out; fi
     EOF
+  '';
+
+  preFixup = ''
+    find "$out" -name libfontmanager.so -exec \
+      patchelf --add-needed libfontconfig.so {} \;
   '';
 
   postFixup = ''
