@@ -5,6 +5,7 @@
 , freetype
 , alsaLib
 , setJavaClassPath
+, fontconfig
 }:
 
 let result = stdenv.mkDerivation rec {
