@@ -40,7 +40,7 @@ let result = stdenv.mkDerivation rec {
   '';
 
   postFixup = ''
-    rpath="$out/lib/jli:$out/lib/server:$out/lib:${lib.strings.makeLibraryPath [ zlib xorg.libX11 xorg.libXext xorg.libXtst xorg.libXi xorg.libXrender freetype alsaLib ]}"
+    rpath="$out/lib/jli:$out/lib/server:$out/lib:${lib.strings.makeLibraryPath [ zlib xorg.libX11 xorg.libXext xorg.libXtst xorg.libXi xorg.libXrender freetype alsaLib fontconfig ]}"
 
     for f in $(find $out -name "*.so") $(find $out -type f -perm -0100); do
       patchelf --interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" "$f" || true
