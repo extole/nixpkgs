@@ -4,7 +4,6 @@
 let
   jre8 = jdk8_headless;
   jre11 = jdk11_headless;
-
   versionMap = {
     "2.7" = {
       kafkaVersion = "2.7.1";
