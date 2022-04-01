@@ -1,10 +1,10 @@
-{ lib, stdenv, fetchurl, jdk8_headless, jdk11_headless, oraclejdk12, makeWrapper, bash, coreutils, gnugrep, gnused, ps,
+{ lib, stdenv, fetchurl, jdk8_headless, jdk11_headless, openjdk, makeWrapper, bash, coreutils, gnugrep, gnused, ps,
   majorVersion ? "1.0" }:
 
 let
   jre8 = jdk8_headless;
   jre11 = jdk11_headless;
-  jre12 = oraclejdk12;
+  jre17 = openjdk;
   versionMap = {
     "2.7" = {
       kafkaVersion = "2.7.1";
@@ -16,7 +16,7 @@ let
       kafkaVersion = "2.8.1";
       scalaVersion = "2.13";
       sha256 = "0fgil47hxdnc374k0p9sxv6b163xknp3pkihv3r99p977czb1228";
-      jre = jre12;
+      jre = jre17;
     };
   };
 in
