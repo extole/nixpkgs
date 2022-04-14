@@ -1,10 +1,10 @@
 { lib, fetchurl, makeDesktopItem, appimageTools, gtk3 }:
 let
   name = "saleae-logic-2";
-  version = "2.3.38";
+  version = "2.3.45";
   src = fetchurl {
     url = "https://downloads.saleae.com/logic2/Logic-${version}-master.AppImage";
-    sha256 = "0y3ys3q6gd9fxgaf36q5av0kgvy7jv5anyjxb4cva8d95l4k3ask";
+    sha256 = "sha256-kX8jMCUkz7B0muxsEwEttEX+DA2P+6swdZJGHyo7ScA=";
   };
   desktopItem = makeDesktopItem {
     inherit name;
@@ -13,7 +13,7 @@ let
     comment = "Software for Saleae logic analyzers";
     desktopName = "Saleae Logic";
     genericName = "Logic analyzer";
-    categories = "Development";
+    categories = [ "Development" ];
   };
 in
 appimageTools.wrapType2 {
