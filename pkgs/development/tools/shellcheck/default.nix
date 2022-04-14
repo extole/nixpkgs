@@ -1,4 +1,4 @@
-{ stdenv, lib, ShellCheck, haskell, pandoc }:
+{ stdenv, lib, haskellPackages, haskell, pandoc }:
 
 # this wraps around the haskell package
 # and puts the documentation into place
@@ -15,13 +15,13 @@ let
       };
     in drv' // { meta = meta' // overrideFn meta'; };
 
-  bin = haskell.lib.compose.justStaticExecutables ShellCheck;
+  bin = haskell.lib.justStaticExecutables haskellPackages.ShellCheck;
 
   shellcheck = stdenv.mkDerivation {
     pname = "shellcheck";
     version = bin.version;
 
-    inherit (ShellCheck) meta src;
+    inherit (haskellPackages.ShellCheck) meta src;
 
     nativeBuildInputs = [ pandoc ];
 

@@ -1,11 +1,10 @@
 # Check that overriding works for trivial-builders like
 # `writeShellScript` via `overrideAttrs`. This is useful
-# to override the `checkPhase`, e. g. if you want
-# to disable extglob in `writeShellScript`.
+# to override the `checkPhase`, e. g. when you want
+# to enable extglob in `writeShellScript`.
 #
-# Run using `nix-build -A tests.trivial-builders.overriding`.
+# Run using `nix-build -A tests.trivial-overriding`.
 { lib
-, stdenv
 , runtimeShell
 , runCommand
 , callPackage
@@ -21,6 +20,33 @@ let
     echo @(success|failure)
     rm success
   '';
+
+  # Reuse the old `checkPhase` of `writeShellScript`, but enable extglob.
+  allowExtglob = old: {
+    checkPhase = ''
+      # make sure we don't change the settings for
+      # the rest of the derivation's build
+      (
+        export BASHOPTS
+        shopt -s extglob
+        ${old.checkPhase}
+      )
+    '';
+  };
+
+  # Run old checkPhase, but only succeed if it fails.
+  # This HACK is required because we can't introspect build failures
+  # in nix: With `assertFail` we want to make sure that the default
+  # `checkPhase` would fail if extglob was used in the script.
+  assertFail = old: {
+    # write old checkPhase into a shell script, so we can check for
+    # the phase to fail even though we have `set -e`.
+    checkPhase = ''
+      if source ${writeShellScript "old-check-phase" old.checkPhase} 2>/dev/null; then
+        exit 1
+      fi
+    '';
+  };
 
   simpleCase = case:
     writeShellScript "test-trivial-overriding-${case}" extglobScript;
@@ -44,33 +70,16 @@ let
     executable = true;
   };
 
-    disallowExtglob = x: x.overrideAttrs (_: {
-      checkPhase = ''
-        ${stdenv.shell} -n "$target"
-      '';
-    });
-
-    # Run old checkPhase, but only succeed if it fails.
-    # This HACK is required because we can't introspect build failures
-    # in nix: With `assertFail` we want to make sure that the default
-    # `checkPhase` would fail if extglob was used in the script.
-    assertFail = x: x.overrideAttrs (old: {
-      checkPhase = ''
-        if
-          ${old.checkPhase}
-        then exit 1; fi
-      '';
-    });
-
-  mkCase = case: outcome: isBin:
+  mkCase = f: type: isBin:
     let
-      drv = lib.pipe outcome ([ case ] ++ lib.optionals (outcome == "fail") [ disallowExtglob assertFail ]);
+      drv = (f type).overrideAttrs
+        (if type == "succ" then allowExtglob else assertFail);
     in if isBin then "${drv}/bin/${drv.name}" else drv;
 
   writeTextOverrides = {
-    # Make sure extglob works by default
+    # Enabling globbing in checkPhase
     simpleSucc = mkCase simpleCase "succ" false;
-    # Ensure it's possible to fail; in this case extglob is not enabled
+    # Ensure it's possible to fail; in this case globbing is not enabled.
     simpleFail = mkCase simpleCase "fail" false;
     # Do the same checks after wrapping with callPackage
     # to make sure callPackage doesn't mess with the override
@@ -94,7 +103,7 @@ let
       name = script.name or (builtins.baseNameOf script);
     in writeShellScript "run-${name}" ''
       if [ "$(${script})" != "success" ]; then
-        echo "Failed in ${name}"
+        echo "Failed in ${script}"
         exit 1
       fi
     '';

@@ -43,13 +43,13 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "github-runner";
-  version = "2.290.0";
+  version = "2.289.1";
 
   src = fetchFromGitHub {
     owner = "actions";
     repo = "runner";
     rev = "v${version}";
-    hash = "sha256-5ASKWDtASVtGDPn68tjjx8ZTVv1E14M26OCDpMJ+nJU=";
+    hash = "sha256-5TS/tW1hnDvPZQdR659rw+spLq98niyUms3BrixaKRE=";
   };
 
   nativeBuildInputs = [
@@ -83,14 +83,17 @@ stdenv.mkDerivation rec {
     # Relax the version requirement
     substituteInPlace src/global.json \
       --replace '6.0.100' '${dotnetSdk.version}'
+
     # Disable specific tests
     substituteInPlace src/dir.proj \
       --replace 'dotnet test Test/Test.csproj' \
                 "dotnet test Test/Test.csproj --filter '${lib.concatStringsSep "&amp;" (map (x: "FullyQualifiedName!=${x}") disabledTests)}'"
+
     # We don't use a Git checkout
     substituteInPlace src/dir.proj \
       --replace 'git update-index --assume-unchanged ./Runner.Sdk/BuildConstants.cs' \
                 'echo Patched out.'
+
     # Fix FHS path
     substituteInPlace src/Test/L0/Util/IOUtilL0.cs \
       --replace '/bin/ln' '${coreutils}/bin/ln'
@@ -98,17 +101,21 @@ stdenv.mkDerivation rec {
 
   configurePhase = ''
     runHook preConfigure
+
     # Never use nuget.org
     nuget sources Disable -Name "nuget.org"
+
     # Restore the dependencies
     dotnet restore src/ActionsRunner.sln \
       --runtime "${runtimeId}" \
       --source "${nugetSource}"
+
     runHook postConfigure
   '';
 
   buildPhase = ''
     runHook preBuild
+
     dotnet msbuild \
       -t:Build \
       -p:PackageRuntime="${runtimeId}" \
@@ -116,6 +123,7 @@ stdenv.mkDerivation rec {
       -p:RunnerVersion="${version}" \
       -p:GitInfoCommitHash="${fakeSha1}" \
       src/dir.proj
+
     runHook postBuild
   '';
 
@@ -185,10 +193,13 @@ stdenv.mkDerivation rec {
 
   checkPhase = ''
     runHook preCheck
+
     mkdir -p _layout/externals
     ln -s ${nodejs-12_x} _layout/externals/node12
     ln -s ${nodejs-16_x} _layout/externals/node16
+
     printf 'Disabled tests:\n%s\n' '${lib.concatMapStringsSep "\n" (x: " - ${x}") disabledTests}'
+
     # BUILDCONFIG needs to be "Debug"
     dotnet msbuild \
       -t:test \
@@ -197,17 +208,21 @@ stdenv.mkDerivation rec {
       -p:RunnerVersion="${version}" \
       -p:GitInfoCommitHash="${fakeSha1}" \
       src/dir.proj
+
     runHook postCheck
   '';
 
   installPhase = ''
     runHook preInstall
+
     # Copy the built binaries to lib/ instead of bin/ as they
     # have to be wrapped in the fixup phase to work
     mkdir -p $out/lib
     cp -r _layout/bin/. $out/lib/
+
     # Delete debugging files
     find "$out/lib" -type f -name '*.pdb' -delete
+
     # Install the helper scripts to bin/ to resemble the upstream package
     mkdir -p $out/bin
     install -m755 src/Misc/layoutbin/runsvc.sh        $out/bin/
@@ -215,23 +230,28 @@ stdenv.mkDerivation rec {
     install -m755 src/Misc/layoutroot/run.sh          $out/lib/
     install -m755 src/Misc/layoutroot/config.sh       $out/lib/
     install -m755 src/Misc/layoutroot/env.sh          $out/lib/
+
     # Rewrite reference in helper scripts from bin/ to lib/
     substituteInPlace $out/lib/run.sh    --replace '"$DIR"/bin' "$out/lib"
     substituteInPlace $out/lib/config.sh --replace './bin' "$out/lib"
+
     # Make paths absolute
     substituteInPlace $out/bin/runsvc.sh \
       --replace './externals' "$out/externals" \
       --replace './bin' "$out/lib"
+
     # The upstream package includes Node {12,16} and expects it at the path
     # externals/node{12,16}. As opposed to the official releases, we don't
     # link the Alpine Node flavors.
     mkdir -p $out/externals
     ln -s ${nodejs-12_x} $out/externals/node12
     ln -s ${nodejs-16_x} $out/externals/node16
+
     # Install Nodejs scripts called from workflows
     install -D src/Misc/layoutbin/hashFiles/index.js $out/lib/hashFiles/index.js
     mkdir -p $out/lib/checkScripts
     install src/Misc/layoutbin/checkScripts/* $out/lib/checkScripts/
+
     runHook postInstall
   '';
 
@@ -246,19 +266,23 @@ stdenv.mkDerivation rec {
     fix_rpath() {
       patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" $out/lib/$1
     }
+
     wrap() {
       makeWrapper $out/lib/$1 $out/bin/$1 \
         --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath (buildInputs ++ [ openssl ])} \
         ''${@:2}
     }
+
     fix_rpath Runner.Listener
     fix_rpath Runner.PluginHost
     fix_rpath Runner.Worker
+
     wrap Runner.Listener
     wrap Runner.PluginHost
     wrap Runner.Worker
     wrap run.sh
     wrap env.sh
+
     wrap config.sh --prefix PATH : ${lib.makeBinPath [ glibc.bin ]}
   '';
 
@@ -274,18 +298,24 @@ stdenv.mkDerivation rec {
     text = ''
       # Disable telemetry data
       export DOTNET_CLI_TELEMETRY_OPTOUT=1
+
       rundir=$(pwd)
+
       printf "\n* Setup workdir\n"
       workdir="$(mktemp -d /tmp/${pname}.XXX)"
       cp -rT "${src}" "$workdir"
       chmod -R +w "$workdir"
       trap 'rm -rf "$workdir"' EXIT
+
       pushd "$workdir"
+
       mkdir nuget_pkgs
+
       ${lib.concatMapStrings (rid: ''
       printf "\n* Restore ${pname} (${rid}) dotnet project\n"
       dotnet restore src/ActionsRunner.sln --packages nuget_pkgs --no-cache --force --runtime "${rid}"
       '') (lib.attrValues runtimeIds)}
+
       cd "$rundir"
       deps_file=''${1-"/tmp/${pname}-deps.nix"}
       printf "\n* Make %s file\n" "$(basename "$deps_file")"

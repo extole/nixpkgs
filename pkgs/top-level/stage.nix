@@ -3,6 +3,7 @@
    packages, and calls them with appropriate arguments. The result is a set of
    all the packages in the Nix Packages collection for some particular platform
    for some particular stage.
+
    Default arguments are only provided for bootstrapping
    arguments. Normal users should not import this directly but instead
    import `pkgs/default.nix` or `default.nix`. */
@@ -151,7 +152,7 @@ let
       res self super;
     in res;
 
-  aliases = self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix lib self super);
+  aliases = self: super: lib.optionalAttrs (config.allowAliases or true) (import ./aliases.nix lib self super);
 
   # stdenvOverrides is used to avoid having multiple of versions
   # of certain dependencies that were used in bootstrapping the
