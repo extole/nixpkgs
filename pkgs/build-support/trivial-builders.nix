@@ -1,4 +1,4 @@
-{ lib, stdenv, stdenvNoCC, lndir, runtimeShell }:
+{ lib, stdenv, stdenvNoCC, lndir, runtimeShell, shellcheck }:
 
 rec {
 
@@ -70,8 +70,7 @@ rec {
     # name of the resulting derivation
     }: buildCommand:
     stdenv.mkDerivation ({
-      name = lib.strings.sanitizeDerivationName name;
-      inherit buildCommand;
+      inherit buildCommand name;
       passAsFile = [ "buildCommand" ]
         ++ (derivationArgs.passAsFile or []);
     }
@@ -111,27 +110,25 @@ rec {
     , executable ? false # run chmod +x ?
     , destination ? ""   # relative path appended to $out eg "/bin/foo"
     , checkPhase ? ""    # syntax checks, e.g. for scripts
+    , meta ? { }
     }:
     runCommand name
-      { inherit text executable checkPhase;
+      { inherit text executable checkPhase meta;
         passAsFile = [ "text" ];
         # Pointless to do this on a remote machine.
         preferLocalBuild = true;
         allowSubstitutes = false;
       }
       ''
-        n=$out${destination}
-        mkdir -p "$(dirname "$n")"
-
+        target=$out${lib.escapeShellArg destination}
+        mkdir -p "$(dirname "$target")"
         if [ -e "$textPath" ]; then
-          mv "$textPath" "$n"
+          mv "$textPath" "$target"
         else
-          echo -n "$text" > "$n"
+          echo -n "$text" > "$target"
         fi
-
         eval "$checkPhase"
-
-        (test -n "$executable" && chmod +x "$n") || true
+        (test -n "$executable" && chmod +x "$target") || true
       '';
 
   /*
@@ -218,7 +215,7 @@ rec {
         ${text}
         '';
       checkPhase = ''
-        ${stdenv.shell} -n $out
+        ${stdenv.shellDryRun} "$target"
       '';
     };
 
@@ -245,8 +242,60 @@ rec {
         ${text}
         '';
       checkPhase = ''
-        ${stdenv.shell} -n $out/bin/${name}
+        ${stdenv.shellDryRun} "$target"
       '';
+    };
+
+  /*
+   * Similar to writeShellScriptBin and writeScriptBin.
+   * Writes an executable Shell script to /nix/store/<store path>/bin/<name> and
+   * checks its syntax with shellcheck and the shell's -n option.
+   * Automatically includes sane set of shellopts (errexit, nounset, pipefail)
+   * and handles creation of PATH based on runtimeInputs
+   *
+   * Note that the checkPhase uses stdenv.shell for the test run of the script,
+   * while the generated shebang uses runtimeShell. If, for whatever reason,
+   * those were to mismatch you might lose fidelity in the default checks.
+   *
+   * Example:
+   * # Writes my-file to /nix/store/<store path>/bin/my-file and makes executable.
+   * writeShellApplication {
+   *   name = "my-file";
+   *   runtimeInputs = [ curl w3m ];
+   *   text = ''
+   *     curl -s 'https://nixos.org' | w3m -dump -T text/html
+   *    '';
+   * }
+  */
+  writeShellApplication =
+    { name
+    , text
+    , runtimeInputs ? [ ]
+    , checkPhase ? null
+    }:
+    writeTextFile {
+      inherit name;
+      executable = true;
+      destination = "/bin/${name}";
+      text = ''
+        #!${runtimeShell}
+        set -o errexit
+        set -o nounset
+        set -o pipefail
+        export PATH="${lib.makeBinPath runtimeInputs}:$PATH"
+        ${text}
+      '';
+
+      checkPhase =
+        if checkPhase == null then ''
+          runHook preCheck
+          ${stdenv.shellDryRun} "$target"
+          ${shellcheck}/bin/shellcheck "$target"
+          runHook postCheck
+        ''
+        else checkPhase;
+
+      meta.mainProgram = name;
     };
 
   # Create a C binary
@@ -266,6 +315,66 @@ rec {
     mv "$codePath" code.c
     $CC -x c code.c -o "$n"
     '';
+
+
+  /* concat a list of files to the nix store.
+   * The contents of files are added to the file in the store.
+   *
+   * Examples:
+   * # Writes my-file to /nix/store/<store path>
+   * concatTextFile {
+   *   name = "my-file";
+   *   files = [ drv1 "${drv2}/path/to/file" ];
+   * }
+   * # See also the `concatText` helper function below.
+   *
+   * # Writes executable my-file to /nix/store/<store path>/bin/my-file
+   * concatTextFile {
+   *   name = "my-file";
+   *   files = [ drv1 "${drv2}/path/to/file" ];
+   *   executable = true;
+   *   destination = "/bin/my-file";
+   * }
+   */
+  concatTextFile =
+    { name # the name of the derivation
+    , files
+    , executable ? false # run chmod +x ?
+    , destination ? ""   # relative path appended to $out eg "/bin/foo"
+    , checkPhase ? ""    # syntax checks, e.g. for scripts
+    , meta ? { }
+    }:
+    runCommandLocal name
+      { inherit files executable checkPhase meta destination; }
+      ''
+        file=$out$destination
+        mkdir -p "$(dirname "$file")"
+        cat $files > "$file"
+        (test -n "$executable" && chmod +x "$file") || true
+        eval "$checkPhase"
+      '';
+
+
+  /*
+   * Writes a text file to nix store with no optional parameters available.
+   *
+   * Example:
+   * # Writes contents of files to /nix/store/<store path>
+   * concatText "my-file" [ file1 file2 ]
+   *
+  */
+  concatText = name: files: concatTextFile { inherit name files; };
+
+    /*
+   * Writes a text file to nix store with and mark it as executable.
+   *
+   * Example:
+   * # Writes contents of files to /nix/store/<store path>
+   * concatScript "my-file" [ file1 file2 ]
+   *
+  */
+  concatScript = name: files: concatTextFile { inherit name files; executable = true; };
+
 
   /*
    * Create a forest of symlinks to the files in `paths'.
@@ -437,7 +546,6 @@ rec {
 
   /*
     Write the set of references to a file, that is, their immediate dependencies.
-
     This produces the equivalent of `nix-store -q --references`.
    */
   writeDirectReferencesToFile = path: runCommand "runtime-references"
@@ -595,11 +703,9 @@ rec {
       builder = writeScript "restrict-message" ''
         source ${stdenvNoCC}/setup
         cat <<_EOF_
-
         ***
         ${msg}
         ***
-
         _EOF_
         exit 1
       '';
@@ -694,7 +800,7 @@ rec {
     { package,
       command ? "${package.meta.mainProgram or package.pname or package.name} --version",
       version ? package.version,
-    }: runCommand "test-version" { nativeBuildInputs = [ package ]; meta.timeout = 60; } ''
+    }: runCommand "${package.name}-test-version" { nativeBuildInputs = [ package ]; meta.timeout = 60; } ''
       ${command} |& grep -Fw ${version}
       touch $out
     '';
