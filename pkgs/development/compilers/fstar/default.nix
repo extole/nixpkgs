@@ -1,48 +1,39 @@
 { lib, stdenv, fetchFromGitHub, z3, ocamlPackages, makeWrapper, installShellFiles }:
 
-let
-  # FStar requires sedlex < 2.4
-  # see https://github.com/FStarLang/FStar/issues/2343
-  sedlex-2_3 = ocamlPackages.sedlex_2.overrideAttrs (_: rec {
-    pname = "sedlex";
-    version = "2.3";
-    src = fetchFromGitHub {
-       owner = "ocaml-community";
-       repo = "sedlex";
-       rev = "v${version}";
-       sha256 = "WXUXUuIaBUrFPQOKtZ7dgDZYdpEVnoJck0dkrCi8g0c=";
-    };
-  });
-in
-
 stdenv.mkDerivation rec {
   pname = "fstar";
-  version = "2021.10.16";
+  version = "2022.01.15";
 
   src = fetchFromGitHub {
     owner = "FStarLang";
     repo = "FStar";
     rev = "v${version}";
-    sha256 = "03b693s7s7dzflv5qkf61gd8ji9bn6fq4pxd8pd3a6ppkwj6b5vc";
+    sha256 = "sha256-bK3McF/wTjT9q6luihPaEXjx7Lu6+ZbQ9G61Mc4KoB0=";
   };
 
-  nativeBuildInputs = [ makeWrapper installShellFiles ];
+  strictDeps = true;
 
-  buildInputs = [
-    z3
-    sedlex-2_3
+  nativeBuildInputs = [
+    makeWrapper
+    installShellFiles
   ] ++ (with ocamlPackages; [
     ocaml
     findlib
     ocamlbuild
+    menhir
+  ]);
+
+  buildInputs = [
+    z3
+  ] ++ (with ocamlPackages; [
     batteries
     zarith
     stdint
     yojson
     fileutils
-    menhir
     menhirLib
     pprint
+    sedlex_2
     ppxlib
     ppx_deriving
     ppx_deriving_yojson
@@ -73,9 +64,10 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "ML-like functional programming language aimed at program verification";
     homepage = "https://www.fstar-lang.org";
-    license = licenses.asl20;
     changelog = "https://github.com/FStarLang/FStar/raw/v${version}/CHANGES.md";
-    platforms = with platforms; darwin ++ linux;
+    license = licenses.asl20;
     maintainers = with maintainers; [ gebner pnmadelaine ];
+    mainProgram = "fstar.exe";
+    platforms = with platforms; darwin ++ linux;
   };
 }

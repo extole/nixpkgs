@@ -1,12 +1,12 @@
 { stdenv, lib, buildPackages, fetchFromGitHub, callPackage, wrapCCWith, overrideCC }:
 
 let
-  version = "4.3.1";
+  version = "5.1.1";
   src = fetchFromGitHub {
     owner = "RadeonOpenCompute";
     repo = "llvm-project";
     rev = "rocm-${version}";
-    hash = "sha256-7XVtHcrTpw+NYUvuKQFWWFE0FlOTt8EnfZpvepQqE1c=";
+    hash = "sha256-5SGIWiyfHvfwIUc4bhdWrlhBfK5ssA7tm5r3zKdr3kg=";
   };
 in rec {
   clang = wrapCCWith rec {
@@ -47,17 +47,15 @@ in rec {
 
   compiler-rt = callPackage ./compiler-rt {
     inherit version llvm;
-    src = "${src}/compiler-rt";
+    inherit src;
     stdenv = overrideCC stdenv clangNoCompilerRt;
   };
 
   lld = callPackage ./lld.nix {
-    inherit llvm version;
-    src = "${src}/lld";
+    inherit llvm src version;
   };
 
   llvm = callPackage ./llvm {
-    inherit version;
-    src = "${src}/llvm";
+    inherit src version;
   };
 }

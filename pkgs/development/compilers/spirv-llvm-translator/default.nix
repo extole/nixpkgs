@@ -2,29 +2,37 @@
 , fetchFromGitHub
 , cmake
 , pkg-config
-
 , lit
-, llvm_8
+, llvm_11
+, spirv-headers
+, spirv-tools
 }:
 
 stdenv.mkDerivation rec {
   pname = "SPIRV-LLVM-Translator";
-  version = "8.0.1-2";
+  version = "unstable-2022-05-04";
 
   src = fetchFromGitHub {
     owner = "KhronosGroup";
     repo = "SPIRV-LLVM-Translator";
-    rev = "v${version}";
-    sha256 = "0hxalc3fkliqs61hpr97phbm3qsx4b8vgnlg30aimzr6aas403r5";
+    rev = "99420daab98998a7e36858befac9c5ed109d4920";
+    sha256 = "sha256-/vUyL6Wh8hykoGz1QmT1F7lfGDEmG4U3iqmqrJxizOg=";
   };
 
-  nativeBuildInputs = [ pkg-config cmake llvm_8.dev ];
+  nativeBuildInputs = [ pkg-config cmake llvm_11.dev spirv-tools ];
 
-  buildInputs = [ llvm_8 ];
+  buildInputs = [ spirv-headers llvm_11 ];
 
   checkInputs = [ lit ];
 
-  cmakeFlags = [ "-DLLVM_INCLUDE_TESTS=ON" ];
+  makeFlags = [ "llvm-spirv" ];
+
+  cmakeFlags = [
+    "-DLLVM_INCLUDE_TESTS=ON"
+    "-DLLVM_DIR=${llvm_11.dev}"
+    "-DBUILD_SHARED_LIBS=YES"
+    "-DLLVM_SPIRV_BUILD_EXTERNAL=YES"
+  ];
 
   # FIXME: CMake tries to run "/llvm-lit" which of course doesn't exist
   doCheck = false;
