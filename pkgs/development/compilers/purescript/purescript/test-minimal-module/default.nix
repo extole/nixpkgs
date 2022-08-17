@@ -3,9 +3,9 @@
 runCommand "purescript-test-minimal-module" {} ''
   ${purescript}/bin/purs compile -o ./output ${./.}/Main.purs
 
-  echo 'import {main} from "./output/Main/index.js"; main()' > node.mjs
+  echo 'require("./output/Main/index.js").main()' > node.js
 
-  ${nodejs}/bin/node node.mjs | grep "hello world" || (echo "did not output hello world"; exit 1)
+  ${nodejs}/bin/node node.js | grep "hello world" || echo "did not output hello world"
 
   touch $out
 ''

@@ -32,7 +32,6 @@
 , nss
 , systemd
 , which
-, callPackage
 }:
 let
   drvName = "flutter-${version}";
@@ -147,8 +146,6 @@ let
   };
 
 in
-let
-self = (self:
 runCommand drvName
 {
   startScript = ''
@@ -159,13 +156,7 @@ runCommand drvName
   '';
   preferLocalBuild = true;
   allowSubstitutes = false;
-  passthru = {
-    unwrapped = flutter;
-    inherit dart;
-    mkFlutterApp = callPackage ../../../build-support/flutter {
-      flutter = self;
-    };
-  };
+  passthru = { unwrapped = flutter; };
   meta = with lib; {
     description = "Flutter is Google's SDK for building mobile, web and desktop with Dart";
     longDescription = ''
@@ -175,16 +166,11 @@ runCommand drvName
     homepage = "https://flutter.dev";
     license = licenses.bsd3;
     platforms = [ "x86_64-linux" ];
-    maintainers = with maintainers; [ babariviere ericdallo ];
+    maintainers = with maintainers; [ babariviere ericdallo thiagokokada ];
   };
 } ''
   mkdir -p $out/bin
 
-  mkdir -p $out/bin/cache/
-  ln -sf ${dart} $out/bin/cache/dart-sdk
-
   echo -n "$startScript" > $out/bin/${pname}
   chmod +x $out/bin/${pname}
-'') self;
-in
-self
+''

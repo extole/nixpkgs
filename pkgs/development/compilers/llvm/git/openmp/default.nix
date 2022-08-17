@@ -1,13 +1,10 @@
 { lib
 , stdenv
 , llvm_meta
-, monorepoSrc
-, runCommand
+, src
 , cmake
 , llvm
-, clang-unwrapped
 , perl
-, pkg-config
 , version
 }:
 
@@ -15,22 +12,10 @@ stdenv.mkDerivation rec {
   pname = "openmp";
   inherit version;
 
-  src = runCommand "${pname}-src-${version}" {} ''
-    mkdir -p "$out"
-    cp -r ${monorepoSrc}/cmake "$out"
-    cp -r ${monorepoSrc}/${pname} "$out"
-  '';
+  inherit src;
+  sourceRoot = "source/${pname}";
 
-  sourceRoot = "${src.name}/${pname}";
-
-  patches = [
-    ./gnu-install-dirs.patch
-    ./fix-find-tool.patch
-  ];
-
-  outputs = [ "out" "dev" ];
-
-  nativeBuildInputs = [ cmake perl pkg-config clang-unwrapped ];
+  nativeBuildInputs = [ cmake perl ];
   buildInputs = [ llvm ];
 
   cmakeFlags = [

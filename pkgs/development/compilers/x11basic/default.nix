@@ -14,9 +14,8 @@ stdenv.mkDerivation rec {
     sha256 = "1hpxzdqnjl1fiwgs2vrjg4kxm29c7pqwk3g1m4p5pm4x33a3d1q2";
   };
 
-  nativeBuildInputs = [ autoconf automake ];
   buildInputs = [
-    readline libX11 SDL2 bluez
+    autoconf automake readline libX11 SDL2 bluez
   ];
 
   preConfigure = "cd src;autoconf";

@@ -2,17 +2,12 @@
 
 stdenv.mkDerivation rec {
   pname = "4th";
-  version = "3.64.0";
+  version = "3.62.5";
 
   src = fetchurl {
     url = "https://sourceforge.net/projects/forth-4th/files/${pname}-${version}/${pname}-${version}-unix.tar.gz";
-    hash = "sha256-wJBekjFsFRIkhY/P/yHBQ8he+k+fGyrePGTP2Yjgpqg=";
+    sha256 = "sha256-+CL33Yz7CxdEpi1lPG7+kzV4rheJ7GCgiFCaOLyktPw=";
   };
-
-  patches = [
-    # Fix install manual; report this patch to upstream
-    ./001-install-manual-fixup.diff
-  ];
 
   dontConfigure = true;
 
@@ -36,11 +31,9 @@ stdenv.mkDerivation rec {
   ];
 
   meta = with lib; {
-    homepage = "https://thebeez.home.xs4all.nl/4tH/index.html";
     description = "A portable Forth compiler";
-    license = licenses.lgpl3Plus;
-    maintainers = with maintainers; [ AndersonTorres ];
-    platforms = platforms.unix;
+    homepage = "https://thebeez.home.xs4all.nl/4tH/index.html";
+    license = licenses.lgpl3;
+    platforms = platforms.all;
   };
 }
-# TODO: set Makefile according to platform

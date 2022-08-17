@@ -1,6 +1,6 @@
 { lib, stdenv, llvm_meta
 , runCommand
-, monorepoSrc
+, src
 , cmake
 , zlib
 , ncurses
@@ -27,13 +27,8 @@ stdenv.mkDerivation (rec {
   pname = "lldb";
   inherit version;
 
-  src = runCommand "${pname}-src-${version}" {} ''
-    mkdir -p "$out"
-    cp -r ${monorepoSrc}/cmake "$out"
-    cp -r ${monorepoSrc}/${pname} "$out"
-  '';
-
-  sourceRoot = "${src.name}/${pname}";
+  inherit src;
+  sourceRoot = "source/${pname}";
 
   patches = [
     ./procfs.patch

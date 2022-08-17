@@ -13,7 +13,7 @@ let
       bootstrap-chicken = self.chicken.override { bootstrap-chicken = null; };
     };
 
-    chickenEggs = lib.recurseIntoAttrs (callPackage ./eggs.nix { });
+    chickenEggs = callPackage ./eggs.nix { };
 
     egg2nix = callPackage ./egg2nix.nix { };
   };

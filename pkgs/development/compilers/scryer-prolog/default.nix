@@ -1,8 +1,6 @@
 { lib
 , fetchFromGitHub
-, fetchpatch
 , rustPlatform
-, rustfmt
 , gmp
 , libmpc
 , mpfr
@@ -12,32 +10,21 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "scryer-prolog";
-  version = "0.9.0";
+  version = "0.8.127";
 
   src = fetchFromGitHub {
     owner = "mthom";
     repo = "scryer-prolog";
     rev = "v${version}";
-    sha256 = "3NHpEg6QaUaqbBCq8uM5hFcqS24q4XrOnKjMmn8Z1Dg=";
+    sha256 = "0307yclslkdx6f0h0101a3da47rhz6qizf4i8q8rjh4id8wpdsn8";
   };
 
-  cargoPatches = [
-    # Use system openssl, gmp, mpc and mpfr.
-    ./cargo.patch
+  # Use system openssl, gmp, mpc and mpfr.
+  cargoPatches = [ ./cargo.patch ];
 
-    ./fix-tests.patch
+  cargoSha256 = "1vf7pfhvpk7ikzibdccw7xgbywv5n4vvshjwsdsf94bhl2knrlg3";
 
-    # Avoid testing failing with "couldn't save history"
-    (fetchpatch {
-      name = "fix-tests-1";
-      url = "https://patch-diff.githubusercontent.com/raw/mthom/scryer-prolog/pull/1342.patch";
-      sha256 = "2N0AOkFuf+H/aUn2QTXgmqjmvShTxHxB6kNuNdNoVRI=";
-    })
-  ];
-
-  cargoSha256 = "nqAHVXAmTW9mdE2L2yhpOTz16JbYgQUmCgiFq9pBzUU=";
-
-  nativeBuildInputs = [ pkg-config rustfmt];
+  nativeBuildInputs = [ pkg-config ];
   buildInputs = [ openssl gmp libmpc mpfr ];
 
   meta = with lib; {

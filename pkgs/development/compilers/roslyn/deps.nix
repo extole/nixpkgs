@@ -1,6 +1,6 @@
 { fetchurl }: [
   {
-    pname = "microsoft.aspnetcore.app.ref";
+    name = "microsoft.aspnetcore.app.ref";
     version = "3.1.10";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.aspnetcore.app.ref/3.1.10/microsoft.aspnetcore.app.ref.3.1.10.nupkg";
@@ -8,7 +8,7 @@
     };
   }
   {
-    pname = "microsoft.build.framework";
+    name = "microsoft.build.framework";
     version = "15.3.409";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.build.framework/15.3.409/microsoft.build.framework.15.3.409.nupkg";
@@ -16,7 +16,7 @@
     };
   }
   {
-    pname = "microsoft.build.tasks.core";
+    name = "microsoft.build.tasks.core";
     version = "15.3.409";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.build.tasks.core/15.3.409/microsoft.build.tasks.core.15.3.409.nupkg";
@@ -24,7 +24,7 @@
     };
   }
   {
-    pname = "microsoft.build.tasks.git";
+    name = "microsoft.build.tasks.git";
     version = "1.1.0-beta-20206-02";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/1a5f89f6-d8da-4080-b15f-242650c914a8/nuget/v3/flat2/microsoft.build.tasks.git/1.1.0-beta-20206-02/microsoft.build.tasks.git.1.1.0-beta-20206-02.nupkg";
@@ -32,7 +32,7 @@
     };
   }
   {
-    pname = "microsoft.build.utilities.core";
+    name = "microsoft.build.utilities.core";
     version = "15.3.409";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.build.utilities.core/15.3.409/microsoft.build.utilities.core.15.3.409.nupkg";
@@ -40,7 +40,7 @@
     };
   }
   {
-    pname = "microsoft.codeanalysis.analyzers";
+    name = "microsoft.codeanalysis.analyzers";
     version = "3.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.codeanalysis.analyzers/3.0.0/microsoft.codeanalysis.analyzers.3.0.0.nupkg";
@@ -48,7 +48,7 @@
     };
   }
   {
-    pname = "microsoft.codeanalysis.bannedapianalyzers";
+    name = "microsoft.codeanalysis.bannedapianalyzers";
     version = "3.3.2-beta1.20562.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/825db618-e3eb-4426-ba54-b1d6e6c944d8/nuget/v3/flat2/microsoft.codeanalysis.bannedapianalyzers/3.3.2-beta1.20562.1/microsoft.codeanalysis.bannedapianalyzers.3.3.2-beta1.20562.1.nupkg";
@@ -56,7 +56,7 @@
     };
   }
   {
-    pname = "microsoft.codeanalysis.common";
+    name = "microsoft.codeanalysis.common";
     version = "3.8.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.codeanalysis.common/3.8.0/microsoft.codeanalysis.common.3.8.0.nupkg";
@@ -64,7 +64,7 @@
     };
   }
   {
-    pname = "microsoft.codeanalysis.csharp.codestyle";
+    name = "microsoft.codeanalysis.csharp.codestyle";
     version = "3.8.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.codeanalysis.csharp.codestyle/3.8.0/microsoft.codeanalysis.csharp.codestyle.3.8.0.nupkg";
@@ -72,7 +72,7 @@
     };
   }
   {
-    pname = "microsoft.codeanalysis.netanalyzers";
+    name = "microsoft.codeanalysis.netanalyzers";
     version = "6.0.0-preview1.21054.10";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/825db618-e3eb-4426-ba54-b1d6e6c944d8/nuget/v3/flat2/microsoft.codeanalysis.netanalyzers/6.0.0-preview1.21054.10/microsoft.codeanalysis.netanalyzers.6.0.0-preview1.21054.10.nupkg";
@@ -80,7 +80,7 @@
     };
   }
   {
-    pname = "microsoft.codeanalysis.performancesensitiveanalyzers";
+    name = "microsoft.codeanalysis.performancesensitiveanalyzers";
     version = "3.3.2-beta1.20562.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/825db618-e3eb-4426-ba54-b1d6e6c944d8/nuget/v3/flat2/microsoft.codeanalysis.performancesensitiveanalyzers/3.3.2-beta1.20562.1/microsoft.codeanalysis.performancesensitiveanalyzers.3.3.2-beta1.20562.1.nupkg";
@@ -88,7 +88,7 @@
     };
   }
   {
-    pname = "microsoft.codeanalysis.publicapianalyzers";
+    name = "microsoft.codeanalysis.publicapianalyzers";
     version = "3.3.2-beta1.20562.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/825db618-e3eb-4426-ba54-b1d6e6c944d8/nuget/v3/flat2/microsoft.codeanalysis.publicapianalyzers/3.3.2-beta1.20562.1/microsoft.codeanalysis.publicapianalyzers.3.3.2-beta1.20562.1.nupkg";
@@ -96,7 +96,7 @@
     };
   }
   {
-    pname = "microsoft.codeanalysis.visualbasic.codestyle";
+    name = "microsoft.codeanalysis.visualbasic.codestyle";
     version = "3.8.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.codeanalysis.visualbasic.codestyle/3.8.0/microsoft.codeanalysis.visualbasic.codestyle.3.8.0.nupkg";
@@ -104,7 +104,7 @@
     };
   }
   {
-    pname = "microsoft.csharp";
+    name = "microsoft.csharp";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.csharp/4.3.0/microsoft.csharp.4.3.0.nupkg";
@@ -112,7 +112,7 @@
     };
   }
   {
-    pname = "microsoft.diasymreader.native";
+    name = "microsoft.diasymreader.native";
     version = "16.9.0-beta1.21055.5";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.diasymreader.native/16.9.0-beta1.21055.5/microsoft.diasymreader.native.16.9.0-beta1.21055.5.nupkg";
@@ -120,7 +120,7 @@
     };
   }
   {
-    pname = "microsoft.dotnet.arcade.sdk";
+    name = "microsoft.dotnet.arcade.sdk";
     version = "1.0.0-beta.21072.7";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/1a5f89f6-d8da-4080-b15f-242650c914a8/nuget/v3/flat2/microsoft.dotnet.arcade.sdk/1.0.0-beta.21072.7/microsoft.dotnet.arcade.sdk.1.0.0-beta.21072.7.nupkg";
@@ -128,7 +128,7 @@
     };
   }
   {
-    pname = "microsoft.net.compilers.toolset";
+    name = "microsoft.net.compilers.toolset";
     version = "3.10.0-1.21101.2";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/d1622942-d16f-48e5-bc83-96f4539e7601/nuget/v3/flat2/microsoft.net.compilers.toolset/3.10.0-1.21101.2/microsoft.net.compilers.toolset.3.10.0-1.21101.2.nupkg";
@@ -136,23 +136,15 @@
     };
   }
   {
-    pname = "microsoft.netcore.app.host.linux-x64";
-    version = "3.1.21";
+    name = "microsoft.netcore.app.host.linux-x64";
+    version = "3.1.19";
     src = fetchurl {
-      url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netcore.app.host.linux-x64/3.1.21/microsoft.netcore.app.host.linux-x64.3.1.21.nupkg";
-      sha256 = "01kbhi29lhv6mg1zfsyakz3z8hfbxnc0kxy0fczl8xqviik9svx7";
+      url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netcore.app.host.linux-x64/3.1.19/microsoft.netcore.app.host.linux-x64.3.1.19.nupkg";
+      sha256 = "10fs93kg8vhhm1l05815m8yqz796i6gk824pk1bps239mshmkybr";
     };
   }
   {
-    pname = "microsoft.netcore.app.host.linux-arm64";
-    version = "3.1.21";
-    src = fetchurl {
-      url = "https://globalcdn.nuget.org/packages/microsoft.netcore.app.host.linux-arm64.3.1.21.nupkg";
-      sha256 = "0mv79mv0g539437jy4cxvkic7iqgh2xs1nlpd8bzx7jha27g5mlr";
-    };
-  }
-  {
-    pname = "microsoft.netcore.app.ref";
+    name = "microsoft.netcore.app.ref";
     version = "3.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netcore.app.ref/3.1.0/microsoft.netcore.app.ref.3.1.0.nupkg";
@@ -160,7 +152,7 @@
     };
   }
   {
-    pname = "microsoft.netcore.platforms";
+    name = "microsoft.netcore.platforms";
     version = "1.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netcore.platforms/1.0.1/microsoft.netcore.platforms.1.0.1.nupkg";
@@ -168,7 +160,7 @@
     };
   }
   {
-    pname = "microsoft.netcore.platforms";
+    name = "microsoft.netcore.platforms";
     version = "1.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netcore.platforms/1.1.0/microsoft.netcore.platforms.1.1.0.nupkg";
@@ -176,7 +168,7 @@
     };
   }
   {
-    pname = "microsoft.netcore.platforms";
+    name = "microsoft.netcore.platforms";
     version = "2.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netcore.platforms/2.1.0/microsoft.netcore.platforms.2.1.0.nupkg";
@@ -184,7 +176,7 @@
     };
   }
   {
-    pname = "microsoft.netcore.platforms";
+    name = "microsoft.netcore.platforms";
     version = "2.1.2";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netcore.platforms/2.1.2/microsoft.netcore.platforms.2.1.2.nupkg";
@@ -192,7 +184,7 @@
     };
   }
   {
-    pname = "microsoft.netcore.targets";
+    name = "microsoft.netcore.targets";
     version = "1.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netcore.targets/1.0.1/microsoft.netcore.targets.1.0.1.nupkg";
@@ -200,7 +192,7 @@
     };
   }
   {
-    pname = "microsoft.netcore.targets";
+    name = "microsoft.netcore.targets";
     version = "1.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netcore.targets/1.1.0/microsoft.netcore.targets.1.1.0.nupkg";
@@ -208,7 +200,7 @@
     };
   }
   {
-    pname = "microsoft.netframework.referenceassemblies";
+    name = "microsoft.netframework.referenceassemblies";
     version = "1.0.0-preview.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netframework.referenceassemblies/1.0.0-preview.1/microsoft.netframework.referenceassemblies.1.0.0-preview.1.nupkg";
@@ -216,7 +208,7 @@
     };
   }
   {
-    pname = "microsoft.netframework.referenceassemblies.net472";
+    name = "microsoft.netframework.referenceassemblies.net472";
     version = "1.0.0-preview.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.netframework.referenceassemblies.net472/1.0.0-preview.1/microsoft.netframework.referenceassemblies.net472.1.0.0-preview.1.nupkg";
@@ -224,7 +216,7 @@
     };
   }
   {
-    pname = "microsoft.sourcelink.azurerepos.git";
+    name = "microsoft.sourcelink.azurerepos.git";
     version = "1.1.0-beta-20206-02";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/1a5f89f6-d8da-4080-b15f-242650c914a8/nuget/v3/flat2/microsoft.sourcelink.azurerepos.git/1.1.0-beta-20206-02/microsoft.sourcelink.azurerepos.git.1.1.0-beta-20206-02.nupkg";
@@ -232,7 +224,7 @@
     };
   }
   {
-    pname = "microsoft.sourcelink.common";
+    name = "microsoft.sourcelink.common";
     version = "1.1.0-beta-20206-02";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/1a5f89f6-d8da-4080-b15f-242650c914a8/nuget/v3/flat2/microsoft.sourcelink.common/1.1.0-beta-20206-02/microsoft.sourcelink.common.1.1.0-beta-20206-02.nupkg";
@@ -240,7 +232,7 @@
     };
   }
   {
-    pname = "microsoft.sourcelink.github";
+    name = "microsoft.sourcelink.github";
     version = "1.1.0-beta-20206-02";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/1a5f89f6-d8da-4080-b15f-242650c914a8/nuget/v3/flat2/microsoft.sourcelink.github/1.1.0-beta-20206-02/microsoft.sourcelink.github.1.1.0-beta-20206-02.nupkg";
@@ -248,7 +240,7 @@
     };
   }
   {
-    pname = "microsoft.visualstudio.threading.analyzers";
+    name = "microsoft.visualstudio.threading.analyzers";
     version = "16.8.55";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.visualstudio.threading.analyzers/16.8.55/microsoft.visualstudio.threading.analyzers.16.8.55.nupkg";
@@ -256,7 +248,7 @@
     };
   }
   {
-    pname = "microsoft.win32.primitives";
+    name = "microsoft.win32.primitives";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.win32.primitives/4.0.1/microsoft.win32.primitives.4.0.1.nupkg";
@@ -264,7 +256,7 @@
     };
   }
   {
-    pname = "microsoft.win32.registry";
+    name = "microsoft.win32.registry";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/microsoft.win32.registry/4.0.0/microsoft.win32.registry.4.0.0.nupkg";
@@ -272,7 +264,7 @@
     };
   }
   {
-    pname = "netstandard.library";
+    name = "netstandard.library";
     version = "2.0.3";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/netstandard.library/2.0.3/netstandard.library.2.0.3.nupkg";
@@ -280,7 +272,15 @@
     };
   }
   {
-    pname = "richcodenav.envvardump";
+    name = "nuget.build.tasks.pack";
+    version = "5.10.0-preview.2.7169";
+    src = fetchurl {
+      url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/d1622942-d16f-48e5-bc83-96f4539e7601/nuget/v3/flat2/nuget.build.tasks.pack/5.10.0-preview.2.7169/nuget.build.tasks.pack.5.10.0-preview.2.7169.nupkg";
+      sha256 = "0siby8s8km50hfwvqx34nfnn9qwhygxlhw57wm1j5d22nf16kasb";
+    };
+  }
+  {
+    name = "richcodenav.envvardump";
     version = "0.1.1643-alpha";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/azure-public/3ccf6661-f8ce-4e8a-bb2e-eff943ddd3c7/_packaging/58ca65bb-e6c1-4210-88ac-fa55c1cd7877/nuget/v3/flat2/richcodenav.envvardump/0.1.1643-alpha/richcodenav.envvardump.0.1.1643-alpha.nupkg";
@@ -288,7 +288,7 @@
     };
   }
   {
-    pname = "roslyn.diagnostics.analyzers";
+    name = "roslyn.diagnostics.analyzers";
     version = "3.3.2-beta1.20562.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/825db618-e3eb-4426-ba54-b1d6e6c944d8/nuget/v3/flat2/roslyn.diagnostics.analyzers/3.3.2-beta1.20562.1/roslyn.diagnostics.analyzers.3.3.2-beta1.20562.1.nupkg";
@@ -296,7 +296,7 @@
     };
   }
   {
-    pname = "runtime.native.system";
+    name = "runtime.native.system";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/runtime.native.system/4.0.0/runtime.native.system.4.0.0.nupkg";
@@ -304,7 +304,7 @@
     };
   }
   {
-    pname = "runtime.native.system.net.http";
+    name = "runtime.native.system.net.http";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/runtime.native.system.net.http/4.0.1/runtime.native.system.net.http.4.0.1.nupkg";
@@ -312,7 +312,7 @@
     };
   }
   {
-    pname = "runtime.native.system.security.cryptography";
+    name = "runtime.native.system.security.cryptography";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/runtime.native.system.security.cryptography/4.0.0/runtime.native.system.security.cryptography.4.0.0.nupkg";
@@ -320,7 +320,7 @@
     };
   }
   {
-    pname = "system.appcontext";
+    name = "system.appcontext";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.appcontext/4.1.0/system.appcontext.4.1.0.nupkg";
@@ -328,7 +328,7 @@
     };
   }
   {
-    pname = "system.buffers";
+    name = "system.buffers";
     version = "4.5.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.buffers/4.5.1/system.buffers.4.5.1.nupkg";
@@ -336,7 +336,7 @@
     };
   }
   {
-    pname = "system.collections";
+    name = "system.collections";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.collections/4.0.11/system.collections.4.0.11.nupkg";
@@ -344,7 +344,7 @@
     };
   }
   {
-    pname = "system.collections";
+    name = "system.collections";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.collections/4.3.0/system.collections.4.3.0.nupkg";
@@ -352,7 +352,7 @@
     };
   }
   {
-    pname = "system.collections.concurrent";
+    name = "system.collections.concurrent";
     version = "4.0.12";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.collections.concurrent/4.0.12/system.collections.concurrent.4.0.12.nupkg";
@@ -360,7 +360,7 @@
     };
   }
   {
-    pname = "system.collections.immutable";
+    name = "system.collections.immutable";
     version = "1.2.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.collections.immutable/1.2.0/system.collections.immutable.1.2.0.nupkg";
@@ -368,7 +368,7 @@
     };
   }
   {
-    pname = "system.collections.immutable";
+    name = "system.collections.immutable";
     version = "1.3.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.collections.immutable/1.3.1/system.collections.immutable.1.3.1.nupkg";
@@ -376,7 +376,7 @@
     };
   }
   {
-    pname = "system.collections.immutable";
+    name = "system.collections.immutable";
     version = "5.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.collections.immutable/5.0.0/system.collections.immutable.5.0.0.nupkg";
@@ -384,7 +384,7 @@
     };
   }
   {
-    pname = "system.collections.nongeneric";
+    name = "system.collections.nongeneric";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.collections.nongeneric/4.0.1/system.collections.nongeneric.4.0.1.nupkg";
@@ -392,7 +392,7 @@
     };
   }
   {
-    pname = "system.console";
+    name = "system.console";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.console/4.0.0/system.console.4.0.0.nupkg";
@@ -400,7 +400,7 @@
     };
   }
   {
-    pname = "system.diagnostics.debug";
+    name = "system.diagnostics.debug";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.diagnostics.debug/4.0.11/system.diagnostics.debug.4.0.11.nupkg";
@@ -408,7 +408,7 @@
     };
   }
   {
-    pname = "system.diagnostics.debug";
+    name = "system.diagnostics.debug";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.diagnostics.debug/4.3.0/system.diagnostics.debug.4.3.0.nupkg";
@@ -416,7 +416,7 @@
     };
   }
   {
-    pname = "system.diagnostics.process";
+    name = "system.diagnostics.process";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.diagnostics.process/4.1.0/system.diagnostics.process.4.1.0.nupkg";
@@ -424,7 +424,7 @@
     };
   }
   {
-    pname = "system.diagnostics.tools";
+    name = "system.diagnostics.tools";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.diagnostics.tools/4.0.1/system.diagnostics.tools.4.0.1.nupkg";
@@ -432,7 +432,7 @@
     };
   }
   {
-    pname = "system.diagnostics.tracesource";
+    name = "system.diagnostics.tracesource";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.diagnostics.tracesource/4.0.0/system.diagnostics.tracesource.4.0.0.nupkg";
@@ -440,7 +440,7 @@
     };
   }
   {
-    pname = "system.diagnostics.tracing";
+    name = "system.diagnostics.tracing";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.diagnostics.tracing/4.1.0/system.diagnostics.tracing.4.1.0.nupkg";
@@ -448,7 +448,7 @@
     };
   }
   {
-    pname = "system.dynamic.runtime";
+    name = "system.dynamic.runtime";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.dynamic.runtime/4.3.0/system.dynamic.runtime.4.3.0.nupkg";
@@ -456,7 +456,7 @@
     };
   }
   {
-    pname = "system.globalization";
+    name = "system.globalization";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.globalization/4.0.11/system.globalization.4.0.11.nupkg";
@@ -464,7 +464,7 @@
     };
   }
   {
-    pname = "system.globalization";
+    name = "system.globalization";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.globalization/4.3.0/system.globalization.4.3.0.nupkg";
@@ -472,7 +472,7 @@
     };
   }
   {
-    pname = "system.globalization.calendars";
+    name = "system.globalization.calendars";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.globalization.calendars/4.0.1/system.globalization.calendars.4.0.1.nupkg";
@@ -480,7 +480,7 @@
     };
   }
   {
-    pname = "system.io";
+    name = "system.io";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.io/4.1.0/system.io.4.1.0.nupkg";
@@ -488,7 +488,7 @@
     };
   }
   {
-    pname = "system.io";
+    name = "system.io";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.io/4.3.0/system.io.4.3.0.nupkg";
@@ -496,7 +496,7 @@
     };
   }
   {
-    pname = "system.io.filesystem";
+    name = "system.io.filesystem";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.io.filesystem/4.0.1/system.io.filesystem.4.0.1.nupkg";
@@ -504,7 +504,7 @@
     };
   }
   {
-    pname = "system.io.filesystem.primitives";
+    name = "system.io.filesystem.primitives";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.io.filesystem.primitives/4.0.1/system.io.filesystem.primitives.4.0.1.nupkg";
@@ -512,7 +512,7 @@
     };
   }
   {
-    pname = "system.io.pipes.accesscontrol";
+    name = "system.io.pipes.accesscontrol";
     version = "4.5.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.io.pipes.accesscontrol/4.5.1/system.io.pipes.accesscontrol.4.5.1.nupkg";
@@ -520,7 +520,7 @@
     };
   }
   {
-    pname = "system.linq";
+    name = "system.linq";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.linq/4.1.0/system.linq.4.1.0.nupkg";
@@ -528,7 +528,7 @@
     };
   }
   {
-    pname = "system.linq";
+    name = "system.linq";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.linq/4.3.0/system.linq.4.3.0.nupkg";
@@ -536,7 +536,7 @@
     };
   }
   {
-    pname = "system.linq.expressions";
+    name = "system.linq.expressions";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.linq.expressions/4.3.0/system.linq.expressions.4.3.0.nupkg";
@@ -544,7 +544,7 @@
     };
   }
   {
-    pname = "system.linq.parallel";
+    name = "system.linq.parallel";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.linq.parallel/4.0.1/system.linq.parallel.4.0.1.nupkg";
@@ -552,7 +552,7 @@
     };
   }
   {
-    pname = "system.memory";
+    name = "system.memory";
     version = "4.5.4";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.memory/4.5.4/system.memory.4.5.4.nupkg";
@@ -560,7 +560,7 @@
     };
   }
   {
-    pname = "system.numerics.vectors";
+    name = "system.numerics.vectors";
     version = "4.4.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.numerics.vectors/4.4.0/system.numerics.vectors.4.4.0.nupkg";
@@ -568,7 +568,7 @@
     };
   }
   {
-    pname = "system.numerics.vectors";
+    name = "system.numerics.vectors";
     version = "4.5.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.numerics.vectors/4.5.0/system.numerics.vectors.4.5.0.nupkg";
@@ -576,7 +576,7 @@
     };
   }
   {
-    pname = "system.objectmodel";
+    name = "system.objectmodel";
     version = "4.0.12";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.objectmodel/4.0.12/system.objectmodel.4.0.12.nupkg";
@@ -584,7 +584,7 @@
     };
   }
   {
-    pname = "system.objectmodel";
+    name = "system.objectmodel";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.objectmodel/4.3.0/system.objectmodel.4.3.0.nupkg";
@@ -592,7 +592,7 @@
     };
   }
   {
-    pname = "system.private.datacontractserialization";
+    name = "system.private.datacontractserialization";
     version = "4.1.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.private.datacontractserialization/4.1.1/system.private.datacontractserialization.4.1.1.nupkg";
@@ -600,7 +600,7 @@
     };
   }
   {
-    pname = "system.reflection";
+    name = "system.reflection";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection/4.1.0/system.reflection.4.1.0.nupkg";
@@ -608,7 +608,7 @@
     };
   }
   {
-    pname = "system.reflection";
+    name = "system.reflection";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection/4.3.0/system.reflection.4.3.0.nupkg";
@@ -616,7 +616,7 @@
     };
   }
   {
-    pname = "system.reflection.emit";
+    name = "system.reflection.emit";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.emit/4.0.1/system.reflection.emit.4.0.1.nupkg";
@@ -624,7 +624,7 @@
     };
   }
   {
-    pname = "system.reflection.emit";
+    name = "system.reflection.emit";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.emit/4.3.0/system.reflection.emit.4.3.0.nupkg";
@@ -632,7 +632,7 @@
     };
   }
   {
-    pname = "system.reflection.emit.ilgeneration";
+    name = "system.reflection.emit.ilgeneration";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.emit.ilgeneration/4.0.1/system.reflection.emit.ilgeneration.4.0.1.nupkg";
@@ -640,7 +640,7 @@
     };
   }
   {
-    pname = "system.reflection.emit.ilgeneration";
+    name = "system.reflection.emit.ilgeneration";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.emit.ilgeneration/4.3.0/system.reflection.emit.ilgeneration.4.3.0.nupkg";
@@ -648,7 +648,7 @@
     };
   }
   {
-    pname = "system.reflection.emit.lightweight";
+    name = "system.reflection.emit.lightweight";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.emit.lightweight/4.0.1/system.reflection.emit.lightweight.4.0.1.nupkg";
@@ -656,7 +656,7 @@
     };
   }
   {
-    pname = "system.reflection.emit.lightweight";
+    name = "system.reflection.emit.lightweight";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.emit.lightweight/4.3.0/system.reflection.emit.lightweight.4.3.0.nupkg";
@@ -664,7 +664,7 @@
     };
   }
   {
-    pname = "system.reflection.extensions";
+    name = "system.reflection.extensions";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.extensions/4.0.1/system.reflection.extensions.4.0.1.nupkg";
@@ -672,7 +672,7 @@
     };
   }
   {
-    pname = "system.reflection.extensions";
+    name = "system.reflection.extensions";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.extensions/4.3.0/system.reflection.extensions.4.3.0.nupkg";
@@ -680,7 +680,7 @@
     };
   }
   {
-    pname = "system.reflection.metadata";
+    name = "system.reflection.metadata";
     version = "1.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.metadata/1.3.0/system.reflection.metadata.1.3.0.nupkg";
@@ -688,7 +688,7 @@
     };
   }
   {
-    pname = "system.reflection.metadata";
+    name = "system.reflection.metadata";
     version = "5.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.metadata/5.0.0/system.reflection.metadata.5.0.0.nupkg";
@@ -696,7 +696,7 @@
     };
   }
   {
-    pname = "system.reflection.primitives";
+    name = "system.reflection.primitives";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.primitives/4.0.1/system.reflection.primitives.4.0.1.nupkg";
@@ -704,7 +704,7 @@
     };
   }
   {
-    pname = "system.reflection.primitives";
+    name = "system.reflection.primitives";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.primitives/4.3.0/system.reflection.primitives.4.3.0.nupkg";
@@ -712,7 +712,7 @@
     };
   }
   {
-    pname = "system.reflection.typeextensions";
+    name = "system.reflection.typeextensions";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.typeextensions/4.1.0/system.reflection.typeextensions.4.1.0.nupkg";
@@ -720,7 +720,7 @@
     };
   }
   {
-    pname = "system.reflection.typeextensions";
+    name = "system.reflection.typeextensions";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.reflection.typeextensions/4.3.0/system.reflection.typeextensions.4.3.0.nupkg";
@@ -728,7 +728,7 @@
     };
   }
   {
-    pname = "system.resources.reader";
+    name = "system.resources.reader";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.resources.reader/4.0.0/system.resources.reader.4.0.0.nupkg";
@@ -736,7 +736,7 @@
     };
   }
   {
-    pname = "system.resources.resourcemanager";
+    name = "system.resources.resourcemanager";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.resources.resourcemanager/4.0.1/system.resources.resourcemanager.4.0.1.nupkg";
@@ -744,7 +744,7 @@
     };
   }
   {
-    pname = "system.resources.resourcemanager";
+    name = "system.resources.resourcemanager";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.resources.resourcemanager/4.3.0/system.resources.resourcemanager.4.3.0.nupkg";
@@ -752,7 +752,7 @@
     };
   }
   {
-    pname = "system.resources.writer";
+    name = "system.resources.writer";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.resources.writer/4.0.0/system.resources.writer.4.0.0.nupkg";
@@ -760,7 +760,7 @@
     };
   }
   {
-    pname = "system.runtime";
+    name = "system.runtime";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime/4.1.0/system.runtime.4.1.0.nupkg";
@@ -768,7 +768,7 @@
     };
   }
   {
-    pname = "system.runtime";
+    name = "system.runtime";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime/4.3.0/system.runtime.4.3.0.nupkg";
@@ -776,7 +776,7 @@
     };
   }
   {
-    pname = "system.runtime.compilerservices.unsafe";
+    name = "system.runtime.compilerservices.unsafe";
     version = "4.7.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.compilerservices.unsafe/4.7.1/system.runtime.compilerservices.unsafe.4.7.1.nupkg";
@@ -784,7 +784,7 @@
     };
   }
   {
-    pname = "system.runtime.compilerservices.unsafe";
+    name = "system.runtime.compilerservices.unsafe";
     version = "5.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.compilerservices.unsafe/5.0.0/system.runtime.compilerservices.unsafe.5.0.0.nupkg";
@@ -792,7 +792,7 @@
     };
   }
   {
-    pname = "system.runtime.extensions";
+    name = "system.runtime.extensions";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.extensions/4.1.0/system.runtime.extensions.4.1.0.nupkg";
@@ -800,7 +800,7 @@
     };
   }
   {
-    pname = "system.runtime.extensions";
+    name = "system.runtime.extensions";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.extensions/4.3.0/system.runtime.extensions.4.3.0.nupkg";
@@ -808,7 +808,7 @@
     };
   }
   {
-    pname = "system.runtime.handles";
+    name = "system.runtime.handles";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.handles/4.0.1/system.runtime.handles.4.0.1.nupkg";
@@ -816,7 +816,7 @@
     };
   }
   {
-    pname = "system.runtime.handles";
+    name = "system.runtime.handles";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.handles/4.3.0/system.runtime.handles.4.3.0.nupkg";
@@ -824,7 +824,7 @@
     };
   }
   {
-    pname = "system.runtime.interopservices";
+    name = "system.runtime.interopservices";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.interopservices/4.1.0/system.runtime.interopservices.4.1.0.nupkg";
@@ -832,7 +832,7 @@
     };
   }
   {
-    pname = "system.runtime.interopservices";
+    name = "system.runtime.interopservices";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.interopservices/4.3.0/system.runtime.interopservices.4.3.0.nupkg";
@@ -840,7 +840,7 @@
     };
   }
   {
-    pname = "system.runtime.interopservices.runtimeinformation";
+    name = "system.runtime.interopservices.runtimeinformation";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.interopservices.runtimeinformation/4.0.0/system.runtime.interopservices.runtimeinformation.4.0.0.nupkg";
@@ -848,7 +848,7 @@
     };
   }
   {
-    pname = "system.runtime.interopservices.runtimeinformation";
+    name = "system.runtime.interopservices.runtimeinformation";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.interopservices.runtimeinformation/4.3.0/system.runtime.interopservices.runtimeinformation.4.3.0.nupkg";
@@ -856,7 +856,7 @@
     };
   }
   {
-    pname = "system.runtime.loader";
+    name = "system.runtime.loader";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.loader/4.3.0/system.runtime.loader.4.3.0.nupkg";
@@ -864,7 +864,7 @@
     };
   }
   {
-    pname = "system.runtime.numerics";
+    name = "system.runtime.numerics";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.numerics/4.0.1/system.runtime.numerics.4.0.1.nupkg";
@@ -872,7 +872,7 @@
     };
   }
   {
-    pname = "system.runtime.serialization.primitives";
+    name = "system.runtime.serialization.primitives";
     version = "4.1.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.serialization.primitives/4.1.1/system.runtime.serialization.primitives.4.1.1.nupkg";
@@ -880,7 +880,7 @@
     };
   }
   {
-    pname = "system.runtime.serialization.xml";
+    name = "system.runtime.serialization.xml";
     version = "4.1.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.runtime.serialization.xml/4.1.1/system.runtime.serialization.xml.4.1.1.nupkg";
@@ -888,7 +888,7 @@
     };
   }
   {
-    pname = "system.security.accesscontrol";
+    name = "system.security.accesscontrol";
     version = "4.5.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.security.accesscontrol/4.5.0/system.security.accesscontrol.4.5.0.nupkg";
@@ -896,7 +896,7 @@
     };
   }
   {
-    pname = "system.security.cryptography.algorithms";
+    name = "system.security.cryptography.algorithms";
     version = "4.2.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.security.cryptography.algorithms/4.2.0/system.security.cryptography.algorithms.4.2.0.nupkg";
@@ -904,7 +904,7 @@
     };
   }
   {
-    pname = "system.security.cryptography.cng";
+    name = "system.security.cryptography.cng";
     version = "4.2.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.security.cryptography.cng/4.2.0/system.security.cryptography.cng.4.2.0.nupkg";
@@ -912,7 +912,7 @@
     };
   }
   {
-    pname = "system.security.cryptography.csp";
+    name = "system.security.cryptography.csp";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.security.cryptography.csp/4.0.0/system.security.cryptography.csp.4.0.0.nupkg";
@@ -920,7 +920,7 @@
     };
   }
   {
-    pname = "system.security.cryptography.encoding";
+    name = "system.security.cryptography.encoding";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.security.cryptography.encoding/4.0.0/system.security.cryptography.encoding.4.0.0.nupkg";
@@ -928,7 +928,7 @@
     };
   }
   {
-    pname = "system.security.cryptography.openssl";
+    name = "system.security.cryptography.openssl";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.security.cryptography.openssl/4.0.0/system.security.cryptography.openssl.4.0.0.nupkg";
@@ -936,7 +936,7 @@
     };
   }
   {
-    pname = "system.security.cryptography.primitives";
+    name = "system.security.cryptography.primitives";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.security.cryptography.primitives/4.0.0/system.security.cryptography.primitives.4.0.0.nupkg";
@@ -944,7 +944,7 @@
     };
   }
   {
-    pname = "system.security.cryptography.x509certificates";
+    name = "system.security.cryptography.x509certificates";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.security.cryptography.x509certificates/4.1.0/system.security.cryptography.x509certificates.4.1.0.nupkg";
@@ -952,7 +952,7 @@
     };
   }
   {
-    pname = "system.security.principal.windows";
+    name = "system.security.principal.windows";
     version = "4.5.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.security.principal.windows/4.5.0/system.security.principal.windows.4.5.0.nupkg";
@@ -960,7 +960,7 @@
     };
   }
   {
-    pname = "system.text.encoding";
+    name = "system.text.encoding";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.text.encoding/4.0.11/system.text.encoding.4.0.11.nupkg";
@@ -968,7 +968,7 @@
     };
   }
   {
-    pname = "system.text.encoding";
+    name = "system.text.encoding";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.text.encoding/4.3.0/system.text.encoding.4.3.0.nupkg";
@@ -976,7 +976,7 @@
     };
   }
   {
-    pname = "system.text.encoding.codepages";
+    name = "system.text.encoding.codepages";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.text.encoding.codepages/4.0.1/system.text.encoding.codepages.4.0.1.nupkg";
@@ -984,7 +984,7 @@
     };
   }
   {
-    pname = "system.text.encoding.codepages";
+    name = "system.text.encoding.codepages";
     version = "4.5.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.text.encoding.codepages/4.5.1/system.text.encoding.codepages.4.5.1.nupkg";
@@ -992,7 +992,7 @@
     };
   }
   {
-    pname = "system.text.encoding.extensions";
+    name = "system.text.encoding.extensions";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.text.encoding.extensions/4.0.11/system.text.encoding.extensions.4.0.11.nupkg";
@@ -1000,7 +1000,7 @@
     };
   }
   {
-    pname = "system.text.regularexpressions";
+    name = "system.text.regularexpressions";
     version = "4.1.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.text.regularexpressions/4.1.0/system.text.regularexpressions.4.1.0.nupkg";
@@ -1008,7 +1008,7 @@
     };
   }
   {
-    pname = "system.threading";
+    name = "system.threading";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.threading/4.0.11/system.threading.4.0.11.nupkg";
@@ -1016,7 +1016,7 @@
     };
   }
   {
-    pname = "system.threading";
+    name = "system.threading";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.threading/4.3.0/system.threading.4.3.0.nupkg";
@@ -1024,7 +1024,7 @@
     };
   }
   {
-    pname = "system.threading.tasks";
+    name = "system.threading.tasks";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.threading.tasks/4.0.11/system.threading.tasks.4.0.11.nupkg";
@@ -1032,7 +1032,7 @@
     };
   }
   {
-    pname = "system.threading.tasks";
+    name = "system.threading.tasks";
     version = "4.3.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.threading.tasks/4.3.0/system.threading.tasks.4.3.0.nupkg";
@@ -1040,7 +1040,7 @@
     };
   }
   {
-    pname = "system.threading.tasks.extensions";
+    name = "system.threading.tasks.extensions";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.threading.tasks.extensions/4.0.0/system.threading.tasks.extensions.4.0.0.nupkg";
@@ -1048,7 +1048,7 @@
     };
   }
   {
-    pname = "system.threading.tasks.extensions";
+    name = "system.threading.tasks.extensions";
     version = "4.5.4";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.threading.tasks.extensions/4.5.4/system.threading.tasks.extensions.4.5.4.nupkg";
@@ -1056,7 +1056,7 @@
     };
   }
   {
-    pname = "system.threading.thread";
+    name = "system.threading.thread";
     version = "4.0.0";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.threading.thread/4.0.0/system.threading.thread.4.0.0.nupkg";
@@ -1064,7 +1064,7 @@
     };
   }
   {
-    pname = "system.threading.threadpool";
+    name = "system.threading.threadpool";
     version = "4.0.10";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.threading.threadpool/4.0.10/system.threading.threadpool.4.0.10.nupkg";
@@ -1072,7 +1072,7 @@
     };
   }
   {
-    pname = "system.threading.timer";
+    name = "system.threading.timer";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.threading.timer/4.0.1/system.threading.timer.4.0.1.nupkg";
@@ -1080,7 +1080,7 @@
     };
   }
   {
-    pname = "system.xml.readerwriter";
+    name = "system.xml.readerwriter";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.xml.readerwriter/4.0.11/system.xml.readerwriter.4.0.11.nupkg";
@@ -1088,7 +1088,7 @@
     };
   }
   {
-    pname = "system.xml.xdocument";
+    name = "system.xml.xdocument";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.xml.xdocument/4.0.11/system.xml.xdocument.4.0.11.nupkg";
@@ -1096,7 +1096,7 @@
     };
   }
   {
-    pname = "system.xml.xmldocument";
+    name = "system.xml.xmldocument";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.xml.xmldocument/4.0.1/system.xml.xmldocument.4.0.1.nupkg";
@@ -1104,7 +1104,7 @@
     };
   }
   {
-    pname = "system.xml.xmlserializer";
+    name = "system.xml.xmlserializer";
     version = "4.0.11";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.xml.xmlserializer/4.0.11/system.xml.xmlserializer.4.0.11.nupkg";
@@ -1112,7 +1112,7 @@
     };
   }
   {
-    pname = "system.xml.xpath";
+    name = "system.xml.xpath";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.xml.xpath/4.0.1/system.xml.xpath.4.0.1.nupkg";
@@ -1120,7 +1120,7 @@
     };
   }
   {
-    pname = "system.xml.xpath.xmldocument";
+    name = "system.xml.xpath.xmldocument";
     version = "4.0.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/45bacae2-5efb-47c8-91e5-8ec20c22b4f8/nuget/v3/flat2/system.xml.xpath.xmldocument/4.0.1/system.xml.xpath.xmldocument.4.0.1.nupkg";
@@ -1128,7 +1128,7 @@
     };
   }
   {
-    pname = "xlifftasks";
+    name = "xlifftasks";
     version = "1.0.0-beta.20206.1";
     src = fetchurl {
       url = "https://pkgs.dev.azure.com/dnceng/9ee6d478-d288-47f7-aacc-f6e6d082ae6d/_packaging/1a5f89f6-d8da-4080-b15f-242650c914a8/nuget/v3/flat2/xlifftasks/1.0.0-beta.20206.1/xlifftasks.1.0.0-beta.20206.1.nupkg";

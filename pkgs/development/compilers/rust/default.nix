@@ -10,7 +10,6 @@
 , llvmSharedForBuild
 , llvmSharedForHost
 , llvmSharedForTarget
-, llvmPackagesForBuild # Exposed through rustc for LTO in Firefox
 }:
 { stdenv, lib
 , buildPackages
@@ -18,17 +17,39 @@
 , CoreFoundation, Security, SystemConfiguration
 , pkgsBuildTarget, pkgsBuildBuild
 , makeRustPlatform
-}:
+}: rec {
+  # https://doc.rust-lang.org/reference/conditional-compilation.html#target_arch
+  toTargetArch = platform:
+    if platform.isAarch32 then "arm"
+    else platform.parsed.cpu.name;
 
-let
-  # Use `import` to make sure no packages sneak in here.
-  lib' = import ../../../build-support/rust/lib { inherit lib; };
-in
-{
-  lib = lib';
+  # https://doc.rust-lang.org/reference/conditional-compilation.html#target_os
+  toTargetOs = platform:
+    if platform.isDarwin then "macos"
+    else platform.parsed.kernel.name;
 
-  # Backwards compat before `lib` was factored out.
-  inherit (lib') toTargetArch toTargetOs toRustTarget toRustTargetSpec;
+  # Returns the name of the rust target, even if it is custom. Adjustments are
+  # because rust has slightly different naming conventions than we do.
+  toRustTarget = platform: with platform.parsed; let
+    cpu_ = platform.rustc.platform.arch or {
+      "armv7a" = "armv7";
+      "armv7l" = "armv7";
+      "armv6l" = "arm";
+      "armv5tel" = "armv5te";
+      "riscv64" = "riscv64gc";
+    }.${cpu.name} or cpu.name;
+    vendor_ = platform.rustc.platform.vendor or {
+      "w64" = "pc";
+    }.${vendor.name} or vendor.name;
+  in platform.rustc.config
+    or "${cpu_}-${vendor_}-${kernel.name}${lib.optionalString (abi.name != "unknown") "-${abi.name}"}";
+
+  # Returns the name of the rust target if it is standard, or the json file
+  # containing the custom target spec.
+  toRustTargetSpec = platform:
+    if (platform.rustc or {}) ? platform
+    then builtins.toFile (toRustTarget platform + ".json") (builtins.toJSON platform.rustc.platform)
+    else toRustTarget platform;
 
   # This just contains tools for now. But it would conceivably contain
   # libraries too, say if we picked some default/recommended versions from
@@ -64,7 +85,7 @@ in
         version = rustcVersion;
         sha256 = rustcSha256;
         inherit enableRustcDev;
-        inherit llvmShared llvmSharedForBuild llvmSharedForHost llvmSharedForTarget llvmPackagesForBuild;
+        inherit llvmShared llvmSharedForBuild llvmSharedForHost llvmSharedForTarget;
 
         patches = rustcPatches;
 

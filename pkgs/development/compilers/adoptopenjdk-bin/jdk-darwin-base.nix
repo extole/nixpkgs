@@ -10,10 +10,9 @@ assert (stdenv.isDarwin && stdenv.isx86_64);
 
 let cpuName = stdenv.hostPlatform.parsed.cpu.name;
     result = stdenv.mkDerivation {
-  pname = if sourcePerArch.packageType == "jdk"
-    then "adoptopenjdk-${sourcePerArch.vmType}-bin"
-    else "adoptopenjdk-${sourcePerArch.packageType}-${sourcePerArch.vmType}-bin";
-  version = sourcePerArch.${cpuName}.version or (throw "unsupported CPU ${cpuName}");
+  name = if sourcePerArch.packageType == "jdk"
+    then "adoptopenjdk-${sourcePerArch.vmType}-bin-${sourcePerArch.${cpuName}.version}"
+    else "adoptopenjdk-${sourcePerArch.packageType}-${sourcePerArch.vmType}-bin-${sourcePerArch.${cpuName}.version}";
 
   src = fetchurl {
     inherit (sourcePerArch.${cpuName}) url sha256;

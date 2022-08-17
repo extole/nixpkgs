@@ -1,7 +1,5 @@
-{ lib }:
-
 let
-  sources = lib.importJSON ./sources.json;
+  sources = builtins.fromJSON (builtins.readFile ./sources.json);
 in
 {
   jdk-hotspot = import ./jdk-linux-base.nix { sourcePerArch = sources.openjdk16.linux.jdk.hotspot; };

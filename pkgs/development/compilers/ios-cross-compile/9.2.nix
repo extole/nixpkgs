@@ -4,7 +4,7 @@
   automake, autoconf, libtool, clangStdenv } :
 
 clangStdenv.mkDerivation rec {
-  pname = "ios-cross-compile";
+  name = "ios-cross-compile-${version}";
   version = "9.2";
   sdk = "iPhoneOS9.2.sdk";
   cctools_port = fetchFromGitHub {
@@ -51,8 +51,7 @@ clangStdenv.mkDerivation rec {
       and run this installation again.
    '';
   };
-  nativeBuildInputs = [ autoconf automake ];
-  buildInputs = [ git xz gnutar openssl libtool clang ];
+  buildInputs = [ git xz gnutar openssl automake autoconf libtool clang ];
   alt_wrapper = ./alt_wrapper.c;
   builder = ./9.2_builder.sh;
   meta = {

@@ -1,39 +1,15 @@
-{ lib, stdenv, llvm_meta
-, monorepoSrc, runCommand
-, cmake, python3, fixDarwinDylibNames, version
-, libcxxabi
+{ lib, stdenv, llvm_meta, src, cmake, python3, fixDarwinDylibNames, version
 , enableShared ? !stdenv.hostPlatform.isStatic
-
-# If headersOnly is true, the resulting package would only include the headers.
-# Use this to break the circular dependency between libcxx and libcxxabi.
-#
-# Some context:
-# https://reviews.llvm.org/rG1687f2bbe2e2aaa092f942d4a97d41fad43eedfb
-, headersOnly ? false
 }:
 
-let
-  basename = "libcxx";
-in
-
 stdenv.mkDerivation rec {
-  pname = basename + lib.optionalString headersOnly "-headers";
+  pname = "libcxx";
   inherit version;
 
-  src = runCommand "${pname}-src-${version}" {} ''
-    mkdir -p "$out"
-    cp -r ${monorepoSrc}/cmake "$out"
-    cp -r ${monorepoSrc}/${basename} "$out"
-    mkdir -p "$out/libcxxabi"
-    cp -r ${monorepoSrc}/libcxxabi/include "$out/libcxxabi"
-    mkdir -p "$out/llvm"
-    cp -r ${monorepoSrc}/llvm/cmake "$out/llvm"
-    cp -r ${monorepoSrc}/llvm/utils "$out/llvm"
-  '';
+  inherit src;
+  sourceRoot = "source/${pname}";
 
-  sourceRoot = "${src.name}/${basename}";
-
-  outputs = [ "out" ] ++ lib.optional (!headersOnly) "dev";
+  outputs = [ "out" "dev" ];
 
   patches = [
     ./gnu-install-dirs.patch
@@ -48,28 +24,14 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake python3 ]
     ++ lib.optional stdenv.isDarwin fixDarwinDylibNames;
 
-  buildInputs = lib.optionals (!headersOnly) [ libcxxabi ];
-
-  cmakeFlags = [ "-DLIBCXX_CXX_ABI=libcxxabi" ]
-    ++ lib.optional (stdenv.hostPlatform.isMusl || stdenv.hostPlatform.isWasi) "-DLIBCXX_HAS_MUSL_LIBC=1"
+  cmakeFlags = [
+  ] ++ lib.optional (stdenv.hostPlatform.isMusl || stdenv.hostPlatform.isWasi) "-DLIBCXX_HAS_MUSL_LIBC=1"
     ++ lib.optional (stdenv.hostPlatform.useLLVM or false) "-DLIBCXX_USE_COMPILER_RT=ON"
-    ++ lib.optionals stdenv.hostPlatform.isWasm [
+    ++ lib.optional stdenv.hostPlatform.isWasm [
       "-DLIBCXX_ENABLE_THREADS=OFF"
       "-DLIBCXX_ENABLE_FILESYSTEM=OFF"
       "-DLIBCXX_ENABLE_EXCEPTIONS=OFF"
     ] ++ lib.optional (!enableShared) "-DLIBCXX_ENABLE_SHARED=OFF";
-
-  buildFlags = lib.optional headersOnly "generate-cxx-headers";
-  installTargets = lib.optional headersOnly "install-cxx-headers";
-
-  # At this point, cxxabi headers would be installed in the dev output, which
-  # prevents moveToOutput from doing its job later in the build process.
-  postInstall = lib.optionalString (!headersOnly) ''
-    mv "$dev/include/c++/v1/"* "$out/include/c++/v1/"
-    pushd "$dev"
-    rmdir -p include/c++/v1
-    popd
-  '';
 
   passthru = {
     isLLVM = true;

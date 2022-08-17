@@ -2,14 +2,14 @@
 
 stdenv.mkDerivation rec {
   pname = "aspectj";
-  version = "1.9.7";
+  version = "1.9.6";
   builder = ./builder.sh;
 
   src = let
     versionSnakeCase = builtins.replaceStrings ["."] ["_"] version;
   in fetchurl {
     url = "https://github.com/eclipse/org.aspectj/releases/download/V${versionSnakeCase}/aspectj-${version}.jar";
-    sha256 = "sha256-xrg88nLOcagaAsFSnnYChhlv6EKhdBqkJJTDzhUBvTo=";
+    sha256 = "02jh66l3vw57k9a4dxlga3qh3487r36gyi6k2z2mmqxbpqajslja";
   };
 
   inherit jre;

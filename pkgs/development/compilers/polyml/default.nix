@@ -1,14 +1,8 @@
-{ lib
-, stdenv
-, fetchFromGitHub
-, autoreconfHook
-, gmp
-, libffi
-}:
+{ lib, stdenv, fetchFromGitHub, fetchpatch, autoreconfHook, gmp, libffi }:
 
 stdenv.mkDerivation rec {
   pname = "polyml";
-  version = "5.9";
+  version = "5.8.2";
 
   prePatch = lib.optionalString stdenv.isDarwin ''
     substituteInPlace configure.ac --replace stdc++ c++
@@ -28,7 +22,7 @@ stdenv.mkDerivation rec {
     owner = "polyml";
     repo = "polyml";
     rev = "v${version}";
-    sha256 = "sha256-4oo4AB54CivhS99RuZVTP9+Ic0CDpsBb+OiHvOhmZnM=";
+    sha256 = "0vvla816g9rk9aa75gq63rb7bf6yla27p8wh1s1ycgq2in2zk0py";
   };
 
   meta = with lib; {

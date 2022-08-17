@@ -27,7 +27,7 @@ stdenv.mkDerivation rec {
 
     export CC="${gcc}/bin/gcc";
     export CCARGS="-I$out/include \
-                   -L${lib.getLib openssl}/lib \
+                   -L${openssl.out}/lib \
                    -L${libmysqlclient}/lib \
                    -L${postgresql.lib}/lib \
                    -L${sqlite.out}/lib";

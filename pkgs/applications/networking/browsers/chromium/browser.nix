@@ -17,8 +17,6 @@ mkChromiumDerivation (base: rec {
   installPhase = ''
     mkdir -p "$libExecPath"
     cp -v "$buildPath/"*.so "$buildPath/"*.pak "$buildPath/"*.bin "$libExecPath/"
-    cp -v "$buildPath/libvulkan.so.1" "$libExecPath/"
-    cp -v "$buildPath/vk_swiftshader_icd.json" "$libExecPath/"
     cp -v "$buildPath/icudtl.dat" "$libExecPath/"
     cp -vLR "$buildPath/locales" "$buildPath/resources" "$libExecPath/"
     cp -v "$buildPath/chrome_crashpad_handler" "$libExecPath/"
@@ -87,7 +85,7 @@ mkChromiumDerivation (base: rec {
       then "https://github.com/Eloston/ungoogled-chromium"
       else "https://www.chromium.org/";
     maintainers = with maintainers; if ungoogled
-      then [ squalus primeos michaeladler ]
+      then [ squalus primeos ]
       else [ primeos thefloweringash ];
     license = if enableWideVine then licenses.unfree else licenses.bsd3;
     platforms = platforms.linux;

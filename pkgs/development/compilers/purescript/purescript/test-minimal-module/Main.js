@@ -1,6 +1,6 @@
 "use strict"
 
-export const log = function (s) {
+exports.log = function (s) {
     return function () {
         console.log(s);
         return {};

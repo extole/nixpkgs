@@ -1,5 +1,5 @@
 { newScope, config, stdenv, fetchurl, makeWrapper
-, llvmPackages_14, ed, gnugrep, coreutils, xdg-utils
+, llvmPackages_13, ed, gnugrep, coreutils, xdg-utils
 , glib, gtk3, gnome, gsettings-desktop-schemas, gn, fetchgit
 , libva, pipewire, wayland
 , gcc, nspr, nss, runCommand
@@ -8,6 +8,8 @@
 # package customization
 # Note: enable* flags should not require full rebuilds (i.e. only affect the wrapper)
 , channel ? "stable"
+, gnomeSupport ? false, gnome2 ? null
+, gnomeKeyringSupport ? false
 , proprietaryCodecs ? true
 , enableWideVine ? false
 , ungoogled ? false # Whether to build chromium or ungoogled-chromium
@@ -17,7 +19,7 @@
 }:
 
 let
-  llvmPackages = llvmPackages_14;
+  llvmPackages = llvmPackages_13;
   stdenv = llvmPackages.stdenv;
 
   upstream-info = (lib.importJSON ./upstream-info.json).${channel};
@@ -44,7 +46,7 @@ let
 
     mkChromiumDerivation = callPackage ./common.nix ({
       inherit channel chromiumVersionAtLeast versionRange;
-      inherit proprietaryCodecs
+      inherit gnome2 gnomeSupport gnomeKeyringSupport proprietaryCodecs
               cupsSupport pulseSupport ungoogled;
       gnChromium = gn.overrideAttrs (oldAttrs: {
         inherit (upstream-info.deps.gn) version;
@@ -155,8 +157,8 @@ let
     else browser;
 
 in stdenv.mkDerivation {
-  pname = lib.optionalString ungoogled "ungoogled-"
-    + "chromium${suffix}";
+  name = lib.optionalString ungoogled "ungoogled-"
+    + "chromium${suffix}-${version}";
   inherit version;
 
   nativeBuildInputs = [
@@ -180,9 +182,8 @@ in stdenv.mkDerivation {
   in with lib; ''
     mkdir -p "$out/bin"
 
-    makeWrapper "${browserBinary}" "$out/bin/chromium" \
-      --add-flags ${escapeShellArg commandLineArgs} \
-      --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--enable-features=UseOzonePlatform --ozone-platform=wayland}}"
+    eval makeWrapper "${browserBinary}" "$out/bin/chromium" \
+      --add-flags ${escapeShellArg (escapeShellArg commandLineArgs)}
 
     ed -v -s "$out/bin/chromium" << EOF
     2i
@@ -205,8 +206,8 @@ in stdenv.mkDerivation {
 
     export XDG_DATA_DIRS=$XDG_ICON_DIRS:$GSETTINGS_SCHEMAS_PATH\''${XDG_DATA_DIRS:+:}\$XDG_DATA_DIRS
 
-    # Mainly for xdg-open but also other xdg-* tools (this is only a fallback; \$PATH is suffixed so that other implementations can be used):
-    export PATH="\$PATH\''${PATH:+:}${xdg-utils}/bin"
+    # Mainly for xdg-open but also other xdg-* tools:
+    export PATH="${xdg-utils}/bin\''${PATH:+:}\$PATH"
 
     .
     w

@@ -21,8 +21,7 @@ let
 in
 
 stdenv.mkDerivation {
-  pname = "urn${optionalString (extraLibraries != []) "-with-libraries"}";
-  inherit version;
+  name = "urn-${optionalString (extraLibraries != []) "with-libraries-"}${version}";
 
   src = fetchFromGitLab {
     owner = "urn";

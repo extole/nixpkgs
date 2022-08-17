@@ -78,11 +78,11 @@ let
     pname = "nim-bootstrap";
     version = "g${lib.substring 0 7 revision}";
 
-    src = fetchFromGitHub {
-      owner = "nim-lang";
-      repo = "csources_v1";
+    src = fetchgit {
+      # A Git checkout is much smaller than a GitHub tarball.
+      url = "https://github.com/nim-lang/csources_v1.git";
       rev = revision;
-      sha256 = "sha256-gwBFuR7lzO4zttR/6rgdjXMRxVhwKeLqDwpmOwMyU7A=";
+      sha256 = "1c2k681knrha1zmf4abhb32i2wwd3nwflzylnqryxk753swla043";
     };
 
     enableParallelBuilding = true;
@@ -98,12 +98,12 @@ in {
 
   nim-unwrapped = stdenv.mkDerivation rec {
     pname = "nim-unwrapped";
-    version = "1.6.6";
+    version = "1.6.0";
     strictDeps = true;
 
     src = fetchurl {
       url = "https://nim-lang.org/download/nim-${version}.tar.xz";
-      hash = "sha256-Z7ERzm84YVA7n8wcrln8NNASJWbT7P7zoGSiF0EhpFI=";
+      hash = "sha256-UgZdSNcqcnAuwa/l96mDHhFnNTHiec3/nK7AGgfuxj0=";
     };
 
     buildInputs = [ boehmgc openssl pcre readline sqlite ];
@@ -183,14 +183,6 @@ in {
       install -Dt $out/bin src/nimble
       runHook postBuild
     '';
-
-    meta = with lib; {
-      description = "Package manager for the Nim programming language";
-      homepage = "https://github.com/nim-lang/nimble";
-      license = licenses.bsd3;
-      maintainers = with maintainers; [ ehmry ];
-      mainProgram = "nimble";
-    };
   };
 
   nim = let

@@ -5,17 +5,17 @@
 
 stdenv.mkDerivation rec {
   pname = "chez-scheme";
-  version = "9.5.8";
+  version = "9.5.4";
 
   src = fetchFromGitHub {
     owner  = "cisco";
     repo   = "ChezScheme";
     rev    = "refs/tags/v${version}";
-    sha256 = "sha256-esCWEzny/I+Ors6+upKlt4h13oN0bRLWN9OTKuSqdl8=";
+    sha256 = "065dir19cqpn0d1bk9w49wnwzn6qfrgvcqw8da2fdhkafhfcb1bj";
     fetchSubmodules = true;
   };
 
-  nativeBuildInputs = lib.optional stdenv.isDarwin cctools;
+  nativeBuildInputs = [ coreutils ] ++ lib.optional stdenv.isDarwin cctools;
   buildInputs = [ ncurses libiconv libX11 libuuid ];
 
   enableParallelBuilding = true;
@@ -73,6 +73,6 @@ stdenv.mkDerivation rec {
     license      = lib.licenses.asl20;
     maintainers  = with lib.maintainers; [ thoughtpolice ];
     platforms    = lib.platforms.unix;
-    badPlatforms = [ "aarch64-linux" "aarch64-darwin" ];
+    badPlatforms = [ "aarch64-linux" ];
   };
 }

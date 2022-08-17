@@ -1,5 +1,5 @@
 { lib, stdenv, removeReferencesTo, pkgsBuildBuild, pkgsBuildHost, pkgsBuildTarget
-, llvmShared, llvmSharedForBuild, llvmSharedForHost, llvmSharedForTarget, llvmPackagesForBuild
+, llvmShared, llvmSharedForBuild, llvmSharedForHost, llvmSharedForTarget
 , fetchurl, file, python3
 , darwin, cmake, rust, rustPlatform
 , pkg-config, openssl
@@ -100,9 +100,6 @@ in stdenv.mkDerivation rec {
     "${setHost}.musl-root=${pkgsBuildHost.targetPackages.stdenv.cc.libc}"
   ] ++ optionals stdenv.targetPlatform.isMusl [
     "${setTarget}.musl-root=${pkgsBuildTarget.targetPackages.stdenv.cc.libc}"
-  ] ++ optionals (stdenv.isDarwin && stdenv.isx86_64) [
-    # https://github.com/rust-lang/rust/issues/92173
-    "--set rust.jemalloc"
   ];
 
   # The bootstrap.py will generated a Makefile that then executes the build.
@@ -177,10 +174,7 @@ in stdenv.mkDerivation rec {
 
   requiredSystemFeatures = [ "big-parallel" ];
 
-  passthru = {
-    llvm = llvmShared;
-    llvmPackages = llvmPackagesForBuild;
-  };
+  passthru.llvm = llvmShared;
 
   meta = with lib; {
     homepage = "https://www.rust-lang.org/";

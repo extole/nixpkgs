@@ -10,6 +10,5 @@
   "elm-xref",
   "create-elm-app",
   "elm-optimize-level-2",
-  "elm-review",
-  "elm-git-install"
+  "elm-review"
 ]

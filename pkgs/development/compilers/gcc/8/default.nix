@@ -7,8 +7,13 @@
 , profiledCompiler ? false
 , langJit ? false
 , staticCompiler ? false
-, enableShared ? !stdenv.targetPlatform.isStatic
-, enableLTO ? !stdenv.hostPlatform.isStatic
+, # N.B. the defult is intentionally not from an `isStatic`. See
+  # https://gcc.gnu.org/install/configure.html - this is about target
+  # platform libraries not host platform ones unlike normal. But since
+  # we can't rebuild those without also rebuilding the compiler itself,
+  # we opt to always build everything unlike our usual policy.
+  enableShared ? true
+, enableLTO ? true
 , texinfo ? null
 , perl ? null # optional, for texi2pod (then pod2man)
 , gmp, mpfr, libmpc, gettext, which, patchelf
@@ -254,7 +259,7 @@ stdenv.mkDerivation ({
   };
 
   enableParallelBuilding = true;
-  inherit enableShared enableMultilib;
+  inherit enableMultilib;
 
   inherit (stdenv) is64bit;
 
@@ -276,7 +281,6 @@ stdenv.mkDerivation ({
     maintainers = lib.teams.gcc.members;
 
     platforms = lib.platforms.unix;
-    badPlatforms = [ "aarch64-darwin" ];
   };
 }
 

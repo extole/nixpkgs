@@ -50,7 +50,6 @@ stdenv.mkDerivation rec {
     '';
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ AndersonTorres ];
-    mainProgram = "a68g";
     platforms = platforms.unix;
   };
 }

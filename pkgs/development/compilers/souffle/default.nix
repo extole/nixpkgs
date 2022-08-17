@@ -1,6 +1,6 @@
 { lib, stdenv, fetchFromGitHub
-, bash-completion, perl, ncurses, zlib, sqlite, libffi
-, mcpp, cmake, bison, flex, doxygen, graphviz
+, perl, ncurses, zlib, sqlite, libffi
+, autoreconfHook, mcpp, bison, flex, doxygen, graphviz
 , makeWrapper
 }:
 
@@ -10,23 +10,32 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "souffle";
-  version = "2.2";
+  version = "2.0.2";
 
   src = fetchFromGitHub {
     owner  = "souffle-lang";
     repo   = "souffle";
     rev    = version;
-    sha256 = "sha256-whvC+DL9XbQLc4wf2kFxUKXSyJnGkYq0/0uLCLbliJU=";
+    sha256 = "1fa6yssgndrln8qbbw2j7j199glxp63irfrz1c2y424rq82mm2r5";
   };
 
-  nativeBuildInputs = [ bison cmake flex mcpp doxygen graphviz makeWrapper perl ];
-  buildInputs = [ bash-completion ncurses zlib sqlite libffi ];
+  nativeBuildInputs = [ autoreconfHook bison flex mcpp doxygen graphviz makeWrapper perl ];
+  buildInputs = [ ncurses zlib sqlite libffi ];
+
   # these propagated inputs are needed for the compiled Souffle mode to work,
   # since generated compiler code uses them. TODO: maybe write a g++ wrapper
   # that adds these so we can keep the propagated inputs clean?
   propagatedBuildInputs = [ ncurses zlib sqlite libffi ];
 
-  cmakeFlags = [ "-DSOUFFLE_GIT=OFF" ];
+  # see 565a8e73e80a1bedbb6cc037209c39d631fc393f and parent commits upstream for
+  # Wno-error fixes
+  patchPhase = ''
+    substituteInPlace ./src/Makefile.am \
+      --replace '-Werror' '-Werror -Wno-error=deprecated -Wno-error=other'
+
+    substituteInPlace configure.ac \
+      --replace "m4_esyscmd([git describe --tags --always | tr -d '\n'])" "${version}"
+  '';
 
   postInstall = ''
     wrapProgram "$out/bin/souffle" --prefix PATH : "${toolsPath}"

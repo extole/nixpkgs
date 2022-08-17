@@ -9,8 +9,13 @@
 , profiledCompiler ? false
 , langJit ? false
 , staticCompiler ? false
-, enableShared ? !stdenv.targetPlatform.isStatic
-, enableLTO ? !stdenv.hostPlatform.isStatic
+, # N.B. the defult is intentionally not from an `isStatic`. See
+  # https://gcc.gnu.org/install/configure.html - this is about target
+  # platform libraries not host platform ones unlike normal. But since
+  # we can't rebuild those without also rebuilding the compiler itself,
+  # we opt to always build everything unlike our usual policy.
+  enableShared ? true
+, enableLTO ? true
 , texinfo ? null
 , perl ? null # optional, for texi2pod (then pod2man)
 , gmp, mpfr, libmpc, gettext, which, patchelf
@@ -58,11 +63,6 @@ with lib;
 with builtins;
 
 let majorVersion = "9";
-    /*
-      If you update, please build on aarch64-linux
-      and check braces adjacent to `cplusplus` lines in file
-      ./result/lib/gcc/aarch64-unknown-linux-gnu/9.*.0/include/arm_acle.h
-    */
     version = "${majorVersion}.3.0";
 
     inherit (stdenv) buildPlatform hostPlatform targetPlatform;
@@ -73,21 +73,15 @@ let majorVersion = "9";
       # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96796
       #
       # This patch can most likely be removed by a post 9.3.0-release.
-      [ ./avoid-cycling-subreg-reloads.patch ./gcc9-asan-glibc-2.34.patch ]
+      [ ./avoid-cycling-subreg-reloads.patch ]
       ++ optional (targetPlatform != hostPlatform) ../libstdc++-target.patch
       ++ optional targetPlatform.isNetBSD ../libstdc++-netbsd-ctypes.patch
       ++ optional noSysDirs ../no-sys-dirs.patch
-      ++ optional (noSysDirs && hostPlatform.isRiscV) ../no-sys-dirs-riscv-gcc9.patch
       /* ++ optional (hostPlatform != buildPlatform) (fetchpatch { # XXX: Refine when this should be applied
         url = "https://git.busybox.net/buildroot/plain/package/gcc/${version}/0900-remove-selftests.patch?id=11271540bfe6adafbc133caf6b5b902a816f5f02";
         sha256 = ""; # TODO: uncomment and check hash when available.
       }) */
       ++ optional langAda ../gnat-cflags.patch
-      ++ optional langAda (fetchpatch {
-        name = "gnat-glibc-234.diff";
-        url = "https://github.com/gcc-mirror/gcc/commit/331763de7d4850702a0f67298f36017c73cdb103.diff";
-        sha256 = "eS4B7vJasnv2N+5v5yB8/iDpKPX8CJDAy2xabWWj+aU=";
-      })
       ++ optional langD ../libphobos.patch
       ++ optional langFortran ../gfortran-driving.patch
       ++ optional (targetPlatform.libc == "musl" && targetPlatform.isPower) ../ppc-musl.patch
@@ -285,7 +279,7 @@ stdenv.mkDerivation ({
   };
 
   enableParallelBuilding = true;
-  inherit enableShared enableMultilib;
+  inherit enableMultilib;
 
   inherit (stdenv) is64bit;
 
@@ -307,7 +301,6 @@ stdenv.mkDerivation ({
     maintainers = lib.teams.gcc.members;
 
     platforms = lib.platforms.unix;
-    badPlatforms = [ "aarch64-darwin" ];
   };
 }
 

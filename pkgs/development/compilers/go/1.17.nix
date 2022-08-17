@@ -7,6 +7,7 @@
 , perl
 , which
 , pkg-config
+, patch
 , procps
 , pcre
 , cacert
@@ -39,13 +40,8 @@ let
     "armv5tel" = "arm";
     "armv6l" = "arm";
     "armv7l" = "arm";
-    "mips" = "mips";
-    "mipsel" = "mipsle";
-    "riscv64" = "riscv64";
-    "s390x" = "s390x";
     "powerpc64le" = "ppc64le";
-    "mips64el" = "mips64le";
-  }.${platform.parsed.cpu.name} or (throw "Unsupported system: ${platform.parsed.cpu.name}");
+  }.${platform.parsed.cpu.name} or (throw "Unsupported system");
 
   # We need a target compiler which is still runnable at build time,
   # to handle the cross-building case where build != host == target
@@ -54,15 +50,15 @@ in
 
 stdenv.mkDerivation rec {
   pname = "go";
-  version = "1.17.9";
+  version = "1.17.2";
 
   src = fetchurl {
     url = "https://dl.google.com/go/go${version}.src.tar.gz";
-    sha256 = "sha256-djrUuvuAqSBEWMX6K45zJ/qXGu5FQlLA42LBEjYVaBM=";
+    sha256 = "sha256-IlXrPk6CTdfV/Nwuf4RTQ3HBhjEuVG+xCGo0wXdS9DE=";
   };
 
   # perl is used for testing go vet
-  nativeBuildInputs = [ perl which pkg-config procps ];
+  nativeBuildInputs = [ perl which pkg-config patch procps ];
   buildInputs = [ cacert pcre ]
     ++ lib.optionals stdenv.isLinux [ stdenv.cc.libc.out ]
     ++ lib.optionals (stdenv.hostPlatform.libc == "glibc") [ stdenv.cc.libc.static ];
@@ -168,7 +164,6 @@ stdenv.mkDerivation rec {
     ./creds-test.patch
     ./go-1.9-skip-flaky-19608.patch
     ./go-1.9-skip-flaky-20072.patch
-    ./skip-chown-tests-1.16.patch
     ./skip-external-network-tests-1.16.patch
     ./skip-nohup-tests.patch
     ./skip-cgo-tests-1.15.patch
@@ -273,10 +268,12 @@ stdenv.mkDerivation rec {
   disallowedReferences = [ goBootstrap ];
 
   meta = with lib; {
-    homepage = "https://go.dev/";
+    homepage = "http://golang.org/";
     description = "The Go Programming language";
     license = licenses.bsd3;
     maintainers = teams.golang.members;
     platforms = platforms.linux ++ platforms.darwin;
+    # requires >=10.13 stdenv on x86_64-darwin
+    badPlatforms = [ "x86_64-darwin" ];
   };
 }

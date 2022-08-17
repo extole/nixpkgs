@@ -1,7 +1,5 @@
-{ lib }:
-
 let
-  sources = lib.importJSON ./sources.json;
+  sources = builtins.fromJSON (builtins.readFile ./sources.json);
 in
 {
   jdk-hotspot = import ./jdk-darwin-base.nix { sourcePerArch = sources.openjdk11.mac.jdk.hotspot; };

@@ -1,8 +1,8 @@
 { lib, stdenv, fetchurl, unzip, makeWrapper
 , cairo, fontconfig, freetype, gdk-pixbuf, glib
-, glibc, gtk2, libX11, nspr, nss, pango
+, glibc, gtk2, libX11, nspr, nss, pango, gconf
 , libxcb, libXi, libXrender, libXext, dbus
-, testers, chromedriver
+, testVersion, chromedriver
 }:
 
 let
@@ -17,11 +17,6 @@ let
       system = "mac64";
       sha256 = upstream-info.sha256_darwin;
     };
-
-    aarch64-darwin = {
-      system = "mac64_m1";
-      sha256 = upstream-info.sha256_darwin_aarch64;
-    };
   };
 
   spec = allSpecs.${stdenv.hostPlatform.system}
@@ -30,9 +25,9 @@ let
   libs = lib.makeLibraryPath [
     stdenv.cc.cc.lib
     cairo fontconfig freetype
-    gdk-pixbuf glib gtk2
+    gdk-pixbuf glib gtk2 gconf
     libX11 nspr nss pango libXrender
-    libxcb libXext libXi
+    gconf libxcb libXext libXi
     dbus
   ];
 
@@ -56,7 +51,7 @@ in stdenv.mkDerivation rec {
     wrapProgram "$out/bin/chromedriver" --prefix LD_LIBRARY_PATH : "${libs}"
   '';
 
-  passthru.tests.version = testers.testVersion { package = chromedriver; };
+  passthru.tests.version = testVersion { package = chromedriver; };
 
   meta = with lib; {
     homepage = "https://chromedriver.chromium.org/";

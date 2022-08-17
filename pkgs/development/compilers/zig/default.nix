@@ -11,20 +11,19 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "zig";
-  version = "0.9.1";
+  version = "0.8.1";
 
   src = fetchFromGitHub {
     owner = "ziglang";
     repo = pname;
     rev = version;
-    hash = "sha256-x2c4c9RSrNWGqEngio4ArW7dJjW0gg+8nqBwPcR721k=";
+    hash = "sha256-zMSOH8ZWcvzHRwOgGIbLO9Q6jf1P5QL5KCMD+frp+JA=";
   };
 
   nativeBuildInputs = [
     cmake
     llvmPackages.llvm.dev
   ];
-
   buildInputs = [
     libxml2
     zlib
@@ -55,3 +54,4 @@ stdenv.mkDerivation rec {
     broken = stdenv.isDarwin; # See https://github.com/NixOS/nixpkgs/issues/86299
   };
 }
+

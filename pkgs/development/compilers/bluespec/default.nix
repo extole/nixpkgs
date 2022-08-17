@@ -1,7 +1,6 @@
 { lib
 , stdenv
 , fetchFromGitHub
-, fetchurl
 , autoconf
 , automake
 , fontconfig
@@ -19,27 +18,20 @@
 , gmp-static
 , verilog
 , asciidoctor
-, tex
-, which
-}:
+, tex }:
 
 let
   ghcWithPackages = ghc.withPackages (g: (with g; [ old-time regex-compat syb split ]));
 
 in stdenv.mkDerivation rec {
   pname = "bluespec";
-  version = "2022.01";
+  version = "2021.07";
 
   src = fetchFromGitHub {
     owner = "B-Lang-org";
     repo = "bsc";
     rev = version;
-    sha256 = "sha256-ivTua3MLa8akma3MGkhsqwSdwswYX916kywKdlj7TqY=";
-  };
-
-  yices-src = fetchurl {
-    url = "https://github.com/B-Lang-org/bsc/releases/download/${version}/yices-src-for-bsc-${version}.tar.gz";
-    sha256 = "sha256-ey5yIIVFZyG4EnYGqbIJqmxK1rZ70FWM0Jz+2hIoGXE=";
+    sha256 = "0gw8wyp65lpkyfhv3laazz9qypdl8qkp1j7cqp0gv11592a9p5qw";
   };
 
   enableParallelBuilding = true;
@@ -51,7 +43,8 @@ in stdenv.mkDerivation rec {
 
   postUnpack = ''
     mkdir -p $sourceRoot/src/vendor/yices/v2.6/yices2
-    tar -C $sourceRoot/src/vendor/yices/v2.6/yices2 -xf ${yices-src}
+    # XXX: only works because yices.src isn't a tarball.
+    cp -av ${yices.src}/* $sourceRoot/src/vendor/yices/v2.6/yices2
     chmod -R +rwX $sourceRoot/src/vendor/yices/v2.6/yices2
   '';
 
@@ -75,7 +68,6 @@ in stdenv.mkDerivation rec {
     libX11 # tcltk
     tcl
     tk
-    which
     xorg.libXft
     zlib
   ];

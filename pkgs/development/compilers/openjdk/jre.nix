@@ -7,7 +7,7 @@
 
 let
   jre = stdenv.mkDerivation {
-    pname = "${jdk.pname}-minimal-jre";
+    name = "${jdk.name}-minimal-jre";
     version = jdk.version;
 
     buildInputs = [ jdk ];

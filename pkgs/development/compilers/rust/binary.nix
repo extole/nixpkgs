@@ -19,7 +19,7 @@ in
 
 rec {
   rustc = stdenv.mkDerivation {
-    pname = "rustc-${versionType}";
+    name = "rustc-${versionType}-${version}";
 
     inherit version;
     inherit src;
@@ -71,7 +71,7 @@ rec {
   };
 
   cargo = stdenv.mkDerivation {
-    pname = "cargo-${versionType}";
+    name = "cargo-${versionType}-${version}";
 
     inherit version;
     inherit src;

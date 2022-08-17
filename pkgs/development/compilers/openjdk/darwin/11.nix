@@ -1,10 +1,4 @@
-{ lib
-, stdenv
-, fetchurl
-, unzip
-, setJavaClassPath
-, enableJavaFX ? false
-}:
+{ lib, stdenv, fetchurl, unzip, setJavaClassPath }:
 let
   # Details from https://www.azul.com/downloads/?version=java-11-lts&os=macos&package=jdk
   # Note that the latest build may differ by platform
@@ -13,34 +7,29 @@ let
       arch = "x64";
       zuluVersion = "11.48.21";
       jdkVersion = "11.0.11";
-      sha256 =
-        if enableJavaFX then "18bd9cd66d6abc6f8c627bc70278dc8fd4860e138e1dc9e170eddb89727ccc7b"
-        else "0v0n7h7i04pvna41wpdq2k9qiy70sbbqzqzvazfdvgm3gb22asw6";
+      sha256 = "0v0n7h7i04pvna41wpdq2k9qiy70sbbqzqzvazfdvgm3gb22asw6";
     };
 
     aarch64-darwin = {
       arch = "aarch64";
       zuluVersion = "11.48.21";
       jdkVersion = "11.0.11";
-      sha256 =
-        if enableJavaFX then "ef0de2705c6c2d586812f7f3736b70e22b069545b38034816016f9f264ad43f9"
-        else "066whglrxx81c95grv2kxdbvyh32728ixhml2v44ildh549n4lhc";
+      sha256 = "066whglrxx81c95grv2kxdbvyh32728ixhml2v44ildh549n4lhc";
     };
   }."${stdenv.hostPlatform.system}";
 
   jce-policies = fetchurl {
-    url = "https://web.archive.org/web/20211126120343/http://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip";
+    # Ugh, unversioned URLs... I hope this doesn't change often enough to cause pain before we move to a Darwin source build of OpenJDK!
+    url    = "http://cdn.azul.com/zcek/bin/ZuluJCEPolicies.zip";
     sha256 = "0nk7m0lgcbsvldq2wbfni2pzq8h818523z912i7v8hdcij5s48c0";
   };
 
-  javaPackage = if enableJavaFX then "ca-fx-jdk" else "ca-jdk";
-
   jdk = stdenv.mkDerivation rec {
-    pname = "zulu${dist.zuluVersion}-${javaPackage}";
+    pname = "zulu${dist.zuluVersion}-ca-jdk";
     version = dist.jdkVersion;
 
     src = fetchurl {
-      url = "https://cdn.azul.com/zulu/bin/zulu${dist.zuluVersion}-${javaPackage}${dist.jdkVersion}-macosx_${dist.arch}.tar.gz";
+      url = "https://cdn.azul.com/zulu/bin/zulu${dist.zuluVersion}-ca-jdk${dist.jdkVersion}-macosx_${dist.arch}.tar.gz";
       inherit (dist) sha256;
       curlOpts = "-H Referer:https://www.azul.com/downloads/zulu/";
     };
@@ -86,7 +75,6 @@ let
       home = jdk;
     };
 
-    meta = import ./meta.nix lib version;
+    meta = import ./meta.nix lib;
   };
-in
-jdk
+in jdk

@@ -7,8 +7,7 @@ let
 in
 
 stdenv.mkDerivation {
-  pname = "dotty";
-  inherit (dotty-bare) version;
+  name = "dotty-${dotty-bare.version}";
 
   dontUnpack = true;
 

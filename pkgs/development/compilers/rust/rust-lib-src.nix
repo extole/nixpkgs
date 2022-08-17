@@ -1,6 +1,11 @@
-{ runCommand, rustc }:
+{ stdenv, rustc }:
 
-runCommand "rust-lib-src" { } ''
-  tar --strip-components=1 -xzf ${rustc.src}
-  mv library $out
-''
+stdenv.mkDerivation {
+  name = "rust-lib-src";
+  src = rustc.src;
+  phases = [ "unpackPhase" "installPhase" ];
+
+  installPhase = ''
+    mv library $out
+  '';
+}

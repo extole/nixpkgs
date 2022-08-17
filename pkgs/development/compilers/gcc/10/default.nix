@@ -8,8 +8,13 @@
 , profiledCompiler ? false
 , langJit ? false
 , staticCompiler ? false
-, enableShared ? !stdenv.targetPlatform.isStatic
-, enableLTO ? !stdenv.hostPlatform.isStatic
+, # N.B. the defult is intentionally not from an `isStatic`. See
+  # https://gcc.gnu.org/install/configure.html - this is about target
+  # platform libraries not host platform ones unlike normal. But since
+  # we can't rebuild those without also rebuilding the compiler itself,
+  # we opt to always build everything unlike our usual policy.
+  enableShared ? true
+, enableLTO ? true
 , texinfo ? null
 , perl ? null # optional, for texi2pod (then pod2man)
 , gmp, mpfr, libmpc, gettext, which, patchelf
@@ -56,10 +61,9 @@ let majorVersion = "10";
 
     inherit (stdenv) buildPlatform hostPlatform targetPlatform;
 
-    patches = [ ./gcc10-asan-glibc-2.34.patch ]
-      ++ optional (targetPlatform != hostPlatform) ../libstdc++-target.patch
+    patches =
+         optional (targetPlatform != hostPlatform) ../libstdc++-target.patch
       ++ optional noSysDirs ../no-sys-dirs.patch
-      ++ optional (noSysDirs && hostPlatform.isRiscV) ../no-sys-dirs-riscv.patch
       /* ++ optional (hostPlatform != buildPlatform) (fetchpatch { # XXX: Refine when this should be applied
         url = "https://git.busybox.net/buildroot/plain/package/gcc/${version}/0900-remove-selftests.patch?id=11271540bfe6adafbc133caf6b5b902a816f5f02";
         sha256 = ""; # TODO: uncomment and check hash when available.
@@ -71,12 +75,7 @@ let majorVersion = "10";
       # Obtain latest patch with ../update-mcfgthread-patches.sh
       ++ optional (!crossStageStatic && targetPlatform.isMinGW) ./Added-mcf-thread-model-support-from-mcfgthread.patch
 
-      ++ [ ../libsanitizer-no-cyclades.patch ]
-
-      ++ optional (buildPlatform.system == "aarch64-darwin" && targetPlatform != buildPlatform) (fetchpatch {
-        url = "https://raw.githubusercontent.com/richard-vd/musl-cross-make/5e9e87f06fc3220e102c29d3413fbbffa456fcd6/patches/gcc-${version}/0008-darwin-aarch64-self-host-driver.patch";
-        sha256 = "sha256-XtykrPd5h/tsnjY1wGjzSOJ+AyyNLsfnjuOZ5Ryq9vA=";
-      });
+      ++ [ ../libsanitizer-no-cyclades.patch ];
 
     /* Cross-gcc settings (build == host != target) */
     crossMingw = targetPlatform != hostPlatform && targetPlatform.libc == "msvcrt";
@@ -266,7 +265,7 @@ stdenv.mkDerivation ({
   };
 
   enableParallelBuilding = true;
-  inherit enableMultilib enableShared;
+  inherit enableMultilib;
 
   inherit (stdenv) is64bit;
 
@@ -288,7 +287,6 @@ stdenv.mkDerivation ({
     maintainers = lib.teams.gcc.members;
 
     platforms = lib.platforms.unix;
-    badPlatforms = [ "aarch64-darwin" ];
   };
 }
 

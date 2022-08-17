@@ -1,6 +1,6 @@
 { stdenv, lib, rustPlatform, rustc, Security, patchelf }:
 rustPlatform.buildRustPackage {
-  pname = "clippy";
+  name = "clippy-${rustc.version}";
   inherit (rustc) version src;
 
   # the rust source tarball already has all the dependencies vendored, no need to fetch them again
