@@ -51,8 +51,8 @@ in {
         Please specify either
         'services.promtail.configuration' or
         'services.promtail.configFile'.
-        configuration: ${cfg.configuration}
-        configFile: ${cfg.configFile}
+        configuration: ${builtins.toString cfg.configuration}
+        configFile: ${builtins.toString cfg.configFile}
       '';
     }];
 
