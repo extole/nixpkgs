@@ -1,26 +1,10 @@
 { config, lib, pkgs, ... }: with lib;
 let
   cfg = config.services.promtail;
-
-  prettyJSON = conf: pkgs.runCommandLocal "promtail-config.json" {} ''
-    echo '${builtins.toJSON conf}' | ${pkgs.buildPackages.jq}/bin/jq 'del(._module)' > $out
-  '';
-
-  allowSystemdJournal = cfg.configuration ? scrape_configs && lib.any (v: v ? journal) cfg.configuration.scrape_configs;
-
-  allowPositionsFile = !lib.hasPrefix "/var/cache/promtail" positionsFile;
-  positionsFile = cfg.configuration.positions.filename;
-in {
+in
+{
   options.services.promtail = with types; {
     enable = mkEnableOption (lib.mdDoc "the Promtail ingresser");
-
-    configuration = mkOption {
-      type = (pkgs.formats.json {}).type;
-      default = {};
-      description = lib.mdDoc ''
-        Specify the configuration for Loki in Nix.
-      '';
-    };
 
     configFile = mkOption {
       type = types.nullOr types.path;
@@ -32,7 +16,7 @@ in {
 
     extraFlags = mkOption {
       type = listOf str;
-      default = [];
+      default = [ ];
       example = [ "--server.http-listen-port=3101" ];
       description = lib.mdDoc ''
         Specify a list of additional command line flags,
@@ -42,37 +26,16 @@ in {
   };
 
   config = mkIf cfg.enable {
-    assertions = [{
-      assertion = (
-        (cfg.configuration == {} -> cfg.configFile != null) &&
-        (cfg.configFile != null -> cfg.configuration == {})
-      );
-      message  = ''
-        Please specify either
-        'services.promtail.configuration' or
-        'services.promtail.configFile'.
-        configuration: ${builtins.toString cfg.configuration}
-        configFile: ${builtins.toString cfg.configFile}
-      '';
-    }];
-
-    services.promtail.configuration.positions.filename = mkDefault "/var/cache/promtail/positions.yaml";
-
     systemd.services.promtail = {
       description = "Promtail log ingress";
       wantedBy = [ "multi-user.target" ];
       stopIfChanged = false;
 
-      serviceConfig = let
-        conf = if cfg.configFile == null
-          then prettyJSON cfg.configuration
-          else cfg.configFile;
-      in
-      {
+      serviceConfig = {
         Restart = "on-failure";
         TimeoutStopSec = 10;
 
-        ExecStart = "${pkgs.promtail}/bin/promtail -config.file=${conf} ${escapeShellArgs cfg.extraFlags}";
+        ExecStart = "${pkgs.promtail}/bin/promtail -config.file=${cfg.configFile} ${escapeShellArgs cfg.extraFlags}";
 
         ProtectSystem = "strict";
         ProtectHome = true;
@@ -83,7 +46,6 @@ in {
         RestrictSUIDSGID = true;
         PrivateMounts = true;
         CacheDirectory = "promtail";
-        ReadWritePaths = lib.optional allowPositionsFile (builtins.dirOf positionsFile);
 
         User = "promtail";
         Group = "promtail";
@@ -101,14 +63,13 @@ in {
         RestrictRealtime = true;
         MemoryDenyWriteExecute = true;
         PrivateUsers = true;
-
-        SupplementaryGroups = lib.optional (allowSystemdJournal) "systemd-journal";
-      } // (optionalAttrs (!pkgs.stdenv.isAarch64) { # FIXME: figure out why this breaks on aarch64
+      } // (optionalAttrs (!pkgs.stdenv.isAarch64) {
+        # FIXME: figure out why this breaks on aarch64
         SystemCallFilter = "@system-service";
       });
     };
 
-    users.groups.promtail = {};
+    users.groups.promtail = { };
     users.users.promtail = {
       description = "Promtail service user";
       isSystemUser = true;
