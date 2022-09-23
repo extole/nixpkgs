@@ -22,6 +22,14 @@ in {
       '';
     };
 
+    configFile = mkOption {
+      type = types.nullOr types.path;
+      default = null;
+      description = lib.mdDoc ''
+        Specify a configuration file that Promtail should use.
+      '';
+    };
+
     extraFlags = mkOption {
       type = listOf str;
       default = [];
@@ -34,6 +42,18 @@ in {
   };
 
   config = mkIf cfg.enable {
+    assertions = [{
+      assertion = (
+        (cfg.configuration == {} -> cfg.configFile != null) &&
+        (cfg.configFile != null -> cfg.configuration == {})
+      );
+      message  = ''
+        Please specify either
+        'services.promtail.configuration' or
+        'services.promtail.configFile'.
+      '';
+    }];
+
     services.promtail.configuration.positions.filename = mkDefault "/var/cache/promtail/positions.yaml";
 
     systemd.services.promtail = {
@@ -41,11 +61,16 @@ in {
       wantedBy = [ "multi-user.target" ];
       stopIfChanged = false;
 
-      serviceConfig = {
+      serviceConfig = let
+        conf = if cfg.configFile == null
+          then prettyJSON cfg.configuration
+          else cfg.configFile;
+      in
+      {
         Restart = "on-failure";
         TimeoutStopSec = 10;
 
-        ExecStart = "${pkgs.promtail}/bin/promtail -config.file=${prettyJSON cfg.configuration} ${escapeShellArgs cfg.extraFlags}";
+        ExecStart = "${pkgs.promtail}/bin/promtail -config.file=${conf} ${escapeShellArgs cfg.extraFlags}";
 
         ProtectSystem = "strict";
         ProtectHome = true;
