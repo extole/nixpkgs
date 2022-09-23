@@ -14,9 +14,9 @@ in {
   options.services.promtail = with types; {
     enable = mkEnableOption (lib.mdDoc "the Promtail ingresser");
 
-
     configuration = mkOption {
       type = (pkgs.formats.json {}).type;
+      default = {};
       description = lib.mdDoc ''
         Specify the configuration for Promtail in Nix.
       '';
