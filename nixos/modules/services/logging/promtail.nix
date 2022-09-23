@@ -18,7 +18,7 @@ in {
       type = (pkgs.formats.json {}).type;
       default = {};
       description = lib.mdDoc ''
-        Specify the configuration for Promtail in Nix.
+        Specify the configuration for Loki in Nix.
       '';
     };
 
@@ -26,7 +26,7 @@ in {
       type = types.nullOr types.path;
       default = null;
       description = lib.mdDoc ''
-        Specify a configuration file that Promtail should use.
+        Specify a configuration file that Loki should use.
       '';
     };
 
@@ -51,6 +51,8 @@ in {
         Please specify either
         'services.promtail.configuration' or
         'services.promtail.configFile'.
+        configuration: ${cfg.configuration}
+        configFile: ${cfg.configFile}
       '';
     }];
 
