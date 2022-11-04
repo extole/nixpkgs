@@ -61,10 +61,6 @@ in {
     # New vendor kernels should go to nixos-hardware instead.
     # e.g. https://github.com/NixOS/nixos-hardware/tree/master/microsoft/surface/kernel
 
-    linux_mptcp_95 = callPackage ../os-specific/linux/kernel/linux-mptcp-95.nix {
-      kernelPatches = linux_4_19.kernelPatches;
-    };
-
     linux_rpi1 = callPackage ../os-specific/linux/kernel/linux-rpi.nix {
       kernelPatches = with kernelPatches; [
         bridge_stp_helper
@@ -170,7 +166,9 @@ in {
 
     linux_5_18 = throw "linux 5.18 was removed because it has reached its end of life upstream";
 
-    linux_5_19 = callPackage ../os-specific/linux/kernel/linux-5.19.nix {
+    linux_5_19 = throw "linux 5.19 was removed because it has reached its end of life upstream";
+
+    linux_6_0 = callPackage ../os-specific/linux/kernel/linux-6.0.nix {
       kernelPatches = [
         kernelPatches.bridge_stp_helper
         kernelPatches.request_key_helper
@@ -190,7 +188,7 @@ in {
        else testing;
 
     linux_testing_bcachefs = callPackage ../os-specific/linux/kernel/linux-testing-bcachefs.nix rec {
-      kernel = linux_5_19;
+      kernel = linux_6_0;
       kernelPatches = kernel.kernelPatches;
    };
 
@@ -229,8 +227,9 @@ in {
     };
 
     linux_xanmod = xanmodKernels.lts;
-    linux_xanmod_latest = xanmodKernels.edge;
-    linux_xanmod_tt = xanmodKernels.tt;
+    linux_xanmod_stable = xanmodKernels.main;
+    linux_xanmod_latest = xanmodKernels.main;
+    linux_xanmod_tt = throw "linux_xanmod_tt was removed because upstream no longer offers this option";
 
     linux_libre = deblobKernel packageAliases.linux_default.kernel;
 
@@ -244,7 +243,8 @@ in {
     linux_5_10_hardened = hardenedKernelFor kernels.linux_5_10 { };
     linux_5_15_hardened = hardenedKernelFor kernels.linux_5_15 { };
     linux_5_18_hardened = throw "linux 5.18 was removed because it has reached its end of life upstream";
-    linux_5_19_hardened = hardenedKernelFor kernels.linux_5_19 { };
+    linux_5_19_hardened = throw "linux 5.19 was removed because it has reached its end of life upstream";
+    linux_6_0_hardened = hardenedKernelFor kernels.linux_6_0 { };
 
   }));
   /*  Linux kernel modules are inherently tied to a specific kernel.  So
@@ -530,7 +530,8 @@ in {
     linux_5_16 = throw "linux 5.16 was removed because it reached its end of life upstream"; # Added 2022-04-23
     linux_5_17 = throw "linux 5.17 was removed because it reached its end of life upstream"; # Added 2022-06-23
     linux_5_18 = throw "linux 5.18 was removed because it reached its end of life upstream"; # Added 2022-09-17
-    linux_5_19 = recurseIntoAttrs (packagesFor kernels.linux_5_19);
+    linux_5_19 = throw "linux 5.19 was removed because it reached its end of life upstream"; # Added 2022-11-01
+    linux_6_0 = recurseIntoAttrs (packagesFor kernels.linux_6_0);
   };
 
   rtPackages = {
@@ -547,7 +548,6 @@ in {
   };
 
   packages = recurseIntoAttrs (vanillaPackages // rtPackages // rpiPackages // {
-    linux_mptcp_95 = packagesFor kernels.linux_mptcp_95;
 
     # Intentionally lacks recurseIntoAttrs, as -rc kernels will quite likely break out-of-tree modules and cause failed Hydra builds.
     linux_testing = packagesFor kernels.linux_testing;
@@ -570,13 +570,15 @@ in {
     linux_5_10_hardened = recurseIntoAttrs (hardenedPackagesFor kernels.linux_5_10 { });
     linux_5_15_hardened = recurseIntoAttrs (hardenedPackagesFor kernels.linux_5_15 { });
     linux_5_18_hardened = throw "linux 5.18 was removed because it has reached its end of life upstream";
-    linux_5_19_hardened = recurseIntoAttrs (hardenedPackagesFor kernels.linux_5_19 { });
+    linux_5_19_hardened = throw "linux 5.19 was removed because it has reached its end of life upstream";
+    linux_6_0_hardened = recurseIntoAttrs (hardenedPackagesFor kernels.linux_6_0 { });
 
     linux_zen = recurseIntoAttrs (packagesFor kernels.linux_zen);
     linux_lqx = recurseIntoAttrs (packagesFor kernels.linux_lqx);
     linux_xanmod = recurseIntoAttrs (packagesFor kernels.linux_xanmod);
+    linux_xanmod_stable = recurseIntoAttrs (packagesFor kernels.linux_xanmod_stable);
     linux_xanmod_latest = recurseIntoAttrs (packagesFor kernels.linux_xanmod_latest);
-    linux_xanmod_tt = recurseIntoAttrs (packagesFor kernels.linux_xanmod_tt);
+    linux_xanmod_tt = throw "linux_xanmod_tt was removed because upstream no longer offers this option";
 
     hardkernel_4_14 = recurseIntoAttrs (packagesFor kernels.linux_hardkernel_4_14);
 
@@ -588,7 +590,7 @@ in {
   packageAliases = {
     linux_default = packages.linux_5_15;
     # Update this when adding the newest kernel major version!
-    linux_latest = packages.linux_5_19;
+    linux_latest = packages.linux_6_0;
     linux_mptcp = packages.linux_mptcp_95;
     linux_rt_default = packages.linux_rt_5_4;
     linux_rt_latest = packages.linux_rt_5_10;

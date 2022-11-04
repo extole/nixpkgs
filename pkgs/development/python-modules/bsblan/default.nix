@@ -11,12 +11,13 @@
 , pytest-mock
 , pytestCheckHook
 , pythonOlder
+, setuptools
 , yarl
 }:
 
 buildPythonPackage rec {
   pname = "bsblan";
-  version = "0.5.5";
+  version = "0.5.6";
   format = "pyproject";
 
   disabled = pythonOlder "3.9";
@@ -24,12 +25,13 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "liudger";
     repo = "python-bsblan";
-    rev = "v${version}";
-    hash = "sha256-kq4cML7D9XC/QRPjGfaWcs0H78OOc2IXGua7qJpWYOQ=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-eTKexiuomlTryy2bD2w9Pzhb4R9C3OIbLNX+7h/5l+c=";
   };
 
   nativeBuildInputs = [
     poetry-core
+    setuptools
   ];
 
   propagatedBuildInputs = [

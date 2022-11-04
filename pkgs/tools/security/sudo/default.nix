@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , fetchurl
+, fetchpatch
 , buildPackages
 , coreutils
 , pam
@@ -14,12 +15,20 @@
 
 stdenv.mkDerivation rec {
   pname = "sudo";
-  version = "1.9.11p3";
+  version = "1.9.12";
 
   src = fetchurl {
     url = "https://www.sudo.ws/dist/${pname}-${version}.tar.gz";
-    sha256 = "4687e7d2f56721708f59cca2e1352c056cb23de526c22725615a42bb094f1f70";
+    hash = "sha256-3hVzOIgXDFaDTar9NL+YPbEPshA5dC/Pw5a9MhaNY2I=";
   };
+
+  patches = [
+    (fetchpatch {
+      name = "CVE-2022-43995.patch";
+      url = "https://github.com/sudo-project/sudo/commit/bd209b9f16fcd1270c13db27ae3329c677d48050.patch";
+      sha256 = "sha256-JUdoStoSyv6KBPsyzxuMIxqwZMZsjUPj8zUqOSvmZ1A=";
+    })
+  ];
 
   prePatch = ''
     # do not set sticky bit in nix store
@@ -35,10 +44,10 @@ stdenv.mkDerivation rec {
     "--with-iologdir=/var/log/sudo-io"
     "--with-sendmail=${sendmailPath}"
     "--enable-tmpfiles.d=no"
-  ] ++ lib.optional withInsults [
+  ] ++ lib.optionals withInsults [
     "--with-insults"
     "--with-all-insults"
-  ] ++ lib.optional withSssd [
+  ] ++ lib.optionals withSssd [
     "--with-sssd"
     "--with-sssd-lib=${sssd}/lib"
   ];

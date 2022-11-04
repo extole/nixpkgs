@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchpatch, kernel, elfutils, python2, python3, perl, newt, slang, asciidoc, xmlto, makeWrapper
+{ lib, stdenv, fetchpatch, kernel, elfutils, python2, python3, python3Packages, perl, newt, slang, asciidoc, xmlto, makeWrapper
 , docbook_xsl, docbook_xml_dtd_45, libxslt, flex, bison, pkg-config, libunwind, binutils-unwrapped
 , libiberty, audit, libbfd, libbfd_2_38, libopcodes, libopcodes_2_38, openssl, systemtap, numactl
 , zlib
@@ -53,7 +53,8 @@ stdenv.mkDerivation {
     ++ lib.optional withGtk gtk2
     ++ (if (lib.versionAtLeast kernel.version "4.19") then [ python3 ] else [ python2 ])
     ++ lib.optional withZstd zstd
-    ++ lib.optional withLibcap libcap;
+    ++ lib.optional withLibcap libcap
+    ++ lib.optional (lib.versionAtLeast kernel.version "6.0") python3Packages.setuptools;
 
   NIX_CFLAGS_COMPILE = toString [
     "-Wno-error=cpp"
@@ -63,7 +64,7 @@ stdenv.mkDerivation {
   ];
 
   postPatch = ''
-    patchShebangs scripts
+    patchShebangs scripts tools/perf/pmu-events/jevents.py
   '';
 
   doCheck = false; # requires "sparse"
@@ -72,10 +73,17 @@ stdenv.mkDerivation {
   separateDebugInfo = true;
   installFlags = [ "install" "install-man" "ASCIIDOC8=1" "prefix=$(out)" ];
 
+  postInstall =''
+    # Same as perf. Remove.
+    rm -f $out/bin/trace
+  '';
+
   preFixup = ''
-    # pull in 'objdump' into PATH to make annotations work
+    # Pull in 'objdump' into PATH to make annotations work.
+    # The embeded Python interpreter will search PATH to calculate the Python path configuration(Should be fixed by upstream).
+    # Add python.interpreter to PATH for now.
     wrapProgram $out/bin/perf \
-      --prefix PATH : "${binutils-unwrapped}/bin"
+      --prefix PATH : ${lib.makeBinPath ([ binutils-unwrapped ] ++ (if (lib.versionAtLeast kernel.version "4.19") then [ python3 ] else [ python2 ]))}
   '';
 
   meta = with lib; {

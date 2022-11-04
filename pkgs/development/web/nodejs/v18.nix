@@ -1,14 +1,15 @@
-{ callPackage, fetchpatch, python3, enableNpm ? true }:
+{ callPackage, openssl, fetchpatch, python3, enableNpm ? true }:
 
 let
   buildNodejs = callPackage ./nodejs.nix {
+    inherit openssl;
     python = python3;
   };
 in
 buildNodejs {
   inherit enableNpm;
-  version = "18.9.0";
-  sha256 = "sha256-x1zImv6tl2eRkArM3gKnsefnYnAvD2+mjqrLAZhNllQ=";
+  version = "18.12.0";
+  sha256 = "sha256-c6fwHimZ6xl3Y87WZqbNVErVgOrvtz4KhJYDs+gE9C4=";
   patches = [
     (fetchpatch {
       # Fixes cross compilation to aarch64-linux by reverting https://github.com/nodejs/node/pull/43200
@@ -19,5 +20,6 @@ buildNodejs {
     })
 
     ./disable-darwin-v8-system-instrumentation.patch
+    ./bypass-darwin-xcrun-node16.patch
   ];
 }

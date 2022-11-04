@@ -16,6 +16,7 @@
 , libXext
 , libGLU
 , libGL
+, libxcrypt
 , libxml2
 , llvm_9
 , lz4
@@ -72,6 +73,7 @@ stdenv.mkDerivation rec {
     zlib
     zstd
     lapack
+    libxcrypt
     libxml2
     _llvm_9
     lz4
@@ -195,5 +197,9 @@ stdenv.mkDerivation rec {
     platforms = platforms.unix;
     maintainers = [ maintainers.veprbl ];
     license = licenses.lgpl21;
+
+    # See https://github.com/NixOS/nixpkgs/pull/192581#issuecomment-1256860426
+    # for some context on issues on aarch64.
+    broken = stdenv.isAarch64;
   };
 }
