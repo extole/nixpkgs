@@ -14365,6 +14365,7 @@ with pkgs;
 
   openjdk11-bootstrap = javaPackages.compiler.openjdk11-bootstrap;
   openjdk11 = javaPackages.compiler.openjdk11;
+  openjdk12 = javaPackages.compiler.openjdk12;
   openjdk11_headless = javaPackages.compiler.openjdk11.headless;
   jdk11 = openjdk11;
   jdk11_headless = openjdk11_headless;
