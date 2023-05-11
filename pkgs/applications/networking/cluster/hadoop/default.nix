@@ -4,7 +4,7 @@
 , makeWrapper
 , autoPatchelfHook
 , jdk8_headless
-, jdk17_headless
+, openjdk12
 , bash
 , coreutils
 , which
@@ -104,7 +104,7 @@ in
         aarch64-darwin = aarch64-linux;
     };
     untarDir = "${pname}-${platformAttrs.${stdenv.system}.version}";
-    jdk = jdk17_headless;
+    jdk = openjdk12;
     inherit openssl;
     # TODO: Package and add Intel Storage Acceleration Library
     nativeLibs = [ stdenv.cc.cc.lib protobuf zlib snappy ];
