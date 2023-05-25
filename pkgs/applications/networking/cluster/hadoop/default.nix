@@ -92,8 +92,8 @@ in
     pname = "hadoop";
     platformAttrs = rec {
         x86_64-linux = {
-          version = "3.3.4";
-          hash = "sha256-akg9GgsSNJDr2N8/cbZOs58zP3i5XwkK61jkM8vCQW0=";
+          version = "3.3.1";
+          hash = "";
         };
         x86_64-darwin = x86_64-linux;
         aarch64-linux = {
