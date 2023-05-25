@@ -93,7 +93,7 @@ in
     platformAttrs = rec {
         x86_64-linux = {
           version = "3.3.1";
-          hash = "";
+          hash = "sha256-rXcK4yk8gUHMB030tiPkDXl4LZUlB/UR7wprD6MJe6w=";
         };
         x86_64-darwin = x86_64-linux;
         aarch64-linux = {
