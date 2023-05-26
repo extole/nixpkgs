@@ -75,7 +75,7 @@ in
   spark_3_3 = spark rec {
     pname = "spark";
     version = "3.3.1";
-    sha256 = "";
+    sha256 = "sha256-iX1dnomLKlNB1NXoQ9XTWhyf5jCNSLHzwkoXtTrUar4=";
   };
   spark_3_2 = spark rec {
     pname = "spark";
