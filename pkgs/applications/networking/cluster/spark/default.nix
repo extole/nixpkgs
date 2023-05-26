@@ -72,6 +72,11 @@ let
     };
 in
 {
+  spark_3_3 = spark rec {
+    pname = "spark";
+    version = "3.3.1";
+    sha256 = "";
+  };
   spark_3_2 = spark rec {
     pname = "spark";
     version = "3.2.2";
