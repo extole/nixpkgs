@@ -33,7 +33,7 @@ let
         mkdir -p $out/{lib/${untarDir}/conf,bin,/share/java}
         mv * $out/lib/${untarDir}
 
-        cp $out/lib/${untarDir}/conf/log4j.properties{.template,}
+        # cp $out/lib/${untarDir}/conf/log4j.properties{.template,}
 
         cat > $out/lib/${untarDir}/conf/spark-env.sh <<- EOF
         export JAVA_HOME="${jdk}"
