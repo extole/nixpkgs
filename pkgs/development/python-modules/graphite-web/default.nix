@@ -33,19 +33,6 @@ buildPythonPackage rec {
     hash = "sha256-gbPsg5w+Vtc6MSiNzTAz+9wxUL+KEnE67dlamYHhzww=";
   };
 
-  patches = [
-    (fetchpatch {
-      name = "CVE-2022-4730.CVE-2022-4729.CVE-2022-4728.part-1.patch";
-      url = "https://github.com/graphite-project/graphite-web/commit/9c626006eea36a9fd785e8f811359aebc9774970.patch";
-      hash = "sha256-JMmdhLqsaRhUG2FsH+yPNl+cR7O2YLfKFliL2GU0aAk=";
-    })
-    (fetchpatch {
-      name = "CVE-2022-4730.CVE-2022-4729.CVE-2022-4728.part-2.patch";
-      url = "https://github.com/graphite-project/graphite-web/commit/2f178f490e10efc03cd1d27c72f64ecab224eb23.patch";
-      hash = "sha256-NL7K5uekf3NlLa58aFFRPJT9ktjqBeNlWC4Htd0fRQ0=";
-    })
-  ];
-
   propagatedBuildInputs = [
     cairocffi
     django
@@ -59,12 +46,6 @@ buildPythonPackage rec {
     urllib3
     whisper
   ];
-
-  postPatch = ''
-    substituteInPlace setup.py \
-      --replace "Django>=1.8,<3.1" "Django" \
-      --replace "django-tagging==0.4.3" "django-tagging"
-  '';
 
   # Carbon-s default installation is /opt/graphite. This env variable ensures
   # carbon is installed as a regular Python module.
