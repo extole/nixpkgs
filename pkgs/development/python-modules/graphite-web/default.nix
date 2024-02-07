@@ -30,7 +30,7 @@ buildPythonPackage rec {
     owner = "graphite-project";
     repo = pname;
     rev = version;
-    hash = "";
+    hash = "sha256-gbPsg5w+Vtc6MSiNzTAz+9wxUL+KEnE67dlamYHhzww=";
   };
 
   patches = [
