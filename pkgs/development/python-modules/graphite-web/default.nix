@@ -47,12 +47,6 @@ buildPythonPackage rec {
     whisper
   ];
 
-  postPatch = ''
-    substituteInPlace setup.py \
-      --replace "Django>=1.8,<3.1" "Django" \
-      --replace "django-tagging==0.4.3" "django-tagging"
-  '';
-
   # Carbon-s default installation is /opt/graphite. This env variable ensures
   # carbon is installed as a regular Python module.
   GRAPHITE_NO_PREFIX = "True";
