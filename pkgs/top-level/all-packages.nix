@@ -5560,6 +5560,8 @@ with pkgs;
 
   gllvm = callPackage ../development/tools/gllvm { };
 
+  glide = callPackage ../development/tools/glide { };
+
   globalarrays = callPackage ../development/libraries/globalarrays { };
 
   glock = callPackage ../development/tools/glock { };
