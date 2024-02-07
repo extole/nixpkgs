@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "noiseprotocol";
   version = "0.3.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "plizonczyk";
@@ -13,7 +14,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ cryptography ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "noise" ];
 
@@ -21,6 +22,6 @@ buildPythonPackage rec {
     description = "Noise Protocol Framework";
     homepage = "https://github.com/plizonczyk/noiseprotocol/";
     license = licenses.mit;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }

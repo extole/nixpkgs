@@ -12,11 +12,11 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [ autoreconfHook ];
 
-  NIX_CFLAGS_COMPILE = [ "-std=c++11" ];
+  CXXFLAGS = "-std=c++11";
 
   meta = with lib; {
     description = "A forked version of log4cpp that has been created for the Shibboleth project";
-    maintainers = [ maintainers.jammerful ];
+    maintainers = [ ];
     license = licenses.lgpl21;
     homepage = "http://log4cpp.sf.net";
   };

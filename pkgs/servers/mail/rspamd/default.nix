@@ -1,6 +1,22 @@
-{ stdenv, lib, fetchFromGitHub, cmake, perl
-, glib, luajit, openssl, pcre, pkg-config, sqlite, ragel, icu
-, hyperscan, jemalloc, blas, lapack, lua, libsodium
+{ stdenv
+, lib
+, fetchFromGitHub
+, cmake
+, perl
+, glib
+, luajit
+, openssl
+, pcre
+, pkg-config
+, sqlite
+, ragel
+, icu
+, hyperscan
+, jemalloc
+, blas
+, lapack
+, lua
+, libsodium
 , withBlas ? true
 , withHyperscan ? stdenv.isx86_64
 , withLuaJIT ? stdenv.isx86_64
@@ -11,13 +27,13 @@ assert withHyperscan -> stdenv.isx86_64;
 
 stdenv.mkDerivation rec {
   pname = "rspamd";
-  version = "3.4";
+  version = "3.7.5";
 
   src = fetchFromGitHub {
     owner = "rspamd";
     repo = "rspamd";
     rev = version;
-    sha256 = "sha256-KEIOyURdioyqD33K3rRTiysGO/zSEm6k29zqjzmK9Uk=";
+    hash = "sha256-Y9Xq6mEq52AeTBGMQOh4jO4BUcSS9YfCs1/Wka5zkK4=";
   };
 
   hardeningEnable = [ "pie" ];

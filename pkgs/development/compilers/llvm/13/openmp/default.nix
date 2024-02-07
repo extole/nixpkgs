@@ -2,8 +2,10 @@
 , stdenv
 , llvm_meta
 , src
+, fetchpatch
 , cmake
 , llvm
+, targetLlvm
 , perl
 , version
 }:
@@ -13,10 +15,22 @@ stdenv.mkDerivation rec {
   inherit version;
 
   inherit src;
-  sourceRoot = "source/${pname}";
+  sourceRoot = "${src.name}/${pname}";
+
+  patches = [
+    # Fix cross.
+    (fetchpatch {
+      url = "https://github.com/llvm/llvm-project/commit/5e2358c781b85a18d1463fd924d2741d4ae5e42e.patch";
+      hash = "sha256-UxIlAifXnexF/MaraPW0Ut6q+sf3e7y1fMdEv1q103A=";
+    })
+  ];
+
+  patchFlags = [ "-p2" ];
 
   nativeBuildInputs = [ cmake perl ];
-  buildInputs = [ llvm ];
+  buildInputs = [
+    (if stdenv.buildPlatform == stdenv.hostPlatform then llvm else targetLlvm)
+  ];
 
   cmakeFlags = [
     "-DLIBOMPTARGET_BUILD_AMDGCN_BCLIB=OFF" # Building the AMDGCN device RTL currently fails

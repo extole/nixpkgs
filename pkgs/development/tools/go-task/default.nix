@@ -1,17 +1,23 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{ lib
+, buildGoModule
+, fetchFromGitHub
+, installShellFiles
+, testers
+, go-task
+}:
 
 buildGoModule rec {
   pname = "go-task";
-  version = "3.17.0";
+  version = "3.33.1";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = "task";
-    rev = "v${version}";
-    sha256 = "sha256-pbroxBHo+Y4mjcZVVth2zfDs/5sz9WDhdYMK5v5KeSg=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-GeAVI1jsYH66KIJsdC20j3HADl6y8gRezSWBUEF1Muw=";
   };
 
-  vendorSha256 = "sha256-nOrzOSLIFZvEuFAfKOXXIVoSzumQHRRcQcOAPH5fCSU=";
+  vendorHash = "sha256-kKYE8O+07ha35koSO+KG/K98rVbmDLqAhvaZsVHwUjY=";
 
   doCheck = false;
 
@@ -20,7 +26,9 @@ buildGoModule rec {
   subPackages = [ "cmd/task" ];
 
   ldflags = [
-    "-s" "-w" "-X main.version=${version}"
+    "-s"
+    "-w"
+    "-X=github.com/go-task/task/v3/internal/version.version=${version}"
   ];
 
   postInstall = ''
@@ -29,9 +37,16 @@ buildGoModule rec {
     installShellCompletion completion/{bash,fish,zsh}/*
   '';
 
+  passthru.tests = {
+    version = testers.testVersion {
+      package = go-task;
+    };
+  };
+
   meta = with lib; {
     homepage = "https://taskfile.dev/";
     description = "A task runner / simpler Make alternative written in Go";
+    changelog = "https://github.com/go-task/task/blob/v${version}/CHANGELOG.md";
     license = licenses.mit;
     maintainers = with maintainers; [ parasrah ];
   };

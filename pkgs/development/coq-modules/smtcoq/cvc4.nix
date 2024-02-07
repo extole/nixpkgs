@@ -1,7 +1,9 @@
-{ lib, stdenv, cln, fetchurl, gmp, swig, pkg-config
+{ lib, stdenv, cln, fetchurl, gmp, gnumake42, swig, pkg-config
 , libantlr3c, boost, autoreconfHook
 , python3
 }:
+
+let cln' = cln.override { gccStdenv = stdenv; }; in
 
 stdenv.mkDerivation rec {
   pname = "cvc4";
@@ -12,9 +14,10 @@ stdenv.mkDerivation rec {
     sha256 = "1iw793zsi48q91lxpf8xl8lnvv0jsj4whdad79rakywkm1gbs62w";
   };
 
-  nativeBuildInputs = [ autoreconfHook pkg-config ];
+  # Build fails with GNUmake 4.4
+  nativeBuildInputs = [ autoreconfHook gnumake42 pkg-config ];
   buildInputs = [ gmp swig libantlr3c boost python3 ]
-    ++ lib.optionals stdenv.isLinux [ cln ];
+    ++ lib.optionals stdenv.isLinux [ cln' ];
 
   configureFlags = [
     "--enable-language-bindings=c"
@@ -26,6 +29,10 @@ stdenv.mkDerivation rec {
     patch -p1 -i ${./minisat-fenv.patch} -d src/prop/minisat
     patch -p1 -i ${./minisat-fenv.patch} -d src/prop/bvminisat
   '';
+
+  patches = [
+    ../../../applications/science/logic/cvc4/cvc4-bash-patsub-replacement.patch
+  ];
 
   preConfigure = ''
     patchShebangs ./src/

@@ -7,7 +7,7 @@ let
   cfg = config.services.flatpak;
 in {
   meta = {
-    doc = ./flatpak.xml;
+    doc = ./flatpak.md;
     maintainers = pkgs.flatpak.meta.maintainers;
   };
 
@@ -35,6 +35,7 @@ in {
     services.dbus.packages = [ pkgs.flatpak ];
 
     systemd.packages = [ pkgs.flatpak ];
+    systemd.tmpfiles.packages = [ pkgs.flatpak ];
 
     environment.profiles = [
       "$HOME/.local/share/flatpak/exports"

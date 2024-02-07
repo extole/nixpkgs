@@ -5,11 +5,12 @@
 buildPythonPackage rec {
   pname = "tubes";
   version = "0.2.1";
+  format = "setuptools";
 
   src = fetchPypi {
     pname = "Tubes";
     inherit version;
-    sha256 = "sha256-WbkZfy+m9/xrwygd5VeXrccpu3XJxhO09tbEFZnw14s=";
+    hash = "sha256-WbkZfy+m9/xrwygd5VeXrccpu3XJxhO09tbEFZnw14s=";
   };
 
   propagatedBuildInputs = [ characteristic six twisted ];

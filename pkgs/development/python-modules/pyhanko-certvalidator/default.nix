@@ -1,31 +1,41 @@
 { lib
-, buildPythonPackage
-, fetchFromGitHub
-, pythonOlder
 , aiohttp
 , asn1crypto
+, buildPythonPackage
 , cryptography
+, fetchFromGitHub
+, freezegun
 , oscrypto
-, requests
-, uritools
-, openssl
+, pytest-asyncio
 , pytestCheckHook
+, pythonOlder
+, requests
+, setuptools
+, uritools
 }:
 
 buildPythonPackage rec {
   pname = "pyhanko-certvalidator";
-  version = "0.19.5";
-  format = "setuptools";
+  version = "0.26.2";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
-  # Tests are only available on GitHub
   src = fetchFromGitHub {
     owner = "MatthiasValvekens";
     repo = "certvalidator";
-    rev = version;
-    sha256 = "sha256-UxlBggKgqvbKioG98UaKvhW0YgEa6PqV913nqYvTx1I=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-yGFaRpAOTbuVfY5UefC1sdJS4FFkgkIZnHHG35p3n3E=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace ', "pytest-runner",' ""
+  '';
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     asn1crypto
@@ -35,14 +45,14 @@ buildPythonPackage rec {
     uritools
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aiohttp
+    freezegun
+    pytest-asyncio
     pytestCheckHook
   ];
 
   disabledTestPaths = [
-    # Test looks for libcrypto.so.1.1
-    "dev/stress_test.py"
     # Requests
     "tests/test_crl_client.py"
   ];
@@ -69,6 +79,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python library for validating X.509 certificates and paths";
     homepage = "https://github.com/MatthiasValvekens/certvalidator";
+    changelog = "https://github.com/MatthiasValvekens/certvalidator/blob/v${version}/changelog.md";
     license = licenses.mit;
     maintainers = with maintainers; [ wolfangaukang ];
   };

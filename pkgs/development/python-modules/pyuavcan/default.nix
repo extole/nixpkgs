@@ -4,13 +4,14 @@
  buildPythonPackage rec {
   pname = "pyuavcan";
   version = "1.1.0.dev1";
+  format = "setuptools";
   disabled = pythonOlder "3.7"; # only python>=3.7 is supported
 
   src = fetchFromGitHub {
     owner = "UAVCAN";
     repo = pname;
     rev = version;
-    sha256 = "0fmbmdnnh679zkllv5m6pkrasg7m9vjwabqnmz5m7flrgdh6h4qa";
+    hash = "sha256-ChNoYHuZulPLrxYvxeVO9Tyt8rymlk3p/OkYaG2rqzo=";
   };
 
   propagatedBuildInputs = [

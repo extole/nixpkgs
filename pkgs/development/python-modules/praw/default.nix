@@ -9,13 +9,13 @@
 , pytestCheckHook
 , pythonOlder
 , requests-toolbelt
-, update_checker
+, update-checker
 , websocket-client
 }:
 
 buildPythonPackage rec {
   pname = "praw";
-  version = "7.6.0";
+  version = "7.7.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -23,23 +23,28 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "praw-dev";
     repo = pname;
-    rev = "v${version}";
-    sha256 = "sha256-y2eynMsjF4wZd31YoLdtk8F+ga7Z3R+IQkQK0x0RAGA=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-L7wTHD/ypXVc8GMfl9u16VNb9caLJoXpaMEIzaVVUgo=";
   };
 
   propagatedBuildInputs = [
     mock
     prawcore
-    update_checker
+    update-checker
     websocket-client
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     betamax
     betamax-serializers
     betamax-matchers
     pytestCheckHook
     requests-toolbelt
+  ];
+
+  disabledTestPaths = [
+    # tests requiring network
+    "tests/integration"
   ];
 
   pythonImportsCheck = [
@@ -49,6 +54,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python Reddit API wrapper";
     homepage = "https://praw.readthedocs.org/";
+    changelog = "https://github.com/praw-dev/praw/blob/v${version}/CHANGES.rst";
     license = licenses.bsd2;
     maintainers = with maintainers; [ fab ];
   };

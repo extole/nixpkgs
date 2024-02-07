@@ -1,34 +1,54 @@
 { lib
 , buildPythonPackage
 , pythonOlder
-, fetchPypi
+, fetchFromGitHub
+, substituteAll
+, ruff
 , click
 , click-default-group
 , docformatter
 , jinja2
 , toposort
+, typing-extensions
 , lxml
 , requests
 , pytestCheckHook
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "xsdata";
-  version = "22.9";
+  version = "24.1";
+  pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
-  format = "setuptools";
-
-  src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-xi1QArTeWbrKTE6p7f3Aj7d1lxPsIROaruv/IMw+fPw=";
+  src = fetchFromGitHub {
+    owner = "tefra";
+    repo = "xsdata";
+    rev = "v${version}";
+    hash = "sha256-vdcCTJqvaRehGWfTd9GR/DypF9ftY4ite7SDMPc2Ups=";
   };
 
+  patches = [
+    (substituteAll {
+      src = ./paths.patch;
+      ruff = lib.getExe ruff;
+    })
+  ];
+
   postPatch = ''
-    substituteInPlace setup.cfg \
+    substituteInPlace pyproject.toml \
       --replace "--benchmark-skip" ""
   '';
+
+  nativeBuildInputs = [
+    setuptools
+  ];
+
+  propagatedBuildInputs = [
+    typing-extensions
+  ];
 
   passthru.optional-dependencies = {
     cli = [
@@ -46,7 +66,7 @@ buildPythonPackage rec {
     ];
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ] ++ passthru.optional-dependencies.cli
     ++ passthru.optional-dependencies.lxml
@@ -72,8 +92,9 @@ buildPythonPackage rec {
   ];
 
   meta = {
-    description = "Python XML Binding";
+    description = "Naive XML & JSON bindings for Python";
     homepage = "https://github.com/tefra/xsdata";
+    changelog = "https://github.com/tefra/xsdata/blob/${src.rev}/CHANGES.rst";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ dotlambda ];
   };

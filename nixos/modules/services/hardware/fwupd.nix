@@ -7,19 +7,19 @@ with lib;
 let
   cfg = config.services.fwupd;
 
+  format = pkgs.formats.ini {
+    listToValue = l: lib.concatStringsSep ";" (map (s: generators.mkValueStringDefault {} s) l);
+    mkKeyValue = generators.mkKeyValueDefault {} "=";
+  };
+
   customEtc = {
-    "fwupd/daemon.conf" = {
-      source = pkgs.writeText "daemon.conf" ''
-        [fwupd]
-        DisabledDevices=${lib.concatStringsSep ";" cfg.disabledDevices}
-        DisabledPlugins=${lib.concatStringsSep ";" cfg.disabledPlugins}
-      '';
-    };
-    "fwupd/uefi_capsule.conf" = {
-      source = pkgs.writeText "uefi_capsule.conf" ''
-        [uefi_capsule]
-        OverrideESPMountPoint=${config.boot.loader.efi.efiSysMountPoint}
-      '';
+    "fwupd/fwupd.conf" = {
+      source = format.generate "fwupd.conf" {
+        fwupd = cfg.daemonSettings;
+        uefi_capsule = cfg.uefiCapsuleSettings;
+      };
+      # fwupd tries to chmod the file if it doesn't have the right permissions
+      mode = "0640";
     };
   };
 
@@ -50,7 +50,7 @@ let
     # to install it because it would create a cyclic dependency between
     # the outputs. We also need to enable the remote,
     # which should not be done by default.
-    if cfg.enableTestRemote then (enableRemote cfg.package.installedTests "fwupd-tests") else {}
+    lib.optionalAttrs cfg.enableTestRemote (enableRemote cfg.package.installedTests "fwupd-tests")
   );
 
 in {
@@ -64,24 +64,6 @@ in {
         description = lib.mdDoc ''
           Whether to enable fwupd, a DBus service that allows
           applications to update firmware.
-        '';
-      };
-
-      disabledDevices = mkOption {
-        type = types.listOf types.str;
-        default = [];
-        example = [ "2082b5e0-7a64-478a-b1b2-e3404fab6dad" ];
-        description = lib.mdDoc ''
-          Allow disabling specific devices by their GUID
-        '';
-      };
-
-      disabledPlugins = mkOption {
-        type = types.listOf types.str;
-        default = [];
-        example = [ "udev" ];
-        description = lib.mdDoc ''
-          Allow disabling specific plugins
         '';
       };
 
@@ -112,26 +94,73 @@ in {
         '';
       };
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.fwupd;
-        defaultText = literalExpression "pkgs.fwupd";
+      package = mkPackageOption pkgs "fwupd" { };
+
+      daemonSettings = mkOption {
+        type = types.submodule {
+          freeformType = format.type.nestedTypes.elemType;
+          options = {
+            DisabledDevices = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              example = [ "2082b5e0-7a64-478a-b1b2-e3404fab6dad" ];
+              description = lib.mdDoc ''
+                List of device GUIDs to be disabled.
+              '';
+            };
+
+            DisabledPlugins = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              example = [ "udev" ];
+              description = lib.mdDoc ''
+                List of plugins to be disabled.
+              '';
+            };
+
+            EspLocation = mkOption {
+              type = types.path;
+              default = config.boot.loader.efi.efiSysMountPoint;
+              defaultText = lib.literalExpression "config.boot.loader.efi.efiSysMountPoint";
+              description = lib.mdDoc ''
+                The EFI system partition (ESP) path used if UDisks is not available
+                or if this partition is not mounted at /boot/efi, /boot, or /efi
+              '';
+            };
+          };
+        };
+        default = {};
         description = lib.mdDoc ''
-          Which fwupd package to use.
+          Configurations for the fwupd daemon.
+        '';
+      };
+
+      uefiCapsuleSettings = mkOption {
+        type = types.submodule {
+          freeformType = format.type.nestedTypes.elemType;
+        };
+        default = {};
+        description = lib.mdDoc ''
+          UEFI capsule configurations for the fwupd daemon.
         '';
       };
     };
   };
 
   imports = [
-    (mkRenamedOptionModule [ "services" "fwupd" "blacklistDevices"] [ "services" "fwupd" "disabledDevices" ])
-    (mkRenamedOptionModule [ "services" "fwupd" "blacklistPlugins"] [ "services" "fwupd" "disabledPlugins" ])
+    (mkRenamedOptionModule [ "services" "fwupd" "blacklistDevices"] [ "services" "fwupd" "daemonSettings" "DisabledDevices" ])
+    (mkRenamedOptionModule [ "services" "fwupd" "blacklistPlugins"] [ "services" "fwupd" "daemonSettings" "DisabledPlugins" ])
+    (mkRenamedOptionModule [ "services" "fwupd" "disabledDevices" ] [ "services" "fwupd" "daemonSettings" "DisabledDevices" ])
+    (mkRenamedOptionModule [ "services" "fwupd" "disabledPlugins" ] [ "services" "fwupd" "daemonSettings" "DisabledPlugins" ])
   ];
 
   ###### implementation
   config = mkIf cfg.enable {
     # Disable test related plug-ins implicitly so that users do not have to care about them.
-    services.fwupd.disabledPlugins = cfg.package.defaultDisabledPlugins;
+    services.fwupd.daemonSettings = {
+      DisabledPlugins = cfg.package.defaultDisabledPlugins;
+      EspLocation = config.boot.loader.efi.efiSysMountPoint;
+    };
 
     environment.systemPackages = [ cfg.package ];
 
@@ -142,7 +171,28 @@ in {
 
     services.udev.packages = [ cfg.package ];
 
-    systemd.packages = [ cfg.package ];
+    # required to update the firmware of disks
+    services.udisks2.enable = true;
+
+    systemd = {
+      packages = [ cfg.package ];
+
+      # fwupd-refresh expects a user that we do not create, so just run with DynamicUser
+      # instead and ensure we take ownership of /var/lib/fwupd
+      services.fwupd-refresh.serviceConfig = {
+        StateDirectory = "fwupd";
+        # Better for debugging, upstream sets stderr to null for some reason..
+        StandardError = "inherit";
+      };
+
+      timers.fwupd-refresh.wantedBy = [ "timers.target" ];
+    };
+
+    users.users.fwupd-refresh = {
+      isSystemUser = true;
+      group = "fwupd-refresh";
+    };
+    users.groups.fwupd-refresh = {};
 
     security.polkit.enable = true;
   };

@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "sacremoses";
   version = "0.0.35";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "alvations";
@@ -21,7 +22,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ click six tqdm joblib ];
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
   # ignore tests which call to remote host
   checkPhase = ''
     pytest -k 'not truecase'

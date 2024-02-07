@@ -23,8 +23,6 @@ lib.makeScope pkgs.newScope (self: with self; {
 
   dconf-editor = callPackage ./core/dconf-editor { };
 
-  empathy = callPackage ./core/empathy { };
-
   epiphany = callPackage ./core/epiphany { };
 
   evince = callPackage ./core/evince { }; # ToDo: dbus would prevent compilation, enable tests
@@ -77,8 +75,8 @@ lib.makeScope pkgs.newScope (self: with self; {
 
   gnome-settings-daemon = callPackage ./core/gnome-settings-daemon { };
 
-  # Using 3.38 to match Mutter used in Pantheon
-  gnome-settings-daemon338 = callPackage ./core/gnome-settings-daemon/3.38 { };
+  # Using 43 to match Mutter used in Pantheon
+  gnome-settings-daemon43 = callPackage ./core/gnome-settings-daemon/43 { };
 
   gnome-software = callPackage ./core/gnome-software { };
 
@@ -98,8 +96,8 @@ lib.makeScope pkgs.newScope (self: with self; {
 
   mutter = callPackage ./core/mutter { };
 
-  # Needed for elementary's gala and greeter until support for higher versions is provided
-  mutter338 = callPackage ./core/mutter/3.38 { };
+  # Needed for elementary's gala, wingpanel and greeter until support for higher versions is provided
+  mutter43 = callPackage ./core/mutter/43 { };
 
   nautilus = callPackage ./core/nautilus { };
 
@@ -151,8 +149,6 @@ lib.makeScope pkgs.newScope (self: with self; {
   cheese = callPackage ./apps/cheese { };
 
   file-roller = callPackage ./apps/file-roller { };
-
-  gedit = callPackage ./apps/gedit { };
 
   ghex = callPackage ./apps/ghex { };
 
@@ -242,9 +238,9 @@ lib.makeScope pkgs.newScope (self: with self; {
 
   gnome-flashback = callPackage ./misc/gnome-flashback { };
 
-  gnome-panel = callPackage ./misc/gnome-panel {
-    autoreconfHook = pkgs.autoreconfHook269;
-  };
+  gnome-panel = callPackage ./misc/gnome-panel { };
+
+  gnome-panel-with-modules = callPackage ./misc/gnome-panel/wrapper.nix { };
 
   gnome-tweaks = callPackage ./misc/gnome-tweaks { };
 
@@ -254,7 +250,7 @@ lib.makeScope pkgs.newScope (self: with self; {
 
   nautilus-python = callPackage ./misc/nautilus-python { };
 
-  gtkhtml = callPackage ./misc/gtkhtml { enchant = pkgs.enchant1; };
+  gtkhtml = callPackage ./misc/gtkhtml { enchant = pkgs.enchant2; };
 
   pomodoro = callPackage ./misc/pomodoro { };
 
@@ -264,12 +260,6 @@ lib.makeScope pkgs.newScope (self: with self; {
 }) // lib.optionalAttrs config.allowAliases {
 #### Legacy aliases. They need to be outside the scope or they will shadow the attributes from parent scope.
 
-  gnome-desktop = throw "The ‘gnome.gnome-desktop’ alias was removed. Please use ‘pkgs.gnome-desktop’ directly."; # converted to throw on 2022-10-26
-  gnome-todo = pkgs.endeavour; # added 2022-07-30
-  libgnome-games-support = throw "The ‘gnome.libgnome-games-support’ alias was removed. Please use ‘pkgs.libgnome-games-support’ directly."; # converted to throw on 2022-10-26
-
-  gnome-books = throw "The ‘gnome.gnome-books’ package was removed as it is broken and abandoned."; # added 2022-10-26
-  gnome-documents = throw "The ‘gnome.gnome-documents’ package was removed as it is broken and abandoned."; # added 2022-10-26
-  gnome-devel-docs = throw "The ‘gnome.gnome-devel-docs’ package was removed as it is outdated and no longer relevant."; # added 2022-10-26
-
+  gedit = throw "The ‘gnome.gedit’ alias was removed. Please use ‘pkgs.gedit’ directly."; # converted to throw on 2023-12-27
+  gnome-todo = throw "The ‘gnome.gnome-todo’ alias was removed. Please use ‘pkgs.endeavour’ directly."; # converted to throw on 2023-12-27
 }

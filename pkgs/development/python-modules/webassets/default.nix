@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "webassets";
   version = "2.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -10,7 +11,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ pyyaml ];
-  checkInputs = [ nose jinja2 mock pytest ];
+  nativeCheckInputs = [ nose jinja2 mock pytest ];
 
   # Needs Babel CLI tool
   doCheck = false;

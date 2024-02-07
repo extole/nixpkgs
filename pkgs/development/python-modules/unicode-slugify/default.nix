@@ -3,13 +3,14 @@
 , fetchPypi
 , nose
 , six
-, unittest2
 , unidecode
+, unittestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "unicode-slugify";
   version = "0.1.5";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -18,7 +19,10 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ six unidecode ];
 
-  checkInputs = [ nose unittest2 ];
+  nativeCheckInputs = [
+    nose
+    unittestCheckHook
+  ];
 
   meta = with lib; {
     description = "Generates unicode slugs";

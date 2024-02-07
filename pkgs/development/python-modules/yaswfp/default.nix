@@ -7,6 +7,7 @@
 buildPythonPackage rec {
   pname = "yaswfp";
   version = "unstable-20210331";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "facundobatista";
@@ -15,7 +16,7 @@ buildPythonPackage rec {
     sha256 = "1dxdz89hlycy1rnn269fwl1f0qxgxqarkc0ivs2m77f8xba2qgj9";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

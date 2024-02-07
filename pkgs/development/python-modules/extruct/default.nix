@@ -17,12 +17,13 @@
 buildPythonPackage rec {
   pname = "extruct";
   version = "0.13.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "scrapinghub";
     repo = "extruct";
     rev = "v${version}";
-    sha256 = "sha256-hf6b/tZLggHzgFmZ6aldZIBd17Ni7vCTIIzhNlyjvxw=";
+    hash = "sha256-hf6b/tZLggHzgFmZ6aldZIBd17Ni7vCTIIzhNlyjvxw=";
   };
 
   nativeBuildInputs = [
@@ -45,7 +46,7 @@ buildPythonPackage rec {
     w3lib
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytestCheckHook
   ];

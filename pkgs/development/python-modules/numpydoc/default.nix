@@ -2,39 +2,44 @@
 , buildPythonPackage
 , fetchPypi
 , isPy27
+, setuptools
 , jinja2
 , sphinx
+, tabulate
 , pytestCheckHook
 , matplotlib
 }:
 
 buildPythonPackage rec {
   pname = "numpydoc";
-  version = "1.4.0";
-  format = "setuptools";
+  version = "1.6.0";
+  pyproject = true;
 
   disabled = isPy27;
 
   src = fetchPypi {
     inherit pname;
     inherit version;
-    sha256 = "sha256-lJTa8cdhL1mQX6CeZcm4qQu6yzgE2R96lOd4gx5vz6U=";
+    hash = "sha256-rnpTgPCgY3PDr+FszRW9ebxrB/JwTLxvHn7MlLT1/A0=";
   };
 
   postPatch = ''
-    substituteInPlace setup.py \
-      --replace "Jinja2>=2.10,<3.1" "Jinja2>=2.10,<3.2"
-    substituteInPlace setup.cfg \
+    substituteInPlace pyproject.toml \
       --replace "--cov-report=" "" \
       --replace "--cov=numpydoc" ""
   '';
 
+  nativeBuildInputs = [
+    setuptools
+  ];
+
   propagatedBuildInputs = [
     jinja2
     sphinx
+    tabulate
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     matplotlib
     pytestCheckHook
   ];
@@ -51,6 +56,7 @@ buildPythonPackage rec {
   ];
 
   meta = {
+    changelog = "https://github.com/numpy/numpydoc/releases/tag/v${version}";
     description = "Sphinx extension to support docstrings in Numpy format";
     homepage = "https://github.com/numpy/numpydoc";
     license = lib.licenses.free;

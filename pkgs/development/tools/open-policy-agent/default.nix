@@ -11,15 +11,16 @@ assert enableWasmEval && stdenv.isDarwin -> builtins.throw "building with wasm o
 
 buildGoModule rec {
   pname = "open-policy-agent";
-  version = "0.45.0";
+  version = "0.60.0";
 
   src = fetchFromGitHub {
     owner = "open-policy-agent";
     repo = "opa";
     rev = "v${version}";
-    sha256 = "sha256-7w5HOZr1cei7AvMdHdVzjB3ZQGWCOgm/g9UhuO3vSJI=";
+    hash = "sha256-E+94J83IDLuEayrlwIp8TL+GZeUCkQmSyNL8N7mvK6o=";
   };
-  vendorSha256 = null;
+
+  vendorHash = null;
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -34,6 +35,10 @@ buildGoModule rec {
         + "`opa build` does not need this feature.")
       "opa_wasm");
 
+  checkFlags = lib.optionals (!enableWasmEval) [
+    "-skip=TestRegoTargetWasmAndTargetPluginDisablesIndexingTopdownStages"
+  ];
+
   preCheck = ''
     # Feed in all but the e2e tests for testing
     # This is because subPackages above limits what is built to just what we
@@ -42,7 +47,7 @@ buildGoModule rec {
     getGoDirs() {
       go list ./... | grep -v -e e2e ${lib.optionalString stdenv.isDarwin "-e wasm"}
     }
-    '' + lib.optionalString stdenv.isDarwin ''
+  '' + lib.optionalString stdenv.isDarwin ''
     # remove tests that have "too many open files"/"no space left on device" issues on darwin in hydra
     rm server/server_test.go
   '';

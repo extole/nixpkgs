@@ -4,18 +4,13 @@ with lib;
 let
   cfg = config.services.greetd;
   tty = "tty${toString cfg.vt}";
-  settingsFormat = pkgs.formats.toml {};
+  settingsFormat = pkgs.formats.toml { };
 in
 {
   options.services.greetd = {
     enable = mkEnableOption (lib.mdDoc "greetd");
 
-    package = mkOption {
-      type = types.package;
-      default = pkgs.greetd.greetd;
-      defaultText = literalExpression "pkgs.greetd.greetd";
-      description = lib.mdDoc "The greetd package that should be used.";
-    };
+    package = mkPackageOption pkgs [ "greetd" "greetd" ] { };
 
     settings = mkOption {
       type = settingsFormat.type;
@@ -32,7 +27,7 @@ in
       '';
     };
 
-    vt = mkOption  {
+    vt = mkOption {
       type = types.int;
       default = 1;
       description = lib.mdDoc ''
@@ -45,7 +40,7 @@ in
       default = !(cfg.settings ? initial_session);
       defaultText = literalExpression "!(config.services.greetd.settings ? initial_session)";
       description = lib.mdDoc ''
-        Wether to restart greetd when it terminates (e.g. on failure).
+        Whether to restart greetd when it terminates (e.g. on failure).
         This is usually desirable so a user can always log in, but should be disabled when using 'settings.initial_session' (autologin),
         because every greetd restart will trigger the autologin again.
       '';
@@ -59,6 +54,7 @@ in
     security.pam.services.greetd = {
       allowNullPassword = true;
       startSession = true;
+      enableGnomeKeyring = mkDefault config.services.gnome.gnome-keyring.enable;
     };
 
     # This prevents nixos-rebuild from killing greetd by activating getty again
@@ -89,6 +85,8 @@ in
         SendSIGHUP = true;
         TimeoutStopSec = "30s";
         KeyringMode = "shared";
+
+        Type = "idle";
       };
 
       # Don't kill a user session when using nixos-rebuild
@@ -99,12 +97,18 @@ in
 
     systemd.defaultUnit = "graphical.target";
 
+    # Create directories potentially required by supported greeters
+    # See https://github.com/NixOS/nixpkgs/issues/248323
+    systemd.tmpfiles.rules = [
+      "d '/var/cache/tuigreet' - greeter greeter - -"
+    ];
+
     users.users.greeter = {
       isSystemUser = true;
       group = "greeter";
     };
 
-    users.groups.greeter = {};
+    users.groups.greeter = { };
   };
 
   meta.maintainers = with maintainers; [ queezle ];

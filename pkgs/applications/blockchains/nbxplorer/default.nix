@@ -6,13 +6,13 @@
 
 buildDotnetModule rec {
   pname = "nbxplorer";
-  version = "2.3.41";
+  version = "2.3.66";
 
   src = fetchFromGitHub {
     owner = "dgarage";
     repo = "NBXplorer";
     rev = "v${version}";
-    sha256 = "sha256-xifL6XafK8FCtOoXt5H8ymCWETZlfzTKk51/saBGxHE=";
+    sha256 = "sha256-DcSY2hnzJexsrRw4k57uOBfDkveEvXccN8GDUR/QmKw=";
   };
 
   projectFile = "NBXplorer/NBXplorer.csproj";
@@ -30,5 +30,6 @@ buildDotnetModule rec {
     maintainers = with maintainers; [ kcalvinalvin erikarvstedt ];
     license = licenses.mit;
     platforms = platforms.linux ++ platforms.darwin;
+    mainProgram = "nbxplorer";
   };
 }

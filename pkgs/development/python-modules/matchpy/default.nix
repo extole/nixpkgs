@@ -12,6 +12,7 @@
 buildPythonPackage rec {
   pname = "matchpy";
   version = "0.5.5"; # Don't upgrade to 4.3.1, this tag is very old
+  format = "setuptools";
   disabled = isPy27;
 
   src = fetchFromGitHub {
@@ -37,7 +38,7 @@ buildPythonPackage rec {
     multiset
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     hypothesis
   ];
@@ -50,6 +51,6 @@ buildPythonPackage rec {
     description = "A library for pattern matching on symbolic expressions";
     homepage = "https://github.com/HPAC/matchpy";
     license = licenses.mit;
-    maintainers = with maintainers; [ costrouc ];
+    maintainers = with maintainers; [ ];
   };
 }

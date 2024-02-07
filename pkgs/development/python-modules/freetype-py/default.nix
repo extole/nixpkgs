@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "freetype-py";
   version = "2.1.0.post1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -32,7 +33,7 @@ buildPythonPackage rec {
     cd tests
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

@@ -12,6 +12,7 @@
 buildPythonPackage rec {
   pname = "keepkey";
   version = "7.2.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "keepkey";
@@ -22,7 +23,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ ecdsa hidapi libusb1 mnemonic protobuf ];
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   # tests requires hardware
   doCheck = false;

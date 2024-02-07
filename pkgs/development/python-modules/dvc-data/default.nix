@@ -5,28 +5,26 @@
 , dvc-objects
 , fetchFromGitHub
 , funcy
-, nanotime
 , pygtrie
 , pythonOlder
-, shortuuid
 , setuptools-scm
+, shortuuid
+, sqltrie
 }:
 
 buildPythonPackage rec {
   pname = "dvc-data";
-  version = "0.1.13";
-  format = "pyproject";
+  version = "3.7.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "iterative";
-    repo = pname;
+    repo = "dvc-data";
     rev = "refs/tags/${version}";
-    hash = "sha256-dKqn7dMwPxKnLLBPJGgmD/2MFzdzrw7W9+w9Zi/9hsA=";
+    hash = "sha256-ycC6NWvU00yUEHu62H5VLKDEZEHyIo4+TBwj5XaswII=";
   };
-
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   nativeBuildInputs = [
     setuptools-scm
@@ -37,18 +35,13 @@ buildPythonPackage rec {
     diskcache
     dvc-objects
     funcy
-    nanotime
     pygtrie
     shortuuid
+    sqltrie
   ];
 
   # Tests depend on upath which is unmaintained and only available as wheel
   doCheck = false;
-
-  postPatch = ''
-    substituteInPlace setup.cfg \
-      --replace "dvc-objects==" "dvc-objects>="
-  '';
 
   pythonImportsCheck = [
     "dvc_data"
@@ -57,6 +50,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "DVC's data management subsystem";
     homepage = "https://github.com/iterative/dvc-data";
+    changelog = "https://github.com/iterative/dvc-data/releases/tag/${version}";
     license = licenses.asl20;
     maintainers = with maintainers; [ fab ];
   };

@@ -1,26 +1,23 @@
 { lib, stdenv, fetchurl, dpkg, autoPatchelfHook, makeWrapper, electron
-, nodePackages, alsa-lib, gtk3, libxshmfence, mesa, nss }:
+, asar, alsa-lib, gtk3, libxshmfence, mesa, nss }:
 
 stdenv.mkDerivation rec {
   pname = "morgen";
-  version = "2.5.16";
+  version = "3.1.6";
 
   src = fetchurl {
-    url = "https://download.todesktop.com/210203cqcj00tw1/morgen-${version}.deb";
-    sha256 = "sha256-U77yOgQNSj1p3WZbwkyq0Ui2UrXeuAv5sD7L+ZI2x24=";
+    url = "https://dl.todesktop.com/210203cqcj00tw1/versions/${version}/linux/deb";
+    hash = "sha256-/rMPNIpjkHdLE0lAdWCz71DbcqIW+1Y6RdFrYAfTSKU=";
   };
 
   nativeBuildInputs = [
     dpkg
     autoPatchelfHook
     makeWrapper
-    nodePackages.asar
+    asar
   ];
 
   buildInputs = [ alsa-lib gtk3 libxshmfence mesa nss ];
-
-  dontBuild = true;
-  dontConfigure = true;
 
   unpackCmd = ''
     dpkg-deb -x ${src} ./morgen-${pname}
@@ -37,7 +34,7 @@ stdenv.mkDerivation rec {
     # 2. Fixes startup script
     substituteInPlace $TMP/work/dist/main.js \
       --replace "process.resourcesPath,\"todesktop-runtime-config.json" "\"$out/opt/Morgen/resources/todesktop-runtime-config.json" \
-      --replace "Exec=\"+process.execPath+\"" "Exec=$out/bin/morgen"
+      --replace "Exec=\".concat(process.execPath," "Exec=\".concat(\"$out/bin/morgen\","
     asar pack --unpack='{*.node,*.ftz,rect-overlay}' "$TMP/work" $out/opt/Morgen/resources/app.asar
 
     substituteInPlace $out/share/applications/morgen.desktop \
@@ -49,12 +46,15 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
+  passthru.updateScript = ./update.sh;
+
   meta = with lib; {
     description = "All-in-one Calendars, Tasks and Scheduler";
     homepage = "https://morgen.so/download";
+    mainProgram = "morgen";
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.unfree;
-    maintainers = with maintainers; [ wolfangaukang ];
+    maintainers = with maintainers; [ justanotherariel wolfangaukang ];
     platforms = [ "x86_64-linux" ];
   };
 }

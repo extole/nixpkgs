@@ -5,6 +5,7 @@
 buildPythonPackage rec {
   pname = "moretools";
   version = "0.1.12";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -16,7 +17,7 @@ buildPythonPackage rec {
   '';
 
   nativeBuildInputs = [ zetup ];
-  checkInputs = [ six path pytest ];
+  nativeCheckInputs = [ six path pytest ];
   propagatedBuildInputs = [ decorator ];
 
   meta = with lib; {

@@ -1,18 +1,24 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, setuptools
 , jupyterlab
 , jupyter-lsp
 }:
 
 buildPythonPackage rec {
   pname = "jupyterlab-lsp";
-  version = "3.10.2";
+  version = "5.0.1";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-VZrUaS+X9C3WufCzMKuScD8CuORbuvbpz1mJiolyIqA=";
+    hash = "sha256-jQ8mhTfZ+6F9EgDfBWVI6I/I3n2lIlJs+mM0OJ0MKTQ=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     jupyterlab
@@ -27,6 +33,6 @@ buildPythonPackage rec {
     homepage = "https://github.com/jupyter-lsp/jupyterlab-lsp";
     license = licenses.bsd3;
     platforms = platforms.all;
-    maintainers = with maintainers; [ doronbehar ];
+    maintainers = with maintainers; [ ];
   };
 }

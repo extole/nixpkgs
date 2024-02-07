@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "txrequests";
   version = "0.9.6";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -21,7 +22,7 @@ buildPythonPackage rec {
   # Require network access
   doCheck = false;
 
-  checkInputs = [ unittestCheckHook ];
+  nativeCheckInputs = [ unittestCheckHook ];
 
   meta = with lib; {
     description = "Asynchronous Python HTTP for Humans.";

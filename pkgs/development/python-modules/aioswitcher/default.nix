@@ -14,8 +14,8 @@
 
 buildPythonPackage rec {
   pname = "aioswitcher";
-  version = "3.2.0";
-  format = "pyproject";
+  version = "3.4.2";
+  pyproject = true;
 
   disabled = pythonOlder "3.9";
 
@@ -23,8 +23,10 @@ buildPythonPackage rec {
     owner = "TomerFi";
     repo = pname;
     rev = "refs/tags/${version}";
-    hash = "sha256-Vob5p0+SlZR2eHj5Br2pWp3FCxW+zgY6crh8jrkreT0=";
+    hash = "sha256-UpwIzwOl1yKqK8KxFDXAWoZFkQ+1r1sUcDfx6AxRdNw=";
   };
+
+  __darwinAllowLocalNetworking = true;
 
   nativeBuildInputs = [
     poetry-core
@@ -34,7 +36,7 @@ buildPythonPackage rec {
     export TZ=Asia/Jerusalem
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     assertpy
     pytest-asyncio
     pytest-mockservers
@@ -44,17 +46,12 @@ buildPythonPackage rec {
     time-machine
   ];
 
-  pytestFlagsArray = [
-    "--asyncio-mode=legacy"
-  ];
-
   disabledTests = [
     # AssertionError: Expected <14:00> to be equal to <17:00>, but was not.
     "test_schedule_parser_with_a_weekly_recurring_enabled_schedule_data"
     "test_schedule_parser_with_a_daily_recurring_enabled_schedule_data"
     "test_schedule_parser_with_a_partial_daily_recurring_enabled_schedule_data"
     "test_schedule_parser_with_a_non_recurring_enabled_schedule_data"
-    "test_hexadecimale_timestamp_to_localtime_with_the_current_timestamp_should_return_a_time_string"
   ];
 
   pythonImportsCheck = [
@@ -64,6 +61,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python module to interact with Switcher water heater";
     homepage = "https://github.com/TomerFi/aioswitcher";
+    changelog = "https://github.com/TomerFi/aioswitcher/releases/tag/${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

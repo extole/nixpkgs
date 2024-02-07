@@ -1,45 +1,58 @@
-{ callPackage
-, buildGoModule
+{ buildGoModule
+, buildPackages
 , fetchFromGitHub
+, fetchNpmDeps
 , lib
+, nodejs
+, npmHooks
 , pkg-config
 , stdenv
-, ffmpeg
+, ffmpeg-headless
 , taglib
 , zlib
 , makeWrapper
 , nixosTests
+, nix-update-script
 , ffmpegSupport ? true
 }:
 
-let
-
-  version = "0.48.0";
+buildGoModule rec {
+  pname = "navidrome";
+  version = "0.50.2";
 
   src = fetchFromGitHub {
     owner = "navidrome";
     repo = "navidrome";
     rev = "v${version}";
-    hash = "sha256-FO2Vl3LeajvZ8CLtnsOSLXr//gaOWPbMthj70RHxp+Q=";
+    hash = "sha256-SZ9wVOHtmkrWfYGA0hNCXag2Yp17glOQpBsEQRK6Npg=";
   };
 
-  ui = callPackage ./ui {
-    inherit src version;
+  vendorHash = "sha256-PKj2zJhGR1yETLZ4as35cuwil3vfyFKfkKF/32YdAt8=";
+
+  npmRoot = "ui";
+
+  npmDeps = fetchNpmDeps {
+    inherit src;
+    sourceRoot = "${src.name}/ui";
+    hash = "sha256-7wMMBJE3zSm+eCIaLBjt+Q0OWh3u0XpS0XHnaH17Xsc=";
   };
 
-in
+  nativeBuildInputs = [
+    buildPackages.makeWrapper
+    nodejs
+    npmHooks.npmConfigHook
+    pkg-config
+  ];
 
-buildGoModule {
+  overrideModAttrs = oldAttrs: {
+    nativeBuildInputs = lib.filter (drv: drv != npmHooks.npmConfigHook) oldAttrs.nativeBuildInputs;
+    preBuild = null;
+  };
 
-  pname = "navidrome";
-
-  inherit src version;
-
-  vendorSha256 = "sha256-LPoM5RFHfTTWZtlxc59hly12zzrY8wjXGZ6xW2teOFM=";
-
-  nativeBuildInputs = [ makeWrapper pkg-config ];
-
-  buildInputs = [ taglib zlib ];
+  buildInputs = [
+    taglib
+    zlib
+  ];
 
   ldflags = [
     "-X github.com/navidrome/navidrome/consts.gitSha=${src.rev}"
@@ -48,19 +61,18 @@ buildGoModule {
 
   CGO_CFLAGS = lib.optionals stdenv.cc.isGNU [ "-Wno-return-local-addr" ];
 
-  prePatch = ''
-    cp -r ${ui}/* ui/build
+  preBuild = ''
+    make buildjs
   '';
 
   postFixup = lib.optionalString ffmpegSupport ''
     wrapProgram $out/bin/navidrome \
-      --prefix PATH : ${lib.makeBinPath [ ffmpeg ]}
+      --prefix PATH : ${lib.makeBinPath [ ffmpeg-headless ]}
   '';
 
   passthru = {
-    inherit ui;
     tests.navidrome = nixosTests.navidrome;
-    updateScript = callPackage ./update.nix {};
+    updateScript = nix-update-script { };
   };
 
   meta = {
@@ -68,7 +80,8 @@ buildGoModule {
     homepage = "https://www.navidrome.org/";
     license = lib.licenses.gpl3Only;
     sourceProvenance = with lib.sourceTypes; [ fromSource ];
-    platforms = lib.platforms.unix;
     maintainers = with lib.maintainers; [ aciceri squalus ];
+    # Broken on Darwin: sandbox-exec: pattern serialization length exceeds maximum (NixOS/nix#4119)
+    broken = stdenv.isDarwin;
   };
 }

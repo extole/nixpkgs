@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "pyzbar";
   version = "0.1.9";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "NaturalHistoryMuseum";
@@ -21,7 +22,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ zbar pillow numpy ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   # find_library doesn't return an absolute path
   # https://github.com/NixOS/nixpkgs/issues/7307

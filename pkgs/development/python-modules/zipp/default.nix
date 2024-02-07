@@ -2,21 +2,21 @@
 , buildPythonPackage
 , fetchPypi
 , func-timeout
-, jaraco_itertools
+, jaraco-itertools
 , pythonOlder
 , setuptools-scm
 }:
 
 let zipp = buildPythonPackage rec {
   pname = "zipp";
-  version = "3.8.1";
+  version = "3.17.0";
   format = "pyproject";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-BbRfHuj4B9DMkoSFykCgfLSRzwkv9YfA35yx/RVISNI=";
+    hash = "sha256-hOZKHCjPfpHtIHi7jMjCWcsZt2lCCWyNe4SUdpDKuvA=";
   };
 
   nativeBuildInputs = [
@@ -26,9 +26,9 @@ let zipp = buildPythonPackage rec {
   # Prevent infinite recursion with pytest
   doCheck = false;
 
-  checkInputs = [
+  nativeCheckInputs = [
     func-timeout
-    jaraco_itertools
+    jaraco-itertools
   ];
 
   pythonImportsCheck = [
@@ -43,6 +43,6 @@ let zipp = buildPythonPackage rec {
     description = "Pathlib-compatible object wrapper for zip files";
     homepage = "https://github.com/jaraco/zipp";
     license = licenses.mit;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }; in zipp

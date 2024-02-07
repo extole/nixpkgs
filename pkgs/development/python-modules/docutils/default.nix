@@ -2,23 +2,26 @@
 , lib
 , fetchPypi
 , buildPythonPackage
-, isPy3k
 , python
+, pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "docutils";
-  version = "0.19";
+  version = "0.20.1";
+
+  disabled = pythonOlder "3.7";
+
   format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-M5laZ1PDC39Xf+v8LFBBH+xqrH9//rfEz+WZEHLc+eY=";
+    hash = "sha256-8IpOJ2w6FYOobc4+NKuj/gTQK7ot1R7RYQYkToqSPjs=";
   };
 
   # Only Darwin needs LANG, but we could set it in general.
   # It's done here conditionally to prevent mass-rebuilds.
-  checkPhase = lib.optionalString (isPy3k && stdenv.isDarwin) ''LANG="en_US.UTF-8" LC_ALL="en_US.UTF-8" '' + ''
+  checkPhase = lib.optionalString stdenv.isDarwin ''LANG="en_US.UTF-8" LC_ALL="en_US.UTF-8" '' + ''
     ${python.interpreter} test/alltests.py
   '';
 

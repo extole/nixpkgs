@@ -1,9 +1,11 @@
 { lib
 , pythonOlder
-, pythonAtLeast
 , buildPythonPackage
 , fetchFromGitHub
-, fetchpatch
+
+# build-system
+, setuptools
+
   # Python Inputs
 , fastdtw
 , numpy
@@ -21,7 +23,8 @@
 
 buildPythonPackage rec {
   pname = "qiskit-machine-learning";
-  version = "0.4.0";
+  version = "0.7.1";
+  pyproject = true;
 
   disabled = pythonOlder "3.6";
 
@@ -29,8 +32,12 @@ buildPythonPackage rec {
     owner = "qiskit";
     repo = pname;
     rev = "refs/tags/${version}";
-    sha256 = "sha256-WZSXt+sVeO64wCVbDgBhuGvo5jTn/JKh9oNSO7ZY9wo=";
+    hash = "sha256-qTHacEUTp0RY2piplE6XoYKpJyeFswTPBvjfQ9Gvwt0=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     fastdtw
@@ -43,7 +50,7 @@ buildPythonPackage rec {
   ];
 
   doCheck = false;  # TODO: enable. Tests fail on unstable due to some multithreading issue?
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-timeout
     ddt

@@ -1,13 +1,16 @@
 { lib
 , fetchFromGitHub
 }: rec {
-  version = "3.3.0";
+  version = "3.6.1";
+  format = "setuptools";
+
   src = fetchFromGitHub {
     owner = "openrazer";
     repo = "openrazer";
     rev = "v${version}";
-    sha256 = "1lw2cpj2xzwcsn5igrqj3f6m2v5n6zp1xa9vv3j9f9r2fbb48jcl";
+    hash = "sha256-bboTRZqJq5tKeBQuiEQAXxTHYvoldDQlwbfehjDA8EE=";
   };
+
   meta = with lib; {
     homepage = "https://openrazer.github.io/";
     license = licenses.gpl2Only;

@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "openrouteservice";
   version = "2.3.3";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "GIScience";
@@ -11,7 +12,7 @@ buildPythonPackage rec {
     sha256 = "1d5qbygb81fhpwfdm1a118r3xv45xz9n9avfkgxkvw1n8y6ywz2q";
   };
 
-  checkInputs = [ pytestCheckHook responses ];
+  nativeCheckInputs = [ pytestCheckHook responses ];
 
   disabledTests = [
     # touches network

@@ -1,14 +1,14 @@
-{ lib, stdenv, buildGoModule, fetchFromGitHub, installShellFiles }:
+{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
 
 buildGoModule rec {
   pname = "syft";
-  version = "0.60.2";
+  version = "0.100.0";
 
   src = fetchFromGitHub {
     owner = "anchore";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-qOsKpJwX+8wFvVt/vLdVJ47rfoOn+11phq4HsQVLV6M=";
+    hash = "sha256-NF+Cjf3EZ9nNi10ckEuL6CnUJZssSuv3cq95QIoj+e8=";
     # populate values that require us to use git. By doing this in postFetch we
     # can delete .git afterwards and maintain better reproducibility of the src.
     leaveDotGit = true;
@@ -22,7 +22,7 @@ buildGoModule rec {
   };
   # hash mismatch with darwin
   proxyVendor = true;
-  vendorSha256 = "sha256-gwj6Tj4JqZCCLOSw+K1DpwKhcWLtJ6YY5No20WbqQHU=";
+  vendorHash = "sha256-C6I9NGIt++FesC86NgZc2jrPHQvS5Xmgdc/tlvPJzMo=";
 
   nativeBuildInputs = [ installShellFiles ];
 
@@ -31,14 +31,14 @@ buildGoModule rec {
   ldflags = [
     "-s"
     "-w"
-    "-X github.com/anchore/syft/internal/version.version=${version}"
-    "-X github.com/anchore/syft/internal/version.gitDescription=v${version}"
-    "-X github.com/anchore/syft/internal/version.gitTreeState=clean"
+    "-X main.version=${version}"
+    "-X main.gitDescription=v${version}"
+    "-X main.gitTreeState=clean"
   ];
 
   preBuild = ''
-    ldflags+=" -X github.com/anchore/syft/internal/version.gitCommit=$(cat COMMIT)"
-    ldflags+=" -X github.com/anchore/syft/internal/version.buildDate=$(cat SOURCE_DATE_EPOCH)"
+    ldflags+=" -X main.gitCommit=$(cat COMMIT)"
+    ldflags+=" -X main.buildDate=$(cat SOURCE_DATE_EPOCH)"
   '';
 
   # tests require a running docker instance
@@ -75,6 +75,6 @@ buildGoModule rec {
       vulnerability detection when used with a scanner tool like Grype.
     '';
     license = with licenses; [ asl20 ];
-    maintainers = with maintainers; [ jk ];
+    maintainers = with maintainers; [ jk developer-guy kashw2 ];
   };
 }

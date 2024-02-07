@@ -11,12 +11,13 @@
 buildPythonPackage rec {
   pname = "gym";
   version = "0.26.2";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "openai";
     repo = pname;
-    rev = "${version}";
-    sha256 = "sha256-uJgm8l1SxIRC5PV6BIH/ht/1ucGT5UaUhkFMdusejgA=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-uJgm8l1SxIRC5PV6BIH/ht/1ucGT5UaUhkFMdusejgA=";
   };
 
   propagatedBuildInputs = [

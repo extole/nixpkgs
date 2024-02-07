@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "pure-python-adb";
   version = "0.3.0.dev0";
+  format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
@@ -25,7 +26,7 @@ buildPythonPackage rec {
 
   doCheck = pythonOlder "3.10"; # all tests result in RuntimeError on 3.10
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ]
   ++ passthru.optional-dependencies.async;

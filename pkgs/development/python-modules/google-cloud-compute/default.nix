@@ -8,25 +8,32 @@
 , protobuf
 , pytest-asyncio
 , pytestCheckHook
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "google-cloud-compute";
-  version = "1.5.2";
+  version = "1.15.0";
+  pyproject = true;
+
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-D0pIR1vQEt/7aIxMo0uDlxvt+fwS2DxCurU/lxMHAjo=";
+    hash = "sha256-+mda6vBMYnpELNMDIZbW82rWhEO6MnyXZ6a/vECkKyE=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     google-api-core
     proto-plus
     protobuf
-  ];
+  ] ++ google-api-core.optional-dependencies.grpc;
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytest-asyncio
     pytestCheckHook
@@ -37,8 +44,8 @@ buildPythonPackage rec {
     "google.cloud.compute_v1"
   ];
 
-  # disable tests that require credentials
   disabledTestPaths = [
+    # Disable tests that require credentials
     "tests/system/test_addresses.py"
     "tests/system/test_instance_group.py"
     "tests/system/test_pagination.py"
@@ -47,7 +54,8 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "API Client library for Google Cloud Compute";
-    homepage = "https://github.com/googleapis/python-compute";
+    homepage = "https://github.com/googleapis/google-cloud-python/tree/main/packages/google-cloud-compute";
+    changelog = "https://github.com/googleapis/google-cloud-python/blob/google-cloud-compute-v${version}/packages/google-cloud-compute/CHANGELOG.md";
     license = licenses.asl20;
     maintainers = with maintainers; [ jpetrucciani ];
   };

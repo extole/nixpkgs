@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "pytest-helpers-namespace";
   version = "2021.12.29";
+  format = "setuptools";
   disabled = isPy27;
 
   src = fetchPypi {
@@ -20,7 +21,7 @@ buildPythonPackage rec {
 
   nativeBuildInputs = [ setuptools setuptools-declarative-requirements setuptools-scm ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "pytest_helpers_namespace" ];
 

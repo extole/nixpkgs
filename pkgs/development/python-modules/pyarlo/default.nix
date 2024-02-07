@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "pyarlo";
   version = "0.2.4";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "tchellomello";
@@ -24,7 +25,7 @@ buildPythonPackage rec {
     sseclient-py
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     mock
     requests-mock

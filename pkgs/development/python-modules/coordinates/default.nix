@@ -5,6 +5,7 @@
 buildPythonPackage rec {
   pname = "coordinates";
   version = "0.4.0";
+  format = "setuptools";
 
   disabled = pythonOlder "3.5";
 
@@ -15,7 +16,7 @@ buildPythonPackage rec {
     sha256 = "1zha594rshjg3qjq9mrai2hfldya282ihasp2i3km7b2j4gjdw2b";
   };
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   checkPhase = ''
     runHook preCheck

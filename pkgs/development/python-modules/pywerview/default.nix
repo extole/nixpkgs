@@ -7,22 +7,28 @@
 , ldap3
 , lxml
 , pyasn1
+, pycryptodome
 , pythonOlder
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "pywerview";
-  version = "0.4.0";
-  format = "setuptools";
+  version = "0.6";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "the-useless-one";
-    repo = pname;
-    rev = "v${version}";
-    hash = "sha256-nrPhyBHW13dkXFC5YJfrkiztAxMw4KuEif0zCdjQEq0=";
+    repo ="pywerview";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-WZE6qWq9v4A78YELMEcbgyufBRrVFRTqlhGmknpKn1Y=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     beautifulsoup4
@@ -30,17 +36,12 @@ buildPythonPackage rec {
     impacket
     ldap3
     lxml
+    pycryptodome
     pyasn1
   ];
 
   # Module has no tests
   doCheck = false;
-
-  postPatch = ''
-    # https://github.com/the-useless-one/pywerview/pull/51
-    substituteInPlace setup.py \
-      --replace "bs4" "beautifulsoup4"
-  '';
 
   pythonImportsCheck = [
     "pywerview"
@@ -49,6 +50,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Module for PowerSploit's PowerView support";
     homepage = "https://github.com/the-useless-one/pywerview";
+    changelog = "https://github.com/the-useless-one/pywerview/releases/tag/v${version}";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ fab ];
   };

@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "python-i18n";
   version = "0.3.9";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "danhper";
@@ -11,7 +12,7 @@ buildPythonPackage rec {
     sha256 = "6FahoHZqaOWYGaT9RqLARCm2kLfUIlYuauB6+0eX7jA=";
   };
 
-  checkInputs = [ pytestCheckHook pyyaml ];
+  nativeCheckInputs = [ pytestCheckHook pyyaml ];
 
   pytestFlagsArray = [ "i18n/tests/run_tests.py" ];
 

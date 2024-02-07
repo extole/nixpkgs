@@ -8,6 +8,7 @@
 , tomli
 , pytestCheckHook
 , build
+, hatchling
 , pydantic
 , pytest-mock
 , git
@@ -16,13 +17,14 @@
 
 buildPythonPackage rec {
   pname = "versioningit";
-  version = "2.0.1";
-  disabled = pythonOlder "3.8";
+  version = "2.3.0";
   format = "pyproject";
+
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-gJfiYNm99nZYW9gTO/e1//rDeox2KWJVtC2Gy1EqsuM=";
+    hash = "sha256-HQ1xz6PCvE+N+z1KFcFE64qmoJ2dqYkj1BCZSi74Juo=";
   };
 
   postPatch = ''
@@ -32,17 +34,22 @@ buildPythonPackage rec {
       --replace "--no-cov-on-fail" ""
   '';
 
-  propagatedBuildInputs = [
-    packaging
+  nativeBuildInputs = [
     setuptools
-    tomli
-  ] ++ lib.optionals (pythonOlder "3.10") [
-    importlib-metadata
   ];
 
-  checkInputs = [
+  propagatedBuildInputs = [
+    packaging
+  ] ++ lib.optionals (pythonOlder "3.10") [
+    importlib-metadata
+  ] ++ lib.optionals (pythonOlder "3.11") [
+    tomli
+  ];
+
+  nativeCheckInputs = [
     pytestCheckHook
     build
+    hatchling
     pydantic
     pytest-mock
     git

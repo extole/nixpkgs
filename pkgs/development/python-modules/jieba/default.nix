@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "jieba";
   version = "0.42.1";
+  format = "setuptools";
 
   # no tests in PyPI tarball
   src = fetchFromGitHub {
@@ -12,7 +13,7 @@ buildPythonPackage rec {
     sha256 = "028vmd6sj6wn9l1ilw7qfmlpyiysnlzdgdlhwxs6j4fvq0gyrwxk";
   };
 
-  checkInputs = [ glibcLocales ];
+  nativeCheckInputs = [ glibcLocales ];
 
   # UnicodeEncodeError
   doCheck = isPy3k;

@@ -1,43 +1,57 @@
 { lib
+, arrow
 , buildPythonPackage
 , fetchPypi
-, nose
-, arrow
-, requests
-, units
+, pint
+, pydantic
+, pythonOlder
 , pytz
-, six
+, requests
+, responses
+, setuptools
+, setuptools-scm
 }:
 
 buildPythonPackage rec {
   pname = "stravalib";
-  version = "0.10.4";
+  version = "1.5";
+  pyproject = true;
+
+  disabled = pythonOlder "3.9";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "451817c68a11e0c77db9cb628e3c4df0f4806c5a481536598ab3baa1d1c21215";
+    hash = "sha256-OEdMRg3KjUrXt/CgJgsUqa/sVFAE0JONNZg5MBKtxmY=";
   };
 
-  checkInputs = [
-    nose
+  nativeBuildInputs = [
+    setuptools
+    setuptools-scm
   ];
 
   propagatedBuildInputs = [
     arrow
-    requests
-    units
+    pint
+    pydantic
     pytz
-    six
+    requests
+    responses
   ];
 
-  # tests require network access
-  # testing strava api
+  # Tests require network access, testing strava API
   doCheck = false;
+
+  pythonImportsCheck = [
+    "stravalib"
+  ];
 
   meta = with lib; {
     description = "Python library for interacting with Strava v3 REST API";
-    homepage = "https://github.com/hozn/stravalib";
+    homepage = "https://github.com/stravalib/stravalib";
+    changelog = "https://github.com/stravalib/stravalib/releases/tag/v${version}";
     license = licenses.asl20;
-    maintainers = [ maintainers.costrouc ];
+    maintainers = with maintainers; [ ];
+    # Support for pydantic > 2, https://github.com/stravalib/stravalib/issues/379
+    broken = versionAtLeast pydantic.version "2";
   };
 }

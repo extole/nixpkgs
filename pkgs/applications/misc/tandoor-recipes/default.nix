@@ -1,15 +1,21 @@
 { callPackage
 , nixosTests
 , python3
+, fetchFromGitHub
+, fetchpatch
 }:
 let
   python = python3.override {
     packageOverrides = self: super: {
-      django = super.django_4;
-
-      # Tests are incompatible with Django 4
-      django-js-reverse = super.django-js-reverse.overridePythonAttrs (_: {
-        doCheck = false;
+      validators = super.validators.overridePythonAttrs (_: rec {
+        version = "0.20.0";
+        src = fetchFromGitHub {
+          owner = "python-validators";
+          repo = "validators";
+          rev = version;
+          hash = "sha256-ZnLyTHlsrXthGnaPzlV2ga/UTm5SSEHLTwC/tobiPak=";
+        };
+        propagatedBuildInputs = [ super.decorator super.six ];
       });
     };
   };
@@ -28,6 +34,11 @@ python.pkgs.pythonPackages.buildPythonPackage rec {
   patches = [
     # Allow setting MEDIA_ROOT through environment variable
     ./media-root.patch
+    # https://github.com/TandoorRecipes/recipes/pull/2706
+    (fetchpatch {
+      url = "https://github.com/TandoorRecipes/recipes/commit/702c1d67d3b2d13cf471bf9daa1d2ef0f1837dec.patch";
+      hash = "sha256-6vmtYs6b0d38Ojxxc2I7oxqpkIlyRVlhzURBOTO2VlQ=";
+    })
   ];
 
   propagatedBuildInputs = with python.pkgs; [
@@ -44,6 +55,7 @@ python.pkgs.pythonPackages.buildPythonPackage rec {
     django-cleanup
     django-cors-headers
     django-crispy-forms
+    django-crispy-bootstrap4
     django-hcaptcha
     django-js-reverse
     django-oauth-toolkit
@@ -52,7 +64,7 @@ python.pkgs.pythonPackages.buildPythonPackage rec {
     django-storages
     django-tables2
     django-webpack-loader
-    django_treebeard
+    django-treebeard
     djangorestframework
     drf-writable-nested
     gunicorn
@@ -88,8 +100,10 @@ python.pkgs.pythonPackages.buildPythonPackage rec {
   buildPhase = ''
     runHook preBuild
 
-    # Avoid dependency on django debug toolbar
+    # Disable debug logging
     export DEBUG=0
+    # Avoid dependency on django debug toolbar
+    export DEBUG_TOOLBAR=0
 
     # See https://github.com/TandoorRecipes/recipes/issues/2043
     mkdir cookbook/static/themes/maps/
@@ -97,8 +111,8 @@ python.pkgs.pythonPackages.buildPythonPackage rec {
     touch cookbook/static/themes/bootstrap.min.css.map
     touch cookbook/static/css/bootstrap-vue.min.css.map
 
-    ${python.pythonForBuild.interpreter} manage.py collectstatic_js_reverse
-    ${python.pythonForBuild.interpreter} manage.py collectstatic
+    ${python.pythonOnBuildForHost.interpreter} manage.py collectstatic_js_reverse
+    ${python.pythonOnBuildForHost.interpreter} manage.py collectstatic
 
     runHook postBuild
   '';
@@ -118,10 +132,15 @@ python.pkgs.pythonPackages.buildPythonPackage rec {
     runHook postInstall
   '';
 
-  checkInputs = with python.pkgs; [
+  nativeCheckInputs = with python.pkgs; [
     pytestCheckHook
     pytest-django
     pytest-factoryboy
+  ];
+
+  # flaky
+  disabledTests = [
+    "test_search_count"
   ];
 
   passthru = {

@@ -6,7 +6,7 @@ racket.overrideAttrs (oldAttrs: rec {
   version = oldAttrs.version;
   src = oldAttrs.src.override {
     name = "${pname}-${version}";
-    sha256 = "sha256-AdUJ1f/YKSD/S7Qd6EwH7MavkSKVNxatQ9hKp7OTn0g=";
+    hash = "sha256-H1X9bhQw9yOaESbK4+tveFWVb4EyMNGLKukwKAo588w=";
   };
 
   meta = oldAttrs.meta // {
@@ -16,6 +16,5 @@ racket.overrideAttrs (oldAttrs: rec {
       and the pkg library are still bundled.
     '';
     platforms = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
-    broken = false; # Minimal build does not require working FFI
   };
 })

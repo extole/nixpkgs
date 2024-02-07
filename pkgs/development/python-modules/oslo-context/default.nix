@@ -2,11 +2,11 @@
 
 buildPythonPackage rec {
   pname = "oslo.context";
-  version = "5.0.0";
+  version = "5.3.0";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-iMDG0HZoHGDVYPfWZWXkKsEWxaqKKKBNt8CsACUTMiQ=";
+    hash = "sha256-xRBxQcYotq5W1P62MiucSnAJL9ahgekfq+relKCeTjg=";
   };
 
   postPatch = ''
@@ -20,7 +20,7 @@ buildPythonPackage rec {
     pbr
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     oslotest
     stestr
   ];

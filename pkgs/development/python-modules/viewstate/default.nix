@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "viewstate";
   version = "0.4.3";
+  format = "setuptools";
   disabled = !isPy3k;
 
   src = fetchFromGitHub {
@@ -17,7 +18,7 @@ buildPythonPackage rec {
     sha256 = "15s0n1lhkz0zwi33waqkkjipal3f7s45rxsj1bw89xpr4dj87qx5";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest
   ];
 

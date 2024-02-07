@@ -8,10 +8,11 @@
 buildPythonPackage rec {
   pname = "anyconfig";
   version = "0.13.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-A/8uF2KvOI+7vtHBq3+fHsAGqR2n2zpouWPabneV0qw=";
+    hash = "sha256-A/8uF2KvOI+7vtHBq3+fHsAGqR2n2zpouWPabneV0qw=";
   };
 
   postPatch = ''
@@ -23,7 +24,7 @@ buildPythonPackage rec {
     setuptools
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

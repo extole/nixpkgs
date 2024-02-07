@@ -2,19 +2,20 @@
 
 buildPythonPackage rec {
   pname = "libvirt";
-  version = "8.8.0";
+  version = "9.10.0";
+  format = "setuptools";
 
   src = fetchFromGitLab {
     owner = "libvirt";
     repo = "libvirt-python";
     rev = "v${version}";
-    sha256 = "sha256-UguqUsIfrql1UZeBoHLKXvLYuWicbJWamglkvqS++FI=";
+    hash = "sha256-7qJieTLPzyHvhOLUsti4Mbt94iba2eTZd6OvPn3uLEA=";
   };
 
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [ libvirt lxml ];
 
-  checkInputs = [ nose ];
+  nativeCheckInputs = [ nose ];
   checkPhase = ''
     nosetests
   '';

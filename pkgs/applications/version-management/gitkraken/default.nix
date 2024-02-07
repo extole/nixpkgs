@@ -10,24 +10,24 @@ with lib;
 
 let
   pname = "gitkraken";
-  version = "8.9.1";
+  version = "9.10.0";
 
   throwSystem = throw "Unsupported system: ${stdenv.hostPlatform.system}";
 
   srcs = {
     x86_64-linux = fetchzip {
       url = "https://release.axocdn.com/linux/GitKraken-v${version}.tar.gz";
-      sha256 = "sha256-taz610BIAZm8TB2GQSHLjcDLVjfvtcyLqJ2XBaD6NRE=";
+      hash = "sha256-JVeJY0VUNyIeR/IQcfoLBN0I1WQNFy7PpCjzk5bPv/Q=";
     };
 
     x86_64-darwin = fetchzip {
       url = "https://release.axocdn.com/darwin/GitKraken-v${version}.zip";
-      sha256 = "sha256-TMcXtRO9ANQlmHPULgC/05qrqQC6oN58G3ytokRr/Z8=";
+      hash = "sha256-npc+dwHH0tlVKkAZxmGwpoiHXeDn0VHkivqbwoJsI7M=";
     };
 
     aarch64-darwin = fetchzip {
       url = "https://release.axocdn.com/darwin-arm64/GitKraken-v${version}.zip";
-      sha256 = "sha256-vuk0nfl+Ga5yiZWNwDd9o8qOjmiTLe5tQjGhia0bIk0=";
+      hash = "sha256-fszsGdNKcVgKdv97gBBf+fSODzjKbOBB4MyCvWzm3CA=";
     };
   };
 
@@ -39,7 +39,8 @@ let
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];
     license = licenses.unfree;
     platforms = builtins.attrNames srcs;
-    maintainers = with maintainers; [ xnwdd evanjs arkivm ];
+    maintainers = with maintainers; [ xnwdd evanjs arkivm nicolas-goudry ];
+    mainProgram = "gitkraken";
   };
 
   linux = stdenv.mkDerivation rec {
@@ -122,7 +123,9 @@ let
 
     postFixup = ''
       pushd $out/share/${pname}
-      patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" ${pname}
+      for file in ${pname} chrome-sandbox chrome_crashpad_handler; do
+        patchelf --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" $file
+      done
 
       for file in $(find . -type f \( -name \*.node -o -name ${pname} -o -name \*.so\* \) ); do
         patchelf --set-rpath ${libPath}:$out/share/${pname} $file || true
@@ -137,9 +140,15 @@ let
     nativeBuildInputs = [ unzip ];
 
     installPhase = ''
+      runHook preInstall
+
       mkdir -p $out/Applications/GitKraken.app
       cp -R . $out/Applications/GitKraken.app
+
+      runHook postInstall
     '';
+
+    dontFixup = true;
   };
 in
 if stdenv.isDarwin

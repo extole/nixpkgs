@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "aspy-refactor-imports";
   version = "3.0.1";
+  format = "setuptools";
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
@@ -22,7 +23,7 @@ buildPythonPackage rec {
     "aspy.refactor_imports"
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

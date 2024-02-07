@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "flynt";
   version = "0.66";
+  format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
@@ -21,7 +22,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ astor ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   meta = with lib; {
     description = "command line tool to automatically convert a project's Python code from old format style strings into Python 3.6+'s f-strings";

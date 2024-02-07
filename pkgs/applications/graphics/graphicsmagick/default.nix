@@ -7,11 +7,11 @@
 
 stdenv.mkDerivation rec {
   pname = "graphicsmagick";
-  version = "1.3.38";
+  version = "1.3.42";
 
   src = fetchurl {
     url = "mirror://sourceforge/graphicsmagick/GraphicsMagick-${version}.tar.xz";
-    sha256 = "sha256-1gzZ21k1HSucsZvrRDFwrKoo8HPRPSWPZ7NidjXjJnU=";
+    sha256 = "sha256-SE/M/Ssvr2wrqRUUaezlByvLkbpO1z517T2ORsdZ1Vc=";
   };
 
   patches = [
@@ -48,7 +48,7 @@ stdenv.mkDerivation rec {
       issue-157920 = runCommand "issue-157920-regression-test" {
         buildInputs = [ graphicsmagick ];
       } ''
-        gm convert ${graphviz}/share/graphviz/doc/pdf/neatoguide.pdf jpg:$out
+        gm convert ${graphviz}/share/doc/graphviz/neatoguide.pdf jpg:$out
       '';
     };
   };

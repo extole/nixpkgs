@@ -7,20 +7,24 @@
 , pythonOlder
 , requests
 , responses
-, tox
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "ibm-cloud-sdk-core";
-  version = "3.16.0";
-  format = "setuptools";
+  version = "3.18.2";
+  pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-MfWZGWbU0k586EYY0uhHHo2LuhQSmCfgs9Lz50Ds5Hc=";
+    hash = "sha256-0gjISrKELopSMEuZHL8fy8q7rMuMqzATkP+c4Y8I+9A=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     pyjwt
@@ -28,10 +32,9 @@ buildPythonPackage rec {
     requests
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     responses
-    tox
   ];
 
   disabledTests = [
@@ -53,11 +56,14 @@ buildPythonPackage rec {
 
   disabledTestPaths = [
     "test/test_container_token_manager.py"
+    # Tests require credentials
+    "test_integration/"
   ];
 
   meta = with lib; {
     description = "Client library for the IBM Cloud services";
     homepage = "https://github.com/IBM/python-sdk-core";
+    changelog = "https://github.com/IBM/python-sdk-core/blob/v${version}/CHANGELOG.md";
     license = licenses.asl20;
     maintainers = with maintainers; [ globin ];
   };

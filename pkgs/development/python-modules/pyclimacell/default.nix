@@ -10,13 +10,14 @@
 buildPythonPackage rec {
   pname = "pyclimacell";
   version = "0.18.2";
+  format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "raman325";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-jWHjnebg4Aar48gid7bB7XYXOQtSqbmVmASsZd0YoPc=";
+    hash = "sha256-jWHjnebg4Aar48gid7bB7XYXOQtSqbmVmASsZd0YoPc=";
   };
 
   propagatedBuildInputs = [
@@ -24,7 +25,7 @@ buildPythonPackage rec {
     pytz
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

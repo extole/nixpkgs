@@ -1,6 +1,5 @@
-{ stdenv
-, gcc11Stdenv
-, lib
+{ lib
+, stdenv
 , fetchFromGitHub
 , cmake
 , libpthreadstubs
@@ -9,15 +8,15 @@
 , wrapQtAppsHook
 }:
 
-gcc11Stdenv.mkDerivation rec {
+stdenv.mkDerivation rec {
   pname = "qcoro";
-  version = "0.6.0";
+  version = "0.10.0";
 
   src = fetchFromGitHub {
     owner = "danvratil";
     repo = "qcoro";
     rev = "v${version}";
-    sha256 = "sha256-6kRWBzspwsO0Q6/8gQUr69DJjmkPa3lWrKTmSgVn6V4=";
+    sha256 = "sha256-C4k5ClsMwzxURAQBGV5WBwlRr5N0SvUMJobZ+ROT0EY=";
   };
 
   outputs = [ "out" "dev" ];

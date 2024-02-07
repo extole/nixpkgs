@@ -1,28 +1,36 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, setuptools
 , requests
-, pytest
+, pytestCheckHook
 , mock
 , sphinx
 }:
 
 buildPythonPackage rec {
   pname = "readthedocs-sphinx-ext";
-  version = "2.1.8";
+  version = "2.2.3";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-pX43E9r3e/kdG6GeS5iIpHwKv+tj7PAuOsd/z9mb/mk=";
+    hash = "sha256-ZYPCZ5GlhT7p5Xzp24ZOL7BoCLpHD4BddNU/xQgR4BI=";
   };
 
-  propagatedBuildInputs = [ requests ];
+  nativeBuildInputs = [
+    setuptools
+  ];
 
-  checkInputs = [ pytest mock sphinx ];
+  propagatedBuildInputs = [
+    requests
+  ];
 
-  checkPhase = ''
-    py.test
-  '';
+  nativeCheckInputs = [
+    pytestCheckHook
+    mock
+    sphinx
+  ];
 
   meta = with lib; {
     description = "Sphinx extension for Read the Docs overrides";

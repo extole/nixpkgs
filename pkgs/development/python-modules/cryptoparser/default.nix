@@ -1,33 +1,46 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, setuptools
 , attrs
-, six
 , asn1crypto
+, cryptodatahub
 , python-dateutil
+, urllib3
+, pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "cryptoparser";
-  version = "0.8.0";
+  version = "0.12.1";
+  format = "pyproject";
 
   src = fetchPypi {
-    inherit pname version;
-    sha256 = "sha256-kJg8d1PoGIC0feefbJM8oyXcRyMGdg1wWkQUl/nSNCo=";
+    pname = "CryptoParser";
+    inherit version;
+    hash = "sha256-Q05koDfVaVgiQYhULkwzl9uzUIumO8ZIGJPfxRBUsj0=";
   };
 
-  propagatedBuildInputs = [
-    attrs
-    six
-    asn1crypto
-    python-dateutil
+  nativeBuildInputs = [
+    setuptools
   ];
 
-  pythonImportsCheck = [ "cryptoparser" ];
+  propagatedBuildInputs = [
+    asn1crypto
+    attrs
+    cryptodatahub
+    python-dateutil
+    urllib3
+  ];
+
+  pythonImportsCheck = [
+    "cryptoparser"
+  ];
 
   meta = with lib; {
-    description = "Fast and flexible security protocol parser and generator";
+    description = "Security protocol parser and generator";
     homepage = "https://gitlab.com/coroner/cryptoparser";
+    changelog = "https://gitlab.com/coroner/cryptoparser/-/blob/v${version}/CHANGELOG.md";
     license = licenses.mpl20;
     maintainers = with maintainers; [ kranzes ];
   };

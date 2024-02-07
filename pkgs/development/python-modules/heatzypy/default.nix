@@ -5,28 +5,40 @@
 , requests
 , pytestCheckHook
 , pythonOlder
+, setuptools
+, wheel
 }:
 
 buildPythonPackage rec {
   pname = "heatzypy";
-  version = "2.1.1";
-  format = "setuptools";
+  version = "2.2.0";
+  pyproject = true;
 
-  disabled = pythonOlder "3.8";
+  disabled = pythonOlder "3.11";
 
   src = fetchFromGitHub {
     owner = "Cyr-ius";
-    repo = pname;
+    repo = "heatzypy";
     rev = "refs/tags/${version}";
-    sha256 = "sha256-4/v0xodpJzVi6/ciW5icqDFGCtBFKtGoMB92CknH9xw=";
+    hash = "sha256-Q6v1Ob1PY8tpMnd8hchepq983dsZ6lJPCKz83RRwL3w=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace "replace_by_workflow" "${version}"
+  '';
+
+  nativeBuildInputs = [
+    setuptools
+    wheel
+  ];
 
   propagatedBuildInputs = [
     aiohttp
     requests
   ];
 
-  # Project has no tests
+  # Module has no tests
   doCheck = false;
 
   pythonImportsCheck = [
@@ -34,8 +46,9 @@ buildPythonPackage rec {
   ];
 
   meta = with lib; {
-    description = "Python module to interact with Heatzy devices";
+    description = "Module to interact with Heatzy devices";
     homepage = "https://github.com/Cyr-ius/heatzypy";
+    changelog = "https://github.com/cyr-ius/heatzypy/releases/tag/${version}";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ fab ];
   };

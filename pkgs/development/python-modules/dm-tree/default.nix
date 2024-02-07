@@ -13,13 +13,14 @@
 
 buildPythonPackage rec {
   pname = "dm-tree";
-  version = "0.1.7";
+  version = "0.1.8";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "deepmind";
     repo = "tree";
-    rev = version;
-    hash = "sha256-rg6dcGcbTGfK3h4WAyhwCjgM3o64Jj2SImxNsZXJHHM=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-VvSJTuEYjIz/4TTibSLkbg65YmcYqHImTHOomeorMJc=";
   };
 
   patches = [
@@ -38,7 +39,7 @@ buildPythonPackage rec {
     pybind11
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     absl-py
     attrs
     numpy

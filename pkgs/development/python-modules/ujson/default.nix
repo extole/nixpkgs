@@ -8,19 +8,20 @@
 
 buildPythonPackage rec {
   pname = "ujson";
-  version = "5.5.0";
+  version = "5.8.0";
+  format = "setuptools";
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-slB3qXHH2ke9aEapEqdH9pY3dtkHIMiGA7G1XYF5B4A=";
+    hash = "sha256-eOMY3vSt6JikYbPZKnn5RB5+Dk0q1UGavtQzbXAsdCU=";
   };
 
   nativeBuildInputs = [
     setuptools-scm
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -30,6 +31,6 @@ buildPythonPackage rec {
     description = "Ultra fast JSON encoder and decoder";
     homepage = "https://github.com/ultrajson/ultrajson";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }

@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "redbaron";
   version = "0.9.2";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -16,7 +17,7 @@ buildPythonPackage rec {
     rm tests/test_bounding_box.py
   ''; #error about fixtures
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   meta = with lib; {
     homepage = "https://github.com/gristlabs/asttokens";

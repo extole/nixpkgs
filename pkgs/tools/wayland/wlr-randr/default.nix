@@ -10,13 +10,13 @@
 
 stdenv.mkDerivation rec {
   pname = "wlr-randr";
-  version = "0.2.0";
+  version = "0.4.0";
 
   src = fetchFromSourcehut {
     owner = "~emersion";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-JeSxFXSFxcTwJz9EaLb18wtD4ZIT+ATeYM5OyDTJhDQ=";
+    hash = "sha256-Pr9XEQUtbG3Mo/QjFMoY+oJTQIAVW+aaEjYHZqJgbbg=";
   };
 
   strictDeps = true;
@@ -28,6 +28,7 @@ stdenv.mkDerivation rec {
     homepage = "https://git.sr.ht/~emersion/wlr-randr";
     license = licenses.mit;
     maintainers = with maintainers; [ ma27 ];
-    platforms = platforms.unix;
+    platforms = platforms.linux;
+    mainProgram = "wlr-randr";
   };
 }

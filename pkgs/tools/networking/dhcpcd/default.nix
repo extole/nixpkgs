@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, fetchurl
+, fetchFromGitHub
 , pkg-config
 , udev
 , runtimeShellPackage
@@ -11,11 +11,13 @@
 
 stdenv.mkDerivation rec {
   pname = "dhcpcd";
-  version = "9.4.1";
+  version = "10.0.3";
 
-  src = fetchurl {
-    url = "mirror://roy/${pname}/${pname}-${version}.tar.xz";
-    sha256 = "sha256-gZNXY07+0epc9E7AGyTT0/iFL+yLQkmSXcxWZ8VON2w=";
+  src = fetchFromGitHub {
+    owner = "NetworkConfiguration";
+    repo = "dhcpcd";
+    rev = "v${version}";
+    sha256 = "sha256-NXLOfSPGHiRDSagaT+37TAn9XtdcG4+wP9AvyGJi4Dc=";
   };
 
   nativeBuildInputs = [ pkg-config ];
@@ -27,8 +29,6 @@ stdenv.mkDerivation rec {
   prePatch = ''
     substituteInPlace hooks/dhcpcd-run-hooks.in --replace /bin/sh ${runtimeShell}
   '';
-
-  preConfigure = "patchShebangs ./configure";
 
   configureFlags = [
     "--sysconfdir=/etc"

@@ -11,7 +11,7 @@
 , nbclient
 , nbformat
 , pyarrow
-, PyGithub
+, pygithub
 , pytest-mock
 , pytestCheckHook
 , pythonOlder
@@ -23,14 +23,14 @@
 
 buildPythonPackage rec {
   pname = "papermill";
-  version = "2.4.0";
+  version = "2.5.0";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-b4+KmwazlnfyB8CRAMjThrz1kvDLvdqfD1DoFEVpdic=";
+    hash = "sha256-6ntwwFU/Vv6RsPqcxeFwEs1pkyCosBU3PnhwxeYIbHI=";
   };
 
   propagatedBuildInputs = [
@@ -54,7 +54,7 @@ buildPythonPackage rec {
       gcsfs
     ];
     github = [
-      PyGithub
+      pygithub
     ];
     hdfs = [
       pyarrow
@@ -64,7 +64,7 @@ buildPythonPackage rec {
     ];
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-mock
   ];
@@ -84,6 +84,6 @@ buildPythonPackage rec {
     description = "Parametrize and run Jupyter and interact with notebooks";
     homepage = "https://github.com/nteract/papermill";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ costrouc ];
+    maintainers = with maintainers; [ ];
   };
 }

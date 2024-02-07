@@ -28,14 +28,12 @@ buildPythonPackage rec {
     setuptools-scm
   ];
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
-
   propagatedBuildInputs = [
     aiohttp
     netifaces
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest-aio
     pytest-asyncio
     pytestCheckHook

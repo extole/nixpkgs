@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "isodate";
   version = "0.6.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -16,7 +17,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ six ];
 
-  checkInputs = [ unittestCheckHook ];
+  nativeCheckInputs = [ unittestCheckHook ];
 
   unittestFlagsArray = [ "-s" "src/isodate/tests" ];
 

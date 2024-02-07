@@ -8,12 +8,13 @@
 buildPythonPackage rec {
   pname = "djangorestframework-recursive";
   version = "0.1.2";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "heywbj";
     repo = "django-rest-framework-recursive";
     rev = version;
-    sha256 = "sha256-Q/6yxpz3c402sMZudAeFIht9+5GmTRlzM51AMAx5muY=";
+    hash = "sha256-Q/6yxpz3c402sMZudAeFIht9+5GmTRlzM51AMAx5muY=";
   };
 
   propagatedBuildInputs = [
@@ -32,6 +33,6 @@ buildPythonPackage rec {
     description = " Recursive Serialization for Django REST framework ";
     homepage = "https://github.com/heywbj/django-rest-framework-recursive";
     license = licenses.isc;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }

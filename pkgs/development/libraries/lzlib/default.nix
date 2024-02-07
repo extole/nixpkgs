@@ -12,7 +12,11 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-3ea9WzJTXxeyjJrCS2ZgfgJQUGrBQypBEso8c/XWYsM=";
   };
 
-  makeFlags = [ "CC:=$(CC)" ];
+  postPatch = lib.optionalString stdenv.isDarwin ''
+    substituteInPlace Makefile.in --replace '-Wl,--soname=' '-Wl,-install_name,$(out)/lib/'
+  '';
+
+  makeFlags = [ "CC:=$(CC)" "AR:=$(AR)" ];
   doCheck = true;
 
   configureFlags = [ "--enable-shared" ];

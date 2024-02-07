@@ -1,4 +1,5 @@
 { lib
+, ocaml
 , buildDunePackage
 , fetchFromGitHub
 , ppx_deriving
@@ -14,6 +15,9 @@
 , printbox-text
 }:
 
+lib.throwIf (lib.versionAtLeast ocaml.version "5.0")
+  "phylogenetics is not compatible with OCaml ${ocaml.version}"
+
 buildDunePackage rec {
   pname = "phylogenetics";
   version = "unstable-2022-05-06";
@@ -27,8 +31,9 @@ buildDunePackage rec {
 
   minimalOCamlVersion = "4.08";
 
-  checkInputs = [ alcotest bppsuite ];
-  buildInputs = [ menhir ];
+  nativeCheckInputs = [ bppsuite ];
+  checkInputs = [ alcotest ];
+  nativeBuildInputs = [ menhir ];
   propagatedBuildInputs = [
     angstrom-unix
     biocaml
@@ -40,6 +45,11 @@ buildDunePackage rec {
     printbox-text
   ];
 
+  checkPhase = ''
+    runHook preCheck
+    dune build @app/fulltest
+    runHook postCheck
+  '';
   doCheck = true;
 
   meta = with lib; {

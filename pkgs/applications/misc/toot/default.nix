@@ -1,24 +1,29 @@
-{ lib, fetchFromGitHub, python3Packages }:
+{ lib, fetchFromGitHub, python3Packages, nixosTests }:
 
 python3Packages.buildPythonApplication rec {
   pname = "toot";
-  version = "0.28.0";
+  version = "0.41.1";
 
   src = fetchFromGitHub {
     owner  = "ihabunek";
     repo   = "toot";
-    rev    = version;
-    sha256 = "076r6l89gxjwxjpiklidcs8yajn5c2bnqjvbj4wc559iqdqj88lz";
+    rev = "refs/tags/${version}";
+    sha256 = "sha256-FwxA8YJzNKEK5WjdDi8PIufHh+SRVMRiFVIQs1iZ0UY=";
   };
 
-  checkInputs = with python3Packages; [ pytest ];
+  nativeCheckInputs = with python3Packages; [ pytest ];
 
   propagatedBuildInputs = with python3Packages;
-    [ requests beautifulsoup4 future wcwidth urwid ];
+  [
+    requests beautifulsoup4 future wcwidth
+    urwid urwidgets psycopg2 tomlkit click
+  ];
 
   checkPhase = ''
     py.test
   '';
+
+  passthru.tests.toot = nixosTests.pleroma;
 
   meta = with lib; {
     description = "Mastodon CLI interface";
@@ -28,4 +33,3 @@ python3Packages.buildPythonApplication rec {
   };
 
 }
-

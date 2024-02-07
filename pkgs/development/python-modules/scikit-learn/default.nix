@@ -2,29 +2,36 @@
 , lib
 , buildPythonPackage
 , fetchPypi
-, fetchpatch
+
+# build-system
+, cython
 , gfortran
-, glibcLocales
 , numpy
+, oldest-supported-numpy
 , scipy
+, setuptools
+
+# native dependencies
+, glibcLocales
+, llvmPackages
 , pytestCheckHook
 , pytest-xdist
 , pillow
-, cython
 , joblib
-, llvmPackages
 , threadpoolctl
 , pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "scikit-learn";
-  version = "1.1.2";
+  version = "1.3.2";
+  pyproject = true;
+
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-fCLRMFsW8I1XdRpOo2Bx4iFe+0wJy3kYP6pOjoKj2/g=";
+    hash = "sha256-ovVMdqzMFaNL+5Bm5selbB5yNd2ldiuZB5IzC1LM+wU=";
   };
 
   buildInputs = [
@@ -37,19 +44,26 @@ buildPythonPackage rec {
   nativeBuildInputs = [
     cython
     gfortran
+    numpy
+    oldest-supported-numpy
+    scipy
+    setuptools
   ];
 
   propagatedBuildInputs = [
-    numpy
-    scipy
-    numpy.blas
     joblib
+    numpy
+    numpy.blas
+    scipy
     threadpoolctl
   ];
 
-  checkInputs = [ pytestCheckHook pytest-xdist ];
+  nativeCheckInputs = [
+    pytestCheckHook
+    pytest-xdist
+  ];
 
-  LC_ALL="en_US.UTF-8";
+  env.LC_ALL="en_US.UTF-8";
 
   preBuild = ''
     export SKLEARN_BUILD_PARALLEL=$NIX_BUILD_CORES
@@ -65,6 +79,8 @@ buildPythonPackage rec {
     "check_regressors_train"
     "check_classifiers_train"
     "xfail_ignored_in_check_estimator"
+  ] ++ lib.optionals (stdenv.isDarwin) [
+    "test_graphical_lasso"
   ];
 
   pytestFlagsArray = [
@@ -93,7 +109,7 @@ buildPythonPackage rec {
     changelog = let
       major = versions.major version;
       minor = versions.minor version;
-      dashVer = replaceChars ["."] ["-"] version;
+      dashVer = replaceStrings ["."] ["-"] version;
     in
       "https://scikit-learn.org/stable/whats_new/v${major}.${minor}.html#version-${dashVer}";
     homepage = "https://scikit-learn.org";

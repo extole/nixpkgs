@@ -6,11 +6,7 @@ let
   cfg = config.services.heapster;
 in {
   options.services.heapster = {
-    enable = mkOption {
-      description = lib.mdDoc "Whether to enable heapster monitoring";
-      default = false;
-      type = types.bool;
-    };
+    enable = mkEnableOption (lib.mdDoc "Heapster monitoring");
 
     source = mkOption {
       description = lib.mdDoc "Heapster metric source";
@@ -30,12 +26,7 @@ in {
       type = types.separatedString " ";
     };
 
-    package = mkOption {
-      description = lib.mdDoc "Package to use by heapster";
-      default = pkgs.heapster;
-      defaultText = literalExpression "pkgs.heapster";
-      type = types.package;
-    };
+    package = mkPackageOption pkgs "heapster" { };
   };
 
   config = mkIf cfg.enable {

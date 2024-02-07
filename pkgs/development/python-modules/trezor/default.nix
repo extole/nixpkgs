@@ -7,13 +7,13 @@
 , attrs
 , click
 , construct
+, construct-classes
 , ecdsa
 , hidapi
 , libusb1
 , mnemonic
 , pillow
 , protobuf
-, pyblake2
 , requests
 , shamir-mnemonic
 , simple-rlp
@@ -24,13 +24,14 @@
 
 buildPythonPackage rec {
   pname = "trezor";
-  version = "0.13.3";
+  version = "0.13.8";
+  format = "setuptools";
 
   disabled = !isPy3k;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "055d32174d4ecf2353f7622ee44b8e82e3bef78fe40ce5cdbeafc785b422a049";
+    hash = "sha256-Y01O3fNWAyV8MhYY2FSMajWyc4Rle2XjsL261jWlfP8=";
   };
 
   nativeBuildInputs = [ installShellFiles ];
@@ -39,13 +40,13 @@ buildPythonPackage rec {
     attrs
     click
     construct
+    construct-classes
     ecdsa
     hidapi
     libusb1
     mnemonic
     pillow
     protobuf
-    pyblake2
     requests
     shamir-mnemonic
     simple-rlp
@@ -54,10 +55,11 @@ buildPythonPackage rec {
     trezor-udev-rules
   ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   disabledTestPaths = [
     "tests/test_stellar.py" # requires stellar-sdk
+    "tests/test_firmware.py" # requires network downloads
   ];
 
   pythonImportsCheck = [ "trezorlib" ];

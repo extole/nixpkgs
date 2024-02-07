@@ -1,17 +1,24 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, cryptography
+, types-pyopenssl
 }:
 
 buildPythonPackage rec {
   pname = "types-redis";
-  version = "4.3.21.3";
+  version = "4.6.0.20240106";
   format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-Lh8YQFYYjIdU3tC1Fz3AGCTSv+QZdf4xgGimi+7ftiw=";
+    hash = "sha256-Ky+jp4+EVZYWJC0j+G3l9BMN/Ww7g/stjOMynlA/dW4=";
   };
+
+  propagatedBuildInputs = [
+    cryptography
+    types-pyopenssl
+  ];
 
   # Module doesn't have tests
   doCheck = false;

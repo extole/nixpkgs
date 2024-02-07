@@ -12,6 +12,7 @@
 buildPythonPackage rec {
   pname = "stups-zign";
   version = "1.2";
+  format = "setuptools";
   disabled = !isPy3k;
 
   src = fetchFromGitHub {
@@ -38,7 +39,7 @@ buildPythonPackage rec {
     export HOME=$TEMPDIR
   ";
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest
     pytest-cov
   ];

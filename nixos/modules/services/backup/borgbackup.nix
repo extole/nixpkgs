@@ -11,7 +11,11 @@ let
 
   mkExcludeFile = cfg:
     # Write each exclude pattern to a new line
-    pkgs.writeText "excludefile" (concatStringsSep "\n" cfg.exclude);
+    pkgs.writeText "excludefile" (concatMapStrings (s: s + "\n") cfg.exclude);
+
+  mkPatternsFile = cfg:
+    # Write each pattern to a new line
+    pkgs.writeText "patternsfile" (concatMapStrings (s: s + "\n") cfg.patterns);
 
   mkKeepArgs = cfg:
     # If cfg.prune.keep e.g. has a yearly attribute,
@@ -19,7 +23,8 @@ let
     concatStringsSep " "
       (mapAttrsToList (x: y: "--keep-${x}=${toString y}") cfg.prune.keep);
 
-  mkBackupScript = cfg: ''
+  mkBackupScript = name: cfg: pkgs.writeShellScript "${name}-script" (''
+    set -e
     on_exit()
     {
       exitStatus=$?
@@ -28,7 +33,7 @@ let
     }
     trap on_exit EXIT
 
-    archiveName="${if cfg.archiveBaseName == null then "" else cfg.archiveBaseName + "-"}$(date ${cfg.dateFormat})"
+    archiveName="${optionalString (cfg.archiveBaseName != null) (cfg.archiveBaseName + "-")}$(date ${cfg.dateFormat})"
     archiveSuffix="${optionalString cfg.appendFailedSuffix ".failed"}"
     ${cfg.preHook}
   '' + optionalString cfg.doInit ''
@@ -46,6 +51,7 @@ let
       borg create $extraArgs \
         --compression ${cfg.compression} \
         --exclude-from ${mkExcludeFile cfg} \
+        --patterns-from ${mkPatternsFile cfg} \
         $extraCreateArgs \
         "::$archiveName$archiveSuffix" \
         ${if cfg.paths == null then "-" else escapeShellArgs cfg.paths}
@@ -58,10 +64,11 @@ let
   '' + optionalString (cfg.prune.keep != { }) ''
     borg prune $extraArgs \
       ${mkKeepArgs cfg} \
-      ${optionalString (cfg.prune.prefix != null) "--prefix ${escapeShellArg cfg.prune.prefix} \\"}
+      ${optionalString (cfg.prune.prefix != null) "--glob-archives ${escapeShellArg "${cfg.prune.prefix}*"}"} \
       $extraPruneArgs
+    borg compact $extraArgs $extraCompactArgs
     ${cfg.postPrune}
-  '';
+  '');
 
   mkPassEnv = cfg: with cfg.encryption;
     if passCommand != null then
@@ -73,12 +80,19 @@ let
   mkBackupService = name: cfg:
     let
       userHome = config.users.users.${cfg.user}.home;
-    in nameValuePair "borgbackup-job-${name}" {
+      backupJobName = "borgbackup-job-${name}";
+      backupScript = mkBackupScript backupJobName cfg;
+    in nameValuePair backupJobName {
       description = "BorgBackup job ${name}";
-      path = with pkgs; [
-        borgbackup openssh
+      path =  [
+        config.services.borgbackup.package pkgs.openssh
       ];
-      script = mkBackupScript cfg;
+      script = "exec " + optionalString cfg.inhibitsSleep ''\
+        ${pkgs.systemd}/bin/systemd-inhibit \
+            --who="borgbackup" \
+            --what="sleep" \
+            --why="Scheduled backup" \
+        '' + backupScript;
       serviceConfig = {
         User = cfg.user;
         Group = cfg.group;
@@ -95,7 +109,7 @@ let
       };
       environment = {
         BORG_REPO = cfg.repo;
-        inherit (cfg) extraArgs extraInitArgs extraCreateArgs extraPruneArgs;
+        inherit (cfg) extraArgs extraInitArgs extraCreateArgs extraPruneArgs extraCompactArgs;
       } // (mkPassEnv cfg) // cfg.environment;
     };
 
@@ -123,25 +137,21 @@ let
     '');
 
   mkBorgWrapper = name: cfg: mkWrapperDrv {
-    original = "${pkgs.borgbackup}/bin/borg";
+    original = getExe config.services.borgbackup.package;
     name = "borg-job-${name}";
     set = { BORG_REPO = cfg.repo; } // (mkPassEnv cfg) // cfg.environment;
   };
 
   # Paths listed in ReadWritePaths must exist before service is started
-  mkActivationScript = name: cfg:
+  mkTmpfiles = name: cfg:
     let
-      install = "install -o ${cfg.user} -g ${cfg.group}";
-    in
-      nameValuePair "borgbackup-job-${name}" (stringAfter [ "users" ] (''
-        # Ensure that the home directory already exists
-        # We can't assert createHome == true because that's not the case for root
-        cd "${config.users.users.${cfg.user}.home}"
-        ${install} -d .config/borg
-        ${install} -d .cache/borg
-      '' + optionalString (isLocalPath cfg.repo && !cfg.removableDevice) ''
-        ${install} -d ${escapeShellArg cfg.repo}
-      ''));
+      settings = { inherit (cfg) user group; };
+    in lib.nameValuePair "borgbackup-job-${name}" ({
+      "${config.users.users."${cfg.user}".home}/.config/borg".d = settings;
+      "${config.users.users."${cfg.user}".home}/.cache/borg".d = settings;
+    } // optionalAttrs (isLocalPath cfg.repo && !cfg.removableDevice) {
+      "${cfg.repo}".d = settings;
+    });
 
   mkPassAssertion = name: cfg: {
     assertion = with cfg.encryption;
@@ -212,9 +222,11 @@ let
 
 in {
   meta.maintainers = with maintainers; [ dotlambda ];
-  meta.doc = ./borgbackup.xml;
+  meta.doc = ./borgbackup.md;
 
   ###### interface
+
+  options.services.borgbackup.package = mkPackageOption pkgs "borgbackup" { };
 
   options.services.borgbackup.jobs = mkOption {
     description = lib.mdDoc ''
@@ -341,6 +353,15 @@ in {
             '';
           };
 
+          inhibitsSleep = mkOption {
+            default = false;
+            type = types.bool;
+            example = true;
+            description = lib.mdDoc ''
+              Prevents the system from sleeping while backing up.
+            '';
+          };
+
           user = mkOption {
             type = types.str;
             description = lib.mdDoc ''
@@ -421,6 +442,21 @@ in {
             example = [
               "/home/*/.cache"
               "/nix"
+            ];
+          };
+
+          patterns = mkOption {
+            type = with types; listOf str;
+            description = lib.mdDoc ''
+              Include/exclude paths matching the given patterns. The first
+              matching patterns is used, so if an include pattern (prefix `+`)
+              matches before an exclude pattern (prefix `-`), the file is
+              backed up. See [{command}`borg help patterns`](https://borgbackup.readthedocs.io/en/stable/usage/help.html#borg-patterns) for pattern syntax.
+            '';
+            default = [ ];
+            example = [
+              "+ /home/susan"
+              "- /home/*"
             ];
           };
 
@@ -561,45 +597,57 @@ in {
           };
 
           extraArgs = mkOption {
-            type = types.str;
+            type = with types; coercedTo (listOf str) escapeShellArgs str;
             description = lib.mdDoc ''
               Additional arguments for all {command}`borg` calls the
               service has. Handle with care.
             '';
-            default = "";
-            example = "--remote-path=/path/to/borg";
+            default = [ ];
+            example = [ "--remote-path=/path/to/borg" ];
           };
 
           extraInitArgs = mkOption {
-            type = types.str;
+            type = with types; coercedTo (listOf str) escapeShellArgs str;
             description = lib.mdDoc ''
               Additional arguments for {command}`borg init`.
               Can also be set at runtime using `$extraInitArgs`.
             '';
-            default = "";
-            example = "--append-only";
+            default = [ ];
+            example = [ "--append-only" ];
           };
 
           extraCreateArgs = mkOption {
-            type = types.str;
+            type = with types; coercedTo (listOf str) escapeShellArgs str;
             description = lib.mdDoc ''
               Additional arguments for {command}`borg create`.
               Can also be set at runtime using `$extraCreateArgs`.
             '';
-            default = "";
-            example = "--stats --checkpoint-interval 600";
+            default = [ ];
+            example = [
+              "--stats"
+              "--checkpoint-interval 600"
+            ];
           };
 
           extraPruneArgs = mkOption {
-            type = types.str;
+            type = with types; coercedTo (listOf str) escapeShellArgs str;
             description = lib.mdDoc ''
               Additional arguments for {command}`borg prune`.
               Can also be set at runtime using `$extraPruneArgs`.
             '';
-            default = "";
-            example = "--save-space";
+            default = [ ];
+            example = [ "--save-space" ];
           };
 
+          extraCompactArgs = mkOption {
+            type = with types; coercedTo (listOf str) escapeShellArgs str;
+            description = lib.mdDoc ''
+              Additional arguments for {command}`borg compact`.
+              Can also be set at runtime using `$extraCompactArgs`.
+            '';
+            default = [ ];
+            example = [ "--cleanup-commits" ];
+          };
         };
       }
     ));
@@ -707,7 +755,7 @@ in {
         ++ mapAttrsToList mkSourceAssertions jobs
         ++ mapAttrsToList mkRemovableDeviceAssertions jobs;
 
-      system.activationScripts = mapAttrs' mkActivationScript jobs;
+      systemd.tmpfiles.settings = mapAttrs' mkTmpfiles jobs;
 
       systemd.services =
         # A job named "foo" is mapped to systemd.services.borgbackup-job-foo
@@ -721,6 +769,7 @@ in {
 
       users = mkMerge (mapAttrsToList mkUsersConfig repos);
 
-      environment.systemPackages = with pkgs; [ borgbackup ] ++ (mapAttrsToList mkBorgWrapper jobs);
+      environment.systemPackages =
+        [ config.services.borgbackup.package ] ++ (mapAttrsToList mkBorgWrapper jobs);
     });
 }

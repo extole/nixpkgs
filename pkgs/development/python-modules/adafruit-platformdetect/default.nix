@@ -7,15 +7,15 @@
 
 buildPythonPackage rec {
   pname = "adafruit-platformdetect";
-  version = "3.32.0";
-  format = "setuptools";
+  version = "3.58.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     pname = "Adafruit-PlatformDetect";
     inherit version;
-    hash = "sha256-MbrRf7kcPNYb1i+5cSkCvO9SJbvrPAeKGWxtfi1FmaQ=";
+    hash = "sha256-9pucdj4rXCLitoNqu1ddETY9XUmIlIfC0hIoKJ54Ks8=";
   };
 
   nativeBuildInputs = [
@@ -32,6 +32,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Platform detection for use by Adafruit libraries";
     homepage = "https://github.com/adafruit/Adafruit_Python_PlatformDetect";
+    changelog = "https://github.com/adafruit/Adafruit_Python_PlatformDetect/releases/tag/${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

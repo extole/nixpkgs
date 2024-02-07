@@ -2,12 +2,16 @@
 , pythonOlder
 , buildPythonPackage
 , fetchFromGitHub
+
+# build-system
+, setuptools
+
   # Python Inputs
 , h5py
 , numpy
 , psutil
 , qiskit-terra
-, retworkx
+, rustworkx
 , scikit-learn
 , scipy
 , withPyscf ? false
@@ -21,7 +25,8 @@
 
 buildPythonPackage rec {
   pname = "qiskit-nature";
-  version = "0.4.3";
+  version = "0.7.1";
+  pyproject = true;
 
   disabled = pythonOlder "3.6";
 
@@ -29,20 +34,24 @@ buildPythonPackage rec {
     owner = "Qiskit";
     repo = pname;
     rev = "refs/tags/${version}";
-    sha256 = "sha256-trThxcft6AOxalOglOKPwrJ23Bqt/FmMCAucKmNmB7c=";
+    hash = "sha256-RspjHEFYdu1k6azmifbpd57tH+SxPeepw5EQzWP/Yc8=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     h5py
     numpy
     psutil
     qiskit-terra
-    retworkx
+    rustworkx
     scikit-learn
     scipy
   ] ++ lib.optional withPyscf pyscf;
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     ddt
     pylatexenc

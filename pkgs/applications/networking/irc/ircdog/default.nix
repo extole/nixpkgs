@@ -5,16 +5,16 @@
 
 buildGoModule rec {
   pname = "ircdog";
-  version = "0.3.0";
+  version = "0.5.2";
 
   src = fetchFromGitHub {
     owner = "goshuirc";
-    repo = pname;
-    rev = "v${version}";
-    sha256 = "sha256-x3ihWLgVYu17vG1xQTgIr4TSkeZ467TZBV1fPTPnZgw=";
-    fetchSubmodules = true;
+    repo = "ircdog";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-rV9IBa30v1T3Zw/av8nfmX9Bg20FPAGdJkMn17r8rYw=";
   };
-  vendorSha256 = null;
+
+  vendorHash = null;
 
   meta = with lib; {
     description = "ircdog is a simple wrapper over the raw IRC protocol that can respond to pings, and interprets formatting codes";

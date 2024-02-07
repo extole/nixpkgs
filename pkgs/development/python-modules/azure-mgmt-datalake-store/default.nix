@@ -10,11 +10,12 @@
 buildPythonPackage rec {
   pname = "azure-mgmt-datalake-store";
   version = "1.0.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
     extension = "zip";
-    sha256 = "sha256-GrmVK97M+iojevPLVTuLmfQRLxvrHtr9DRHymJvLYHE=";
+    hash = "sha256-GrmVK97M+iojevPLVTuLmfQRLxvrHtr9DRHymJvLYHE=";
   };
 
   propagatedBuildInputs = [

@@ -9,13 +9,13 @@
 
 stdenv.mkDerivation rec {
   pname = "gnatcoll-core";
-  version = "22.0.0";
+  version = "24.0.0";
 
   src = fetchFromGitHub {
     owner = "AdaCore";
     repo = "gnatcoll-core";
     rev = "v${version}";
-    sha256 = "0fn28dp6bgpp1sshr09m1x85g2gx11xqkiy410hiicfyg5hamh1l";
+    sha256 = "1cks2w0inj9hvamsdxjriwxnx1igmx2khhr6kwxshsl30rs8nzvb";
   };
 
   nativeBuildInputs = [

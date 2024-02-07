@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "mkl-service";
   version = "2.4.0.post1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "IntelPython";
@@ -13,7 +14,7 @@ buildPythonPackage rec {
 
   MKLROOT = mkl;
 
-  checkInputs = [ nose ];
+  nativeCheckInputs = [ nose ];
   nativeBuildInputs = [ cython ];
   propagatedBuildInputs = [ mkl six ];
 

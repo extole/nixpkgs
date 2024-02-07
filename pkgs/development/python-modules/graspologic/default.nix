@@ -2,6 +2,7 @@
 , buildPythonPackage
 , isPy27
 , fetchFromGitHub
+, setuptools
 , pytestCheckHook
 , pytest-cov
 , hyppo
@@ -15,16 +16,21 @@
 
 buildPythonPackage rec {
   pname = "graspologic";
-  version = "1.0.0";
+  version = "3.3.0";
+  pyproject = true;
 
   disabled = isPy27;
 
   src = fetchFromGitHub {
     owner = "microsoft";
     repo = "graspologic";
-    rev = "v${version}";
-    sha256 = "sha256-mzJ3eFo77gnOh/Vs9u68yFDZW3ilXtcCCwKahKyRRmc=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-hd3OyV95N8vhc4s50HbKkrcUOeSegn66Dkw7dixim00=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     hyppo
@@ -36,7 +42,7 @@ buildPythonPackage rec {
     seaborn
   ];
 
-  checkInputs = [ pytestCheckHook pytest-cov ];
+  nativeCheckInputs = [ pytestCheckHook pytest-cov ];
   pytestFlagsArray = [ "tests" "--ignore=docs" "--ignore=tests/test_sklearn.py" ];
   disabledTests = [ "gridplot_outputs" ];
 

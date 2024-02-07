@@ -1,17 +1,25 @@
-{ stdenv, lib, fetchFromGitHub, buildGoModule }:
+{ stdenv, lib, fetchFromGitHub, buildGoModule, fetchpatch }:
 
 buildGoModule rec {
   pname = "gost";
-  version = "2.11.1";
+  version = "2.11.5";
 
   src = fetchFromGitHub {
     owner = "ginuerzh";
     repo = "gost";
     rev = "v${version}";
-    sha256 = "1mxgjvx99bz34f132827bqk56zgvh5rw3h2xmc524wvx59k9zj2a";
+    sha256 = "sha256-UBjrWeBw9+qKQ/+1T1W/3e0vrigp540URIyM2d9iCE8=";
   };
 
-  vendorSha256 = "1cgb957ipkiix3x0x84c77a1i8l679q3kqykm1lhb4f19x61dqjh";
+  patches = [
+    # Add go1.20 support. Remove with the next release.
+    (fetchpatch {
+      url = "https://github.com/ginuerzh/gost/commit/0f7376bd10c913c7e6b1e7e02dd5fd7769975d78.patch";
+      hash = "sha256-pQNCvl7/huNrkM3+XHkGnvLYCzdjbMV6nef1KcMnKEw=";
+    })
+  ];
+
+  vendorHash = "sha256-wAdNfhSPj9JUcI6Gcja6nRy68bVhV8B4PARR0WS9rjQ=";
 
   postPatch = ''
     substituteInPlace http2_test.go \
@@ -41,8 +49,9 @@ buildGoModule rec {
       --replace '{url.UserPassword("AES-256-GCM", "123456"), url.UserPassword("AES-256-GCM", "123456"), true},' ""
   '';
 
+  __darwinAllowLocalNetworking = true;
+
   meta = with lib; {
-    broken = stdenv.isDarwin;
     description = "A simple tunnel written in golang";
     homepage = "https://github.com/ginuerzh/gost";
     license = licenses.mit;

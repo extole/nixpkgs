@@ -15,13 +15,13 @@
 
 python3Packages.buildPythonApplication rec {
   pname = "tartube";
-  version = "2.4.093";
+  version = "2.5.0";
 
   src = fetchFromGitHub {
     owner = "axcore";
     repo = "tartube";
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-l8jB+3vY9jOlCaLDHAvDm1Ko7viHbnRBIMEXLb/k2z0=";
+    sha256 = "sha256-IcJDh8Q9K6SROZWVi98R1N2kSdgwJczScLdJFKy2FIU=";
   };
 
   nativeBuildInputs = [
@@ -74,5 +74,6 @@ python3Packages.buildPythonApplication rec {
     platforms = platforms.linux;
     maintainers = with maintainers; [ mkg20001 luc65r ];
     homepage = "https://tartube.sourceforge.io/";
+    mainProgram = "tartube";
   };
 }

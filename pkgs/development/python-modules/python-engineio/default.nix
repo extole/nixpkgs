@@ -2,6 +2,7 @@
 , stdenv
 , aiohttp
 , buildPythonPackage
+, setuptools
 , eventlet
 , fetchFromGitHub
 , iana-etc
@@ -10,25 +11,44 @@
 , pytestCheckHook
 , pythonOlder
 , requests
+, simple-websocket
 , tornado
 , websocket-client
 }:
 
 buildPythonPackage rec {
   pname = "python-engineio";
-  version = "4.3.4";
-  format = "setuptools";
+  version = "4.8.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "miguelgrinberg";
     repo = "python-engineio";
-    rev = "v${version}";
-    sha256 = "sha256-fymO9WqkYaRsHKCJHQJpySHqZor2t8BfVrfYUfYoJno=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-btXwx9GRLBcjtcGdgckb2Y/MxC0E/rKTWKgkP8olezo=";
   };
 
-  checkInputs = [
+  nativeBuildInputs = [
+    setuptools
+  ];
+
+  propagatedBuildInputs = [
+    simple-websocket
+  ];
+
+  passthru.optional-dependencies = {
+    client = [
+      requests
+      websocket-client
+    ];
+    asyncio_client = [
+      aiohttp
+    ];
+  };
+
+  nativeCheckInputs = [
     aiohttp
     eventlet
     mock
@@ -66,6 +86,7 @@ buildPythonPackage rec {
       bidirectional event-based communication between clients and a server.
     '';
     homepage = "https://github.com/miguelgrinberg/python-engineio/";
+    changelog = "https://github.com/miguelgrinberg/python-engineio/blob/v${version}/CHANGES.md";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ mic92 ];
   };

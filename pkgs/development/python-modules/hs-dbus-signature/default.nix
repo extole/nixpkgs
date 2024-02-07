@@ -8,13 +8,14 @@
 buildPythonPackage rec {
   pname = "hs-dbus-signature";
   version = "0.7";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
     hash = "sha256-NNnTcSX+K8zU+sj1QBd13h7aEXN9VqltJMNWCuhgZ6I=";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     hypothesis
   ];

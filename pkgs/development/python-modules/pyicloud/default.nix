@@ -17,12 +17,13 @@
 buildPythonPackage rec {
   pname = "pyicloud";
   version = "1.0.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "picklepete";
     repo = pname;
     rev = version;
-    sha256 = "sha256-2E1pdHHt8o7CGpdG+u4xy5OyNCueUGVw5CY8oicYd5w=";
+    hash = "sha256-2E1pdHHt8o7CGpdG+u4xy5OyNCueUGVw5CY8oicYd5w=";
   };
 
   propagatedBuildInputs = [
@@ -37,7 +38,7 @@ buildPythonPackage rec {
     tzlocal
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest-mock
     pytestCheckHook
   ];

@@ -5,7 +5,8 @@
 , appstream-glib
 , desktop-file-utils
 , gettext
-, gtk3
+, gtk4
+, libadwaita
 , meson
 , ninja
 , pkg-config
@@ -14,18 +15,19 @@
 , libwebp
 , optipng
 , pngquant
+, oxipng
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "curtail";
-  version = "1.3.1";
+  version = "1.8.0";
   format = "other";
 
   src = fetchFromGitHub {
     owner = "Huluti";
     repo = "Curtail";
     rev = "refs/tags/${version}";
-    sha256 = "sha256-/xvkRXs1EVu+9RZM+TnyIGxFV2stUR9XHEmaJxsJ3V8=";
+    sha256 = "sha256-LLz4nZ9WFQMogQR2gCKn80gvHUG5hlpQpcNjpr4fs2s=";
   };
 
   nativeBuildInputs = [
@@ -33,28 +35,36 @@ python3.pkgs.buildPythonApplication rec {
     appstream-glib
     desktop-file-utils
     gettext
-    gtk3
+    gtk4
+    libadwaita
     meson
     ninja
     pkg-config
+    gobject-introspection
+  ];
+
+  buildInputs = [
+    appstream-glib
+    gettext
+    gtk4
+    libadwaita
   ];
 
   propagatedBuildInputs = [
-    appstream-glib
     python3.pkgs.pygobject3
-    gobject-introspection
-    gettext
   ];
-
-  # Currently still required for the gobject-introspection setup hook
-  strictDeps = false;
 
   preInstall = ''
     patchShebangs ../build-aux/meson/postinstall.py
   '';
 
-  postInstall = ''
-    wrapProgram $out/bin/curtail --prefix PATH : ${lib.makeBinPath [ jpegoptim libwebp optipng pngquant ]}
+  dontWrapGApps = true;
+
+  preFixup = ''
+    makeWrapperArgs+=(
+      "''${gappsWrapperArgs[@]}"
+      "--prefix" "PATH" ":" "${lib.makeBinPath [ jpegoptim libwebp optipng pngquant oxipng ]}"
+    )
   '';
 
   meta = with lib; {

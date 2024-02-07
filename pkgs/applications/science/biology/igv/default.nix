@@ -1,11 +1,11 @@
-{ lib, stdenv, fetchzip, jdk11 }:
+{ lib, stdenv, fetchzip, jdk11, wrapGAppsHook }:
 
 stdenv.mkDerivation rec {
   pname = "igv";
-  version = "2.14.1";
+  version = "2.17.0";
   src = fetchzip {
     url = "https://data.broadinstitute.org/igv/projects/downloads/${lib.versions.majorMinor version}/IGV_${version}.zip";
-    sha256 = "sha256-IXUyMAhKyNMb7tINlr+9JmPlDRpHzgGS/SXo1Mz5o0Q=";
+    sha256 = "sha256-nOwaeVIvqfHrvykfTyOdnMN6+QpsvNN14jXBQx7THsE=";
   };
 
   installPhase = ''
@@ -24,6 +24,7 @@ stdenv.mkDerivation rec {
     chmod +x $out/bin/igv
     chmod +x $out/bin/igvtools
   '';
+  nativeBuildInputs = [ wrapGAppsHook ];
 
   meta = with lib; {
     homepage = "https://www.broadinstitute.org/igv/";

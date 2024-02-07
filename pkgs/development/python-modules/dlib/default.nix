@@ -6,9 +6,13 @@
 buildPythonPackage {
   inherit (dlib) pname version src nativeBuildInputs buildInputs meta;
 
-  patches = [ ./build-cores.patch ];
+  format = "setuptools";
 
-  checkInputs = [ pytest more-itertools ];
+  patches = [
+    ./build-cores.patch
+  ];
+
+  nativeCheckInputs = [ pytest more-itertools ];
 
   postPatch = ''
     substituteInPlace setup.py \

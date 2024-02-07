@@ -12,6 +12,7 @@
 buildPythonPackage rec {
   pname = "alpha-vantage";
   version = "2.3.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "RomelTorres";
@@ -25,7 +26,7 @@ buildPythonPackage rec {
     requests
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aioresponses
     requests-mock
     pandas

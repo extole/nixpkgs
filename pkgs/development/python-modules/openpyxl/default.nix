@@ -1,40 +1,70 @@
 { lib
 , buildPythonPackage
-, fetchPypi
-, isPy27
-, pytest
-, jdcal
-, et_xmlfile
+, fetchFromGitLab
+, pythonOlder
+
+# dependencies
+, et-xmlfile
+
+# tests
 , lxml
+, pandas
+, pillow
+, pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "openpyxl";
-  version = "3.0.10";
-  disabled = isPy27; # 2.6.4 was final python2 release
+  version = "3.1.2";
+  format = "setuptools";
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "sha256-5HgFYnrrz4YO207feYexMJwbNjLzdQU47ZYrvMO9dEk=";
+  disabled = pythonOlder "3.7";
+
+  src = fetchFromGitLab {
+    domain = "foss.heptapod.net";
+    owner = "openpyxl";
+    repo = "openpyxl";
+    rev = version;
+    hash = "sha256-SWRbjA83AOLrfe6on2CSb64pH5EWXkfyYcTqWJNBEP0=";
   };
 
-  checkInputs = [ pytest ];
-  propagatedBuildInputs = [ jdcal et_xmlfile lxml ];
+  propagatedBuildInputs = [
+    et-xmlfile
+  ];
 
-  postPatch = ''
-    # LICENSE.rst is missing, and setup.cfg currently doesn't contain anything useful anyway
-    # This should likely be removed in the next update
-    rm setup.cfg
-  '';
+  nativeCheckInputs = [
+    lxml
+    pandas
+    pillow
+    pytestCheckHook
+  ];
 
-  # Tests are not included in archive.
-  # https://bitbucket.org/openpyxl/openpyxl/issues/610
-  doCheck = false;
+  pytestFlagsArray = [
+    # broken since lxml 2.12; https://foss.heptapod.net/openpyxl/openpyxl/-/issues/2116
+    "--deselect=openpyxl/chart/tests/test_reader.py::test_read"
+    "--deselect=openpyxl/comments/tests/test_comment_reader.py::test_read_comments"
+    "--deselect=openpyxl/drawing/tests/test_spreadsheet_drawing.py::TestSpreadsheetDrawing::test_ignore_external_blip"
+    "--deselect=openpyxl/packaging/tests/test_manifest.py::TestManifest::test_from_xml"
+    "--deselect=openpyxl/packaging/tests/test_manifest.py::TestManifest::test_filenames"
+    "--deselect=openpyxl/packaging/tests/test_manifest.py::TestManifest::test_exts"
+    "--deselect=openpyxl/styles/tests/test_stylesheet.py::TestStylesheet::test_from_complex"
+    "--deselect=openpyxl/styles/tests/test_stylesheet.py::TestStylesheet::test_merge_named_styles"
+    "--deselect=openpyxl/styles/tests/test_stylesheet.py::TestStylesheet::test_unprotected_cell"
+    "--deselect=openpyxl/styles/tests/test_stylesheet.py::TestStylesheet::test_none_values"
+    "--deselect=openpyxl/styles/tests/test_stylesheet.py::TestStylesheet::test_rgb_colors"
+    "--deselect=openpyxl/styles/tests/test_stylesheet.py::TestStylesheet::test_named_styles"
+    "--deselect=openpyxl/workbook/external_link/tests/test_external.py::test_read_ole_link"
+  ];
 
-  meta = {
-    description = "A Python library to read/write Excel 2007 xlsx/xlsm files";
+  pythonImportsCheck = [
+    "openpyxl"
+  ];
+
+  meta = with lib; {
+    description = "Python library to read/write Excel 2010 xlsx/xlsm files";
     homepage = "https://openpyxl.readthedocs.org";
-    license = lib.licenses.mit;
-    maintainers = with lib.maintainers; [ lihop ];
+    changelog = "https://foss.heptapod.net/openpyxl/openpyxl/-/blob/${version}/doc/changes.rst";
+    license = licenses.mit;
+    maintainers = with maintainers; [ lihop ];
   };
 }

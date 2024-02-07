@@ -1,58 +1,82 @@
 { lib
 , buildPythonPackage
-, pythonOlder
-, fetchFromGitHub
-, pytestCheckHook
-, attrs
 , cached-property
 , click
+, fetchFromGitHub
+, fetchpatch
 , packaging
-, pytest-cov
+, pydantic
 , pytest-timeout
+, pytestCheckHook
+, pythonOlder
 , setuptools
 }:
 
 buildPythonPackage rec {
   pname = "pythonfinder";
-  version = "1.3.1";
-  format = "pyproject";
+  version = "2.0.6";
+  pyproject = true;
+
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "sarugaku";
     repo = pname;
-    rev = "refs/tags/v${version}";
-    sha256 = "sha256-N/q9zi2SX38ivSpnjrx+bEzdR9cS2ivSgy42SR8cl+Q=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-C/Em8Vmv7q030hmH3jU/apBRSSC9QFK9mbBWjBjJHXg=";
   };
+
+  patches = [
+    # https://github.com/sarugaku/pythonfinder/issues/142
+    (fetchpatch {
+      name = "pydantic_2-compatibility.patch";
+      url = "https://gitlab.archlinux.org/archlinux/packaging/packages/python-pythonfinder/-/raw/2.0.6-1/python-pythonfinder-2.0.6-pydantic2.patch";
+      hash = "sha256-mON1MeA+pj6VTB3zpBjF3LfB30wG0QH9nU4bD1djWwg=";
+    })
+  ];
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace " --cov" ""
+  '';
 
   nativeBuildInputs = [
     setuptools
   ];
 
   propagatedBuildInputs = [
-    attrs
-    cached-property
-    click
     packaging
+    pydantic
+  ] ++ lib.optionals (pythonOlder "3.8") [
+    cached-property
   ];
 
-  checkInputs = [
-    pytestCheckHook
-    pytest-cov
+  passthru.optional-dependencies = {
+    cli = [
+      click
+    ];
+  };
+
+  nativeCheckInputs = [
     pytest-timeout
-  ];
+    pytestCheckHook
+  ] ++ lib.flatten (builtins.attrValues passthru.optional-dependencies);
 
-  pytestFlagsArray = [ "--no-cov" ];
+  pythonImportsCheck = [
+    "pythonfinder"
+  ];
 
   # these tests invoke git in a subprocess and
-  # for some reason git can't be found even if included in checkInputs
-  disabledTests = [
-    "test_shims_are_kept"
-    "test_shims_are_removed"
-  ];
+  # for some reason git can't be found even if included in nativeCheckInputs
+  # disabledTests = [
+  #   "test_shims_are_kept"
+  #   "test_shims_are_removed"
+  # ];
 
   meta = with lib; {
+    description = "Cross platform search tool for finding Python";
     homepage = "https://github.com/sarugaku/pythonfinder";
-    description = "Cross Platform Search Tool for Finding Pythons";
+    changelog = "https://github.com/sarugaku/pythonfinder/blob/v${version}/CHANGELOG.rst";
     license = licenses.mit;
     maintainers = with maintainers; [ cpcloud ];
   };

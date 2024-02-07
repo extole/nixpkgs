@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "srpenergy";
   version = "1.3.6";
+  format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
@@ -25,7 +26,7 @@ buildPythonPackage rec {
     requests
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "python-nvd3";
   version = "0.15.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "areski";
@@ -12,7 +13,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ python-slugify jinja2 setuptools ];
-  checkInputs = [ coverage ];
+  nativeCheckInputs = [ coverage ];
 
   checkPhase = ''
     coverage run --source=nvd3 setup.py test

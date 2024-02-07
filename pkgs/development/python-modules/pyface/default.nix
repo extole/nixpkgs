@@ -3,21 +3,26 @@
 , buildPythonPackage
 , importlib-metadata
 , importlib-resources
+, setuptools
 , traits
 , pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "pyface";
-  version = "7.4.2";
-  format = "setuptools";
+  version = "8.0.0";
+  format = "pyproject";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-YT7TAcubr7m6o3xEeT13XQPdI9hD7rkm/xPPaJ6v6N0=";
+    hash = "sha256-fhNhg0e3pkjtIM29T9GlFkj1AQKR815OD/G/cKcgy/g=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     importlib-metadata
@@ -34,6 +39,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Traits-capable windowing framework";
     homepage = "https://github.com/enthought/pyface";
+    changelog = "https://github.com/enthought/pyface/releases/tag/${version}";
     maintainers = with maintainers; [ knedlsepp ];
     license = licenses.bsdOriginal;
   };

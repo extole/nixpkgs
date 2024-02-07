@@ -2,13 +2,13 @@
 
 stdenv.mkDerivation rec {
   pname = "aws-c-io";
-  version = "0.13.5";
+  version = "0.13.36";
 
   src = fetchFromGitHub {
     owner = "awslabs";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-7qNJMIG+bshtapm7uj+8ECSN9j0Bd1famSXp+i+67Uw=";
+    sha256 = "sha256-TwPcsTMBOE1uIInH6/eQdUMV6uD7d60773THzc1/G9Y=";
   };
 
   nativeBuildInputs = [ cmake ];

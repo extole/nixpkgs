@@ -5,6 +5,7 @@
 , dbus-fast
 , fetchFromGitHub
 , poetry-core
+, pytest-asyncio
 , pytestCheckHook
 , pythonOlder
 , typing-extensions
@@ -12,17 +13,23 @@
 
 buildPythonPackage rec {
   pname = "bleak";
-  version = "0.18.1";
+  version = "0.21.1";
   format = "pyproject";
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "hbldh";
     repo = pname;
     rev = "refs/tags/v${version}";
-    hash = "sha256-2/jJ2C2TudwCAshDBLUQjNMbYa2j4XfW8bXmeWrAyrA=";
+    hash = "sha256-T0im8zKyNLbskAEDeUUFS/daJtvttlHlttjscqP8iSk=";
   };
+
+  postPatch = ''
+    # bleak checks BlueZ's version with a call to `bluetoothctl --version`
+    substituteInPlace bleak/backends/bluezdbus/version.py \
+      --replace \"bluetoothctl\" \"${bluez}/bin/bluetoothctl\"
+  '';
 
   nativeBuildInputs = [
     poetry-core
@@ -34,15 +41,10 @@ buildPythonPackage rec {
     typing-extensions
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
+    pytest-asyncio
     pytestCheckHook
   ];
-
-  postPatch = ''
-    # bleak checks BlueZ's version with a call to `bluetoothctl --version`
-    substituteInPlace bleak/backends/bluezdbus/__init__.py \
-      --replace \"bluetoothctl\" \"${bluez}/bin/bluetoothctl\"
-  '';
 
   pythonImportsCheck = [
     "bleak"
@@ -51,6 +53,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Bluetooth Low Energy platform agnostic client";
     homepage = "https://github.com/hbldh/bleak";
+    changelog = "https://github.com/hbldh/bleak/blob/v${version}/CHANGELOG.rst";
     license = licenses.mit;
     platforms = platforms.linux;
     maintainers = with maintainers; [ oxzi ];

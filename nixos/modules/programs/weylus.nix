@@ -26,12 +26,7 @@ in
       '';
     };
 
-    package = mkOption {
-      type = package;
-      default = pkgs.weylus;
-      defaultText = "pkgs.weylus";
-      description = lib.mdDoc "Weylus package to install.";
-    };
+    package = mkPackageOption pkgs "weylus" { };
   };
   config = mkIf cfg.enable {
     networking.firewall = mkIf cfg.openFirewall {

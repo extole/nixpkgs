@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "latexcodec";
   version = "2.0.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -11,7 +12,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ six ];
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   checkPhase = ''
     pytest

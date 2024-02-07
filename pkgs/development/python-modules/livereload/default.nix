@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "livereload";
   version = "2.6.3";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "lepture";
@@ -22,7 +23,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ tornado six ];
 
-  checkInputs = [ nose ];
+  nativeCheckInputs = [ nose ];
   # TODO: retry running all tests after v2.6.1
   checkPhase = "NOSE_EXCLUDE=test_watch_multiple_dirs nosetests -s";
 

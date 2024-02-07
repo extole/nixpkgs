@@ -5,17 +5,27 @@
 
 python3.pkgs.buildPythonApplication rec {
   pname = "faraday-agent-dispatcher";
-  version = "2.3.0";
-  format = "setuptools";
+  version = "3.0.1";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "infobyte";
     repo = "faraday_agent_dispatcher";
     rev = "refs/tags/${version}";
-    hash = "sha256-lsSpD3XJ6Yw9viRCRB7zhl/KTC6Nwle2vnZ9xWr4Ujo=";
+    hash = "sha256-QCxYqLZAPrhcKAFguWT2ygN/OMe2Tr7HtnMx4Kp2bGM=";
   };
 
+  postPatch = ''
+    substituteInPlace setup.py \
+      --replace '"pytest-runner",' ""
+  '';
+
+  pythonRelaxDeps = [
+    "python-socketio"
+  ];
+
   nativeBuildInputs = with python3.pkgs; [
+    pythonRelaxDepsHook
     setuptools-scm
   ];
 
@@ -25,23 +35,21 @@ python3.pkgs.buildPythonApplication rec {
     faraday-agent-parameters-types
     faraday-plugins
     itsdangerous
+    psutil
+    pytenable
     python-gvm
     python-owasp-zap-v2-4
+    python-socketio
     pyyaml
     requests
     syslog-rfc5424-formatter
     websockets
   ];
 
-  checkInputs = with python3.pkgs; [
+  nativeCheckInputs = with python3.pkgs; [
     pytest-asyncio
     pytestCheckHook
   ];
-
-  postPatch = ''
-    substituteInPlace setup.py \
-      --replace '"pytest-runner",' ""
-  '';
 
   preCheck = ''
     export HOME=$(mktemp -d);
@@ -64,6 +72,7 @@ python3.pkgs.buildPythonApplication rec {
   meta = with lib; {
     description = "Tool to send result from tools to the Faraday Platform";
     homepage = "https://github.com/infobyte/faraday_agent_dispatcher";
+    changelog = "https://github.com/infobyte/faraday_agent_dispatcher/releases/tag/${version}";
     license = with licenses; [ gpl3Only ];
     maintainers = with maintainers; [ fab ];
   };

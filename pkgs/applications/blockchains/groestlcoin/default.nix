@@ -4,6 +4,7 @@
 , fetchFromGitHub
 , autoreconfHook
 , pkg-config
+, installShellFiles
 , util-linux
 , hexdump
 , autoSignDarwinBinariesHook
@@ -24,24 +25,24 @@
 }:
 
 let
-  version = "23.0";
   desktop = fetchurl {
-    url = "https://raw.githubusercontent.com/Groestlcoin/packaging/${version}/debian/groestlcoin-qt.desktop";
+    # de45048 is the last commit when the debian/groestlcoin-qt.desktop file was changed
+    url = "https://raw.githubusercontent.com/Groestlcoin/packaging/de4504844e47cf2c7604789650a5db4f3f7a48aa/debian/groestlcoin-qt.desktop";
     sha256 = "0mxwq4jvcip44a796iwz7n1ljkhl3a4p47z7qlsxcfxw3zmm0k0k";
   };
 in
 stdenv.mkDerivation rec {
   pname = if withGui then "groestlcoin" else "groestlcoind";
-  inherit version;
+  version = "26.0";
 
   src = fetchFromGitHub {
     owner = "Groestlcoin";
     repo = "groestlcoin";
     rev = "v${version}";
-    sha256 = "1ag7wpaw4zssx1g482kziqr95yl2vk9r332689s3093xv9i9pz4s";
+    sha256 = "00qvaf53jszsk1rr029zmq60v8w0r92192ab65k2krkmh7ybla9l";
   };
 
-  nativeBuildInputs = [ autoreconfHook pkg-config ]
+  nativeBuildInputs = [ autoreconfHook pkg-config installShellFiles ]
     ++ lib.optionals stdenv.isLinux [ util-linux ]
     ++ lib.optionals stdenv.isDarwin [ hexdump ]
     ++ lib.optionals (stdenv.isDarwin && stdenv.isAarch64) [ autoSignDarwinBinariesHook ]
@@ -51,10 +52,24 @@ stdenv.mkDerivation rec {
     ++ lib.optionals withWallet [ db53 sqlite ]
     ++ lib.optionals withGui [ qrencode qtbase qttools ];
 
-  postInstall = lib.optionalString withGui ''
+  postInstall = ''
+    installShellCompletion --bash contrib/completions/bash/groestlcoin-cli.bash
+    installShellCompletion --bash contrib/completions/bash/groestlcoind.bash
+    installShellCompletion --bash contrib/completions/bash/groestlcoin-tx.bash
+
+    for file in contrib/completions/fish/groestlcoin-*.fish; do
+      installShellCompletion --fish $file
+    done
+  '' + lib.optionalString withGui ''
+    installShellCompletion --fish contrib/completions/fish/groestlcoin-qt.fish
+
     install -Dm644 ${desktop} $out/share/applications/groestlcoin-qt.desktop
     substituteInPlace $out/share/applications/groestlcoin-qt.desktop --replace "Icon=groestlcoin128" "Icon=groestlcoin"
     install -Dm644 share/pixmaps/groestlcoin256.png $out/share/pixmaps/groestlcoin.png
+  '';
+
+  preConfigure = lib.optionalString stdenv.isDarwin ''
+    export MACOSX_DEPLOYMENT_TARGET=10.13
   '';
 
   configureFlags = [
@@ -67,7 +82,7 @@ stdenv.mkDerivation rec {
     "--with-qt-bindir=${qtbase.dev}/bin:${qttools.dev}/bin"
   ];
 
-  checkInputs = [ python3 ];
+  nativeCheckInputs = [ python3 ];
 
   checkFlags = [ "LC_ALL=en_US.UTF-8" ]
     # QT_PLUGIN_PATH needs to be set when executing QT, which is needed when testing Groestlcoin's GUI.

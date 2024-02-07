@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "pypubsub";
   version = "4.0.3";
+  format = "setuptools";
   disabled = isPy27;
 
   src = fetchFromGitHub {
@@ -12,7 +13,7 @@ buildPythonPackage rec {
     sha256 = "02j74w28wzmdvxkk8i561ywjgizjifq3hgcl080yj0rvkd3wivlb";
   };
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   checkPhase = ''
     cd tests/suite

@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "jxmlease";
   version = "1.0.3";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -22,7 +23,7 @@ buildPythonPackage rec {
   # https://github.com/Juniper/jxmlease/issues/26
   doCheck = false;
 
-  checkInputs = [ unittestCheckHook ];
+  nativeCheckInputs = [ unittestCheckHook ];
 
   unittestFlagsArray = [ "-v" ];
 
@@ -30,6 +31,6 @@ buildPythonPackage rec {
     description = "Converts between XML and intelligent Python data structures";
     homepage = "https://github.com/Juniper/jxmlease";
     license = licenses.mit;
-    maintainers = with maintainers; [ hexa ];
+    maintainers = with maintainers; [ ];
   };
 }

@@ -33,6 +33,13 @@ let
     (if !config.networking.useDHCP && enableDHCP then
       map (i: i.name) (filter (i: i.useDHCP == true) interfaces) else null);
 
+  staticIPv6Addresses = map (i: i.name) (filter (i: i.ipv6.addresses != [ ]) interfaces);
+
+  noIPv6rs = concatStringsSep "\n" (map (name: ''
+    interface ${name}
+    noipv6rs
+  '') staticIPv6Addresses);
+
   # Config file adapted from the one that ships with dhcpcd.
   dhcpcdConf = pkgs.writeText "dhcpcd.conf"
     ''
@@ -74,6 +81,11 @@ let
         noipv6
       ''}
 
+      ${optionalString (config.networking.enableIPv6 && cfg.IPv6rs == null && staticIPv6Addresses != [ ]) noIPv6rs}
+      ${optionalString (config.networking.enableIPv6 && cfg.IPv6rs == false) ''
+        noipv6rs
+      ''}
+
       ${cfg.extraConfig}
     '';
 
@@ -86,7 +98,7 @@ let
           # anything ever again ("couldn't resolve ..., giving up on
           # it"), so we silently lose time synchronisation. This also
           # applies to openntpd.
-          /run/current-system/systemd/bin/systemctl try-reload-or-restart ntpd.service openntpd.service chronyd.service || true
+          /run/current-system/systemd/bin/systemctl try-reload-or-restart ntpd.service openntpd.service chronyd.service ntpd-rs.service || true
       fi
 
       ${cfg.runHook}
@@ -148,6 +160,16 @@ in
       default = "";
       description = lib.mdDoc ''
          Literal string to append to the config file generated for dhcpcd.
+      '';
+    };
+
+    networking.dhcpcd.IPv6rs = mkOption {
+      type = types.nullOr types.bool;
+      default = null;
+      description = lib.mdDoc ''
+        Force enable or disable solicitation and receipt of IPv6 Router Advertisements.
+        This is required, for example, when using a static unique local IPv6 address (ULA)
+        and global IPv6 address auto-configuration with SLAAC.
       '';
     };
 

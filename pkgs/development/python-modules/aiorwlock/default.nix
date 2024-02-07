@@ -9,13 +9,14 @@
 buildPythonPackage rec {
   pname = "aiorwlock";
   version = "1.3.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-g/Eth99LlyiguP2hdWWFqw1lKxB7q1nGCE4bGtaSq0U=";
+    hash = "sha256-g/Eth99LlyiguP2hdWWFqw1lKxB7q1nGCE4bGtaSq0U=";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-asyncio
   ];

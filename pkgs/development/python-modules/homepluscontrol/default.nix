@@ -12,13 +12,14 @@
 buildPythonPackage rec {
   pname = "homepluscontrol";
   version = "0.1";
+  format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "chemaaa";
     repo = pname;
     rev = version;
-    sha256 = "sha256-COOGqfYiR4tueQHXuCvVxShrYS0XNltcW4mclbFWcfA=";
+    hash = "sha256-COOGqfYiR4tueQHXuCvVxShrYS0XNltcW4mclbFWcfA=";
   };
 
   propagatedBuildInputs = [
@@ -27,7 +28,7 @@ buildPythonPackage rec {
     yarl
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aioresponses
     pytestCheckHook
   ];

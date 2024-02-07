@@ -14,10 +14,8 @@ buildPythonPackage rec {
     owner = "penguinolog";
     repo = "backports.cached_property";
     rev = version;
-    sha256 = "sha256-rdgKbVQaELilPrN4ve8RbbaLiT14Xex0esy5vUX2ZBc=";
+    hash = "sha256-rdgKbVQaELilPrN4ve8RbbaLiT14Xex0esy5vUX2ZBc=";
   };
-
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   nativeBuildInputs = [
     setuptools-scm
@@ -27,7 +25,7 @@ buildPythonPackage rec {
     wheel
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-mock
     pytest-sugar

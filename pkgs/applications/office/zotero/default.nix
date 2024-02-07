@@ -41,12 +41,12 @@
 
 stdenv.mkDerivation rec {
   pname = "zotero";
-  version = "6.0.16";
+  version = "6.0.30";
 
   src = fetchurl {
     url =
       "https://download.zotero.org/client/release/${version}/Zotero-${version}_linux-x86_64.tar.bz2";
-    sha256 = "sha256-PqC7PqpRSm/Yt3pK8TuzcrhtfJSeJX6th2xb2n/Bul8=";
+    hash = "sha256-4XQZ1xw9Qtk3SzHMsEUk+HuIYtHDAOMgpwzbAd5QQpU=";
   };
 
   nativeBuildInputs = [ wrapGAppsHook ];
@@ -97,7 +97,7 @@ stdenv.mkDerivation rec {
   '';
 
   desktopItem = makeDesktopItem {
-    name = "zotero-${version}";
+    name = "zotero";
     exec = "zotero -url %U";
     icon = "zotero";
     comment = meta.description;
@@ -151,7 +151,7 @@ stdenv.mkDerivation rec {
     description = "Collect, organize, cite, and share your research sources";
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     license = licenses.agpl3Only;
-    platforms = platforms.linux;
+    platforms = [ "x86_64-linux" ];
     maintainers = with maintainers; [ i077 ];
   };
 }

@@ -9,22 +9,33 @@
 , pytest-asyncio
 , pytestCheckHook
 , pythonOlder
+, setuptools
 , zigpy
 }:
 
 buildPythonPackage rec {
   pname = "zigpy-zigate";
-  version = "0.10.2";
-  format = "setuptools";
+  version = "0.12.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "zigpy";
     repo = "zigpy-zigate";
-    rev = "refs/tags/v${version}";
-    hash = "sha256-Vb87G+R4SvAhCF3h/U5Q4/avxPgfIjklWdWGaiIWGhk=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-wziXUFYSUXhzWHM870jphG12h99WVzqiYimtIbkXyM0=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace ', "setuptools-git-versioning<2"' "" \
+      --replace 'dynamic = ["version"]' 'version = "${version}"'
+  '';
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     gpiozero
@@ -34,7 +45,7 @@ buildPythonPackage rec {
     zigpy
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytest-asyncio
     pytestCheckHook
@@ -52,6 +63,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Library which communicates with ZiGate radios for zigpy";
     homepage = "https://github.com/zigpy/zigpy-zigate";
+    changelog = "https://github.com/zigpy/zigpy-zigate/releases/tag/${version}";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ mvnetbiz ];
     platforms = platforms.linux;

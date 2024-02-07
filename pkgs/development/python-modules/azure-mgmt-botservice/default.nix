@@ -6,13 +6,14 @@
 }:
 
 buildPythonPackage rec {
-  version = "1.0.0";
+  version = "2.0.0";
+  format = "setuptools";
   pname = "azure-mgmt-botservice";
   disabled = isPy27;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "9dae4d749a2a072e22703318ea36e379aec20876c553b2889037c7bdec4b9546";
+    hash = "sha256-hsBNJ8UnwZ2WAKiCFfriulJNxnRFU4ew0OUXIrWm1ro=";
     extension = "zip";
   };
 

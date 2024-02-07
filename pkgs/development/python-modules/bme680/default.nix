@@ -9,12 +9,13 @@
 buildPythonPackage rec {
   pname = "bme680";
   version = "1.1.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "pimoroni";
     repo = "bme680-python";
     rev = "v${version}";
-    sha256 = "sha256-gmdRxMJ0DoCyNcb/bYp746PBi4HktHAAYOcSQJ0Uheg=";
+    hash = "sha256-gmdRxMJ0DoCyNcb/bYp746PBi4HktHAAYOcSQJ0Uheg=";
   };
 
   propagatedBuildInputs = [
@@ -25,7 +26,7 @@ buildPythonPackage rec {
     cd library
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytestCheckHook
   ];

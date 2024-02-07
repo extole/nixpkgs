@@ -1,13 +1,16 @@
 { lib
-, awkward
 , buildPythonPackage
 , fetchFromGitHub
-, importlib-metadata
-, lz4
+, pythonOlder
+, awkward
+, hatchling
 , numpy
+, fsspec
 , packaging
 , pytestCheckHook
-, pythonOlder
+, lz4
+, pytest-timeout
+, rangehttpserver
 , scikit-hep-testdata
 , xxhash
 , zstandard
@@ -15,32 +18,37 @@
 
 buildPythonPackage rec {
   pname = "uproot";
-  version = "4.3.6";
-  format = "setuptools";
+  version = "5.2.1";
+  pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "scikit-hep";
-    repo = "uproot4";
+    repo = "uproot5";
     rev = "refs/tags/v${version}";
-    hash = "sha256-Te4D2tHVD5fD8DH2njjQMGnTUvLQdcGBzApklnGn6g8=";
+    hash = "sha256-3BGGtA99MoagFtGcCeGiDyvzqixf+lbEu9Dn/62RQto=";
   };
+
+  nativeBuildInputs = [
+    hatchling
+  ];
 
   propagatedBuildInputs = [
     awkward
     numpy
-    lz4
+    fsspec
     packaging
-    xxhash
-    zstandard
-  ]  ++ lib.optionals (pythonOlder "3.8") [
-    importlib-metadata
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
+    lz4
+    pytest-timeout
+    rangehttpserver
     scikit-hep-testdata
+    xxhash
+    zstandard
   ];
 
   preCheck = ''
@@ -49,17 +57,34 @@ buildPythonPackage rec {
 
   disabledTests = [
     # Tests that try to download files
-    "test_http"
-    "test_no_multipart"
     "test_fallback"
+    "test_file"
+    "test_fsspec_cache_http"
+    "test_fsspec_cache_http_directory"
+    "test_fsspec_chunks"
+    "test_fsspec_globbing_http"
+    "test_fsspec_writing_memory"
+    "test_http"
+    "test_http_fallback"
+    "test_http_multipart"
+    "test_http_port"
+    "test_http_size"
+    "test_http_size_port"
+    "test_issue_1054_filename_colons"
+    "test_no_multipart"
+    "test_open_fsspec_http"
+    "test_open_fsspec_github"
     "test_pickle_roundtrip_http"
   ];
 
   disabledTestPaths = [
     # Tests that try to download files
-    "tests/test_0066-fix-http-fallback-freeze.py"
-    "tests/test_0088-read-with-http.py"
-    "tests/test_0220-contiguous-byte-ranges-in-http.py"
+    "tests/test_0066_fix_http_fallback_freeze.py"
+    "tests/test_0088_read_with_http.py"
+    "tests/test_0220_contiguous_byte_ranges_in_http.py"
+
+    # FileNotFoundError: uproot-issue-1043.root
+    "tests/test_1043_const_std_string.py"
   ];
 
   pythonImportsCheck = [

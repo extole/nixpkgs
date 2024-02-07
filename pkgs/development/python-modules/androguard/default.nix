@@ -32,6 +32,7 @@
 buildPythonPackage rec {
   pname = "androguard";
   version = "3.4.0a1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     repo = pname;
@@ -62,7 +63,7 @@ buildPythonPackage rec {
     pyperclip
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     codecov
     coverage
     mock

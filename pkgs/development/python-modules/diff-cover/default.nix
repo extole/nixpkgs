@@ -3,8 +3,9 @@
 , chardet
 , fetchPypi
 , jinja2
-, jinja2_pluralize
+, jinja2-pluralize
 , pluggy
+, poetry-core
 , pycodestyle
 , pyflakes
 , pygments
@@ -18,27 +19,31 @@
 
 buildPythonPackage rec {
   pname = "diff-cover";
-  version = "7.0.1";
-  format = "setuptools";
+  version = "8.0.1";
+  format = "pyproject";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     pname = "diff_cover";
     inherit version;
-    hash = "sha256-aSWDVdr4J2BXqS5CzsUllK2M/n3VBdbw5W/kQLxEGNA=";
+    hash = "sha256-zDnRmety/kG83P7hZOtbWRUztMYlWA4/mprMaGkGTXw=";
   };
+
+  nativeBuildInputs = [
+    poetry-core
+  ];
 
   propagatedBuildInputs = [
     chardet
     jinja2
-    jinja2_pluralize
+    jinja2-pluralize
     pluggy
     pygments
     tomli
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pycodestyle
     pyflakes
     pylint
@@ -61,6 +66,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Automatically find diff lines that need test coverage";
     homepage = "https://github.com/Bachmann1234/diff-cover";
+    changelog = "https://github.com/Bachmann1234/diff_cover/releases/tag/v${version}";
     license = licenses.asl20;
     maintainers = with maintainers; [ dzabraev ];
   };

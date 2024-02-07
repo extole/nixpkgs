@@ -8,18 +8,20 @@
 , pypubsub
 , pyqrcode
 , pyserial
+, pytap2
 , pytestCheckHook
 , pythonOlder
 , pyyaml
+, requests
+, setuptools
 , tabulate
-, pytap2
 , timeago
 }:
 
 buildPythonPackage rec {
   pname = "meshtastic";
-  version = "2.0.2";
-  format = "setuptools";
+  version = "2.2.18";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
@@ -27,8 +29,12 @@ buildPythonPackage rec {
     owner = "meshtastic";
     repo = "Meshtastic-python";
     rev = "refs/tags/${version}";
-    hash = "sha256-Z2/nzsHRpaykqLRkJoPdNGSLNbJvd4GOUpTYl8MG8mw=";
+    hash = "sha256-r3Hs3oD6CyYa/Ew0wMiLeUj/R4aa8Wc/W65EXMrPGmw=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     dotmap
@@ -39,6 +45,8 @@ buildPythonPackage rec {
     pyqrcode
     pyserial
     pyyaml
+    requests
+    setuptools
     tabulate
     timeago
   ];
@@ -49,7 +57,7 @@ buildPythonPackage rec {
     ];
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytap2
     pytestCheckHook
   ];
@@ -94,15 +102,25 @@ buildPythonPackage rec {
     "test_main_setPref_invalid_field"
     "test_main_setPref_valid_field_int_as_string"
     "test_readGPIOs"
+    "test_onGPIOreceive"
     "test_setURL_empty_url"
     "test_watchGPIOs"
     "test_writeConfig_with_no_radioConfig"
     "test_writeGPIOs"
+    "test_reboot"
+    "test_shutdown"
+    "test_main_sendtext"
+    "test_main_sendtext_with_channel"
+    "test_MeshInterface"
+    "test_getNode_not_local"
+    "test_getNode_not_local_timeout"
+    "test_main_onConnected_exception"
   ];
 
   meta = with lib; {
     description = "Python API for talking to Meshtastic devices";
     homepage = "https://github.com/meshtastic/Meshtastic-python";
+    changelog = "https://github.com/meshtastic/python/releases/tag/${version}";
     license = with licenses; [ asl20 ];
     maintainers = with maintainers; [ fab ];
   };

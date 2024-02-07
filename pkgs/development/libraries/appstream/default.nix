@@ -3,6 +3,7 @@
 , substituteAll
 , fetchFromGitHub
 , meson
+, mesonEmulatorHook
 , ninja
 , pkg-config
 , gettext
@@ -22,15 +23,14 @@
 , gperf
 , vala
 , curl
+, systemd
 , nixosTests
+, withSystemd ? lib.meta.availableOn stdenv.hostPlatform systemd
 }:
 
 stdenv.mkDerivation rec {
   pname = "appstream";
-  version = "0.15.5";
-  # When bumping this package, please also check whether
-  # fix-build-for-qt-olderthan-514.patch still applies by
-  # building libsForQt512.appstream-qt.
+  version = "1.0.1";
 
   outputs = [ "out" "dev" "installedTests" ];
 
@@ -38,7 +38,7 @@ stdenv.mkDerivation rec {
     owner = "ximion";
     repo = "appstream";
     rev = "v${version}";
-    sha256 = "sha256-KVZCtu1w5FMgXZMiSW55rbrI6W/A9zWWKKvACtk/jjk=";
+    sha256 = "sha256-ULqRHepWVuAluXsXJUoqxqJfrN168MGlwdVkoLLwSN0=";
   };
 
   patches = [
@@ -50,6 +50,12 @@ stdenv.mkDerivation rec {
 
     # Allow installing installed tests to a separate output.
     ./installed-tests-path.patch
+  ];
+
+  strictDeps = true;
+
+  depsBuildBuild = [
+    pkg-config
   ];
 
   nativeBuildInputs = [
@@ -64,6 +70,9 @@ stdenv.mkDerivation rec {
     gobject-introspection
     itstool
     vala
+    gperf
+  ] ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
+    mesonEmulatorHook
   ];
 
   buildInputs = [
@@ -74,8 +83,9 @@ stdenv.mkDerivation rec {
     libxml2
     libxmlb
     libyaml
-    gperf
     curl
+  ] ++ lib.optionals withSystemd [
+    systemd
   ];
 
   mesonFlags = [
@@ -83,6 +93,8 @@ stdenv.mkDerivation rec {
     "-Ddocs=false"
     "-Dvapi=true"
     "-Dinstalled_test_prefix=${placeholder "installedTests"}"
+  ] ++ lib.optionals (!withSystemd) [
+    "-Dsystemd=false"
   ];
 
   passthru = {

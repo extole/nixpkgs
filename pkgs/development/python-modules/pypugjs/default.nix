@@ -4,10 +4,10 @@
 , django
 , fetchFromGitHub
 , jinja2
-, Mako
+, mako
 , nose
 , pyramid
-, pyramid_mako
+, pyramid-mako
 , pytestCheckHook
 , six
 , tornado
@@ -16,24 +16,25 @@
 buildPythonPackage rec {
   pname = "pypugjs";
   version = "5.9.12";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "kakulukia";
     repo = "pypugjs";
     rev = "v${version}";
-    sha256 = "sha256-6tIhKCa8wg01gNFygCS6GdUHfbWBu7wOZeMkCExRR34=";
+    hash = "sha256-6tIhKCa8wg01gNFygCS6GdUHfbWBu7wOZeMkCExRR34=";
   };
 
   propagatedBuildInputs = [ six charset-normalizer ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     django
     jinja2
-    Mako
+    mako
     nose
     tornado
     pyramid
-    pyramid_mako
+    pyramid-mako
     pytestCheckHook
   ];
 

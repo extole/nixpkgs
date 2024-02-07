@@ -6,12 +6,13 @@
 buildPythonPackage rec {
   pname = "ed25519-blake2b";
   version = "1.4";
+  format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-0aHLkDLsMHzpW0HGGUQP1NP87MGPIkA1zH1tx6fY70A=";
+    hash = "sha256-0aHLkDLsMHzpW0HGGUQP1NP87MGPIkA1zH1tx6fY70A=";
   };
 
   pythonImportsCheck = [

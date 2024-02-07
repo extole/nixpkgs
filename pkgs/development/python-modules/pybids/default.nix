@@ -1,49 +1,71 @@
 { buildPythonPackage
 , lib
 , fetchPypi
+, setuptools
+, formulaic
 , click
 , num2words
 , numpy
 , scipy
 , pandas
 , nibabel
-, patsy
 , bids-validator
 , sqlalchemy
 , pytestCheckHook
+, versioneer
+, pythonRelaxDepsHook
 }:
 
 buildPythonPackage rec {
-  version = "0.15.3";
   pname = "pybids";
+  version = "0.16.4";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-TZnJebxLwgnP9woC0downJv4xrAzjioLZuvqd8fzxGE=";
+    hash = "sha256-pahl8wi6Sf8AuVqkvi7H90ViHr+9utb14ZVmKK3rFm4=";
   };
 
+  nativeBuildInputs = [
+    pythonRelaxDepsHook
+    setuptools
+    versioneer
+  ] ++ versioneer.optional-dependencies.toml;
+
+  pythonRelaxDeps = [ "sqlalchemy" ];
+
   propagatedBuildInputs = [
+    bids-validator
     click
+    formulaic
+    nibabel
     num2words
     numpy
-    scipy
     pandas
-    nibabel
-    patsy
-    bids-validator
+    scipy
     sqlalchemy
   ];
 
-  checkInputs = [ pytestCheckHook ];
-  pythonImportsCheck = [ "bids" ];
+  pythonImportsCheck = [
+    "bids"
+  ];
+
+  nativeCheckInputs = [
+    pytestCheckHook
+  ];
+
+  disabledTests = [
+    # looks for missing data:
+    "test_config_filename"
+    # regression associated with formulaic >= 0.6.0
+    # (see https://github.com/bids-standard/pybids/issues/1000)
+    "test_split"
+  ];
 
   meta = with lib; {
     description = "Python tools for querying and manipulating BIDS datasets";
     homepage = "https://github.com/bids-standard/pybids";
     license = licenses.mit;
     maintainers = with maintainers; [ jonringer ];
-    # Doesn't support sqlalchemy >=1.4
-    # See https://github.com/bids-standard/pybids/issues/680
-    broken = true;
   };
 }

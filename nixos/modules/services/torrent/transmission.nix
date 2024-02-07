@@ -19,8 +19,8 @@ in
   imports = [
     (mkRenamedOptionModule ["services" "transmission" "port"]
                            ["services" "transmission" "settings" "rpc-port"])
-    (mkAliasOptionModule ["services" "transmission" "openFirewall"]
-                         ["services" "transmission" "openPeerPorts"])
+    (mkAliasOptionModuleMD ["services" "transmission" "openFirewall"]
+                           ["services" "transmission" "openPeerPorts"])
   ];
   options = {
     services.transmission = {
@@ -44,7 +44,7 @@ in
           (each time the service starts).
 
           See [Transmission's Wiki](https://github.com/transmission/transmission/wiki/Editing-Configuration-Files)
-          for documentation of settings not explicitely covered by this module.
+          for documentation of settings not explicitly covered by this module.
         '';
         default = {};
         type = types.submodule {
@@ -148,7 +148,7 @@ in
             type = types.bool;
             default = true;
             description = lib.mdDoc ''
-              Whether to enable [Micro Transport Protocol (µTP)](http://en.wikipedia.org/wiki/Micro_Transport_Protocol).
+              Whether to enable [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol).
             '';
           };
           options.watch-dir = mkOption {
@@ -174,13 +174,15 @@ in
         };
       };
 
+      package = mkPackageOption pkgs "transmission" {};
+
       downloadDirPermissions = mkOption {
         type = with types; nullOr str;
         default = null;
         example = "770";
         description = lib.mdDoc ''
           If not `null`, is used as the permissions
-          set by `systemd.activationScripts.transmission-daemon`
+          set by `system.activationScripts.transmission-daemon`
           on the directories [](#opt-services.transmission.settings.download-dir),
           [](#opt-services.transmission.settings.incomplete-dir).
           and [](#opt-services.transmission.settings.watch-dir).
@@ -249,6 +251,20 @@ in
           For instance, SSH sessions may time out more easily.
         '';
       };
+
+      webHome = mkOption {
+        type = types.nullOr types.path;
+        default = null;
+        example = "pkgs.flood-for-transmission";
+        description = lib.mdDoc ''
+          If not `null`, sets the value of the `TRANSMISSION_WEB_HOME`
+          environment variable used by the service. Useful for overriding
+          the web interface files, without overriding the transmission
+          package and thus requiring rebuilding it locally. Use this if
+          you want to use an alternative web interface, such as
+          `pkgs.flood-for-transmission`.
+        '';
+      };
     };
   };
 
@@ -278,6 +294,7 @@ in
       requires = optional apparmor.enable "apparmor.service";
       wantedBy = [ "multi-user.target" ];
       environment.CURL_CA_BUNDLE = etc."ssl/certs/ca-certificates.crt".source;
+      environment.TRANSMISSION_WEB_HOME = lib.mkIf (cfg.webHome != null) cfg.webHome;
 
       serviceConfig = {
         # Use "+" because credentialsFile may not be accessible to User= or Group=.
@@ -287,7 +304,7 @@ in
           install -D -m 600 -o '${cfg.user}' -g '${cfg.group}' /dev/stdin \
            '${cfg.home}/${settingsDir}/settings.json'
         '')];
-        ExecStart="${pkgs.transmission}/bin/transmission-daemon -f -g ${cfg.home}/${settingsDir} ${escapeShellArgs cfg.extraFlags}";
+        ExecStart="${cfg.package}/bin/transmission-daemon -f -g ${cfg.home}/${settingsDir} ${escapeShellArgs cfg.extraFlags}";
         ExecReload = "${pkgs.coreutils}/bin/kill -HUP $MAINPID";
         User = cfg.user;
         Group = cfg.group;
@@ -312,6 +329,9 @@ in
         BindPaths =
           [ "${cfg.home}/${settingsDir}"
             cfg.settings.download-dir
+            # Transmission may need to read in the host's /run (eg. /run/systemd/resolve)
+            # or write in its private /run (eg. /run/host).
+            "/run"
           ] ++
           optional cfg.settings.incomplete-dir-enabled
             cfg.settings.incomplete-dir ++
@@ -322,7 +342,6 @@ in
           # an AppArmor profile is provided to get a confinement based upon paths and rights.
           builtins.storeDir
           "/etc"
-          "/run"
           ] ++
           optional (cfg.settings.script-torrent-done-enabled &&
                     cfg.settings.script-torrent-done-filename != null)
@@ -331,10 +350,10 @@ in
             cfg.settings.watch-dir;
         StateDirectory = [
           "transmission"
-          "transmission/.config/transmission-daemon"
-          "transmission/.incomplete"
-          "transmission/Downloads"
-          "transmission/watch-dir"
+          "transmission/${settingsDir}"
+          "transmission/${incompleteDir}"
+          "transmission/${downloadsDir}"
+          "transmission/${watchDir}"
         ];
         StateDirectoryMode = mkDefault 750;
         # The following options are only for optimizing:
@@ -347,13 +366,13 @@ in
         MemoryDenyWriteExecute = true;
         NoNewPrivileges = true;
         PrivateDevices = true;
-        PrivateMounts = true;
+        PrivateMounts = mkDefault true;
         PrivateNetwork = mkDefault false;
         PrivateTmp = true;
-        PrivateUsers = true;
+        PrivateUsers = mkDefault true;
         ProtectClock = true;
         ProtectControlGroups = true;
-        # ProtectHome=true would not allow BindPaths= to work accross /home,
+        # ProtectHome=true would not allow BindPaths= to work across /home,
         # and ProtectHome=tmpfs would break statfs(),
         # preventing transmission-daemon to report the available free space.
         # However, RootDirectory= is used, so this is not a security concern
@@ -385,7 +404,7 @@ in
     };
 
     # It's useful to have transmission in path, e.g. for remote control
-    environment.systemPackages = [ pkgs.transmission ];
+    environment.systemPackages = [ cfg.package ];
 
     users.users = optionalAttrs (cfg.user == "transmission") ({
       transmission = {
@@ -431,8 +450,8 @@ in
       # https://trac.transmissionbt.com/browser/trunk/libtransmission/tr-udp.c?rev=11956.
       # at least up to the values hardcoded here:
       (mkIf cfg.settings.utp-enabled {
-        "net.core.rmem_max" = mkDefault "4194304"; # 4MB
-        "net.core.wmem_max" = mkDefault "1048576"; # 1MB
+        "net.core.rmem_max" = mkDefault 4194304; # 4MB
+        "net.core.wmem_max" = mkDefault 1048576; # 1MB
       })
       (mkIf cfg.performanceNetParameters {
         # Increase the number of available source (local) TCP and UDP ports to 49151.
@@ -457,7 +476,7 @@ in
     ];
 
     security.apparmor.policies."bin.transmission-daemon".profile = ''
-      include "${pkgs.transmission.apparmor}/bin.transmission-daemon"
+      include "${cfg.package.apparmor}/bin.transmission-daemon"
     '';
     security.apparmor.includes."local/bin.transmission-daemon" = ''
       r ${config.systemd.services.transmission.environment.CURL_CA_BUNDLE},
@@ -487,6 +506,10 @@ in
         # FIXME: to be tested as I'm not sure it works well with NoNewPrivileges=
         # https://gitlab.com/apparmor/apparmor/-/wikis/AppArmorStacking#seccomp-and-no_new_privs
         px ${cfg.settings.script-torrent-done-filename} -> &@{dirs},
+      ''}
+
+      ${optionalString (cfg.webHome != null) ''
+        r ${cfg.webHome}/**,
       ''}
     '';
   };

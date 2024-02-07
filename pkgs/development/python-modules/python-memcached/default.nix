@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "python-memcached";
   version = "1.59";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "linsomniac";
@@ -21,7 +22,7 @@ buildPythonPackage rec {
     six
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytestCheckHook
   ];

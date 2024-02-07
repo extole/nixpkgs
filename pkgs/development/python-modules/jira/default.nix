@@ -3,45 +3,67 @@
 , fetchFromGitHub
 , defusedxml
 , flaky
+, ipython
 , keyring
+, packaging
+, pyjwt
+, pytestCheckHook
+, pythonOlder
+, requests
+, requests-futures
 , requests-mock
 , requests-oauthlib
 , requests-toolbelt
+, setuptools
 , setuptools-scm
-, setuptools-scm-git-archive
-, pytestCheckHook
-, pythonOlder
+, typing-extensions
 }:
 
 buildPythonPackage rec {
   pname = "jira";
-  version = "3.4.0";
-  format = "setuptools";
+  version = "3.5.2";
+  pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "pycontribs";
     repo = pname;
     rev = "refs/tags/${version}";
-    hash = "sha256-XyMywnuJOGSXWsMNbwNbMaOeAa9bosBg6rvfNKw77Ik=";
+    hash = "sha256-9hzKN57OHi2be9C2mtHZU1KcpbcKxiiYDj9Vw7MxTK4=";
   };
 
   nativeBuildInputs = [
+    setuptools
     setuptools-scm
-    setuptools-scm-git-archive
   ];
-
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   propagatedBuildInputs = [
     defusedxml
-    keyring
+    packaging
+    requests
     requests-oauthlib
     requests-toolbelt
+    typing-extensions
   ];
 
-  checkInputs = [
+  passthru.optional-dependencies = {
+    cli = [
+      ipython
+      keyring
+    ];
+    opt = [
+      # filemagic
+      pyjwt
+      # requests-jwt
+      # requests-keyberos
+    ];
+    async = [
+      requests-futures
+    ];
+  };
+
+  nativeCheckInputs = [
     flaky
     pytestCheckHook
     requests-mock
@@ -62,7 +84,9 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Library to interact with the JIRA REST API";
     homepage = "https://github.com/pycontribs/jira";
+    changelog = "https://github.com/pycontribs/jira/releases/tag/${version}";
     license = licenses.bsd2;
-    maintainers = with maintainers; [ globin ];
+    maintainers = with maintainers; [ ];
+    mainProgram = "jirashell";
   };
 }

@@ -10,19 +10,17 @@
 
 stdenv.mkDerivation rec {
   pname = "ser2net";
-  version = "4.3.8";
+  version = "4.6.0";
 
   src = fetchFromGitHub {
     owner = "cminyard";
     repo = pname;
     rev = "v${version}";
-    hash = "sha256-lJI7TPzV1beZFN6SinjdJ1HqlVX61aWZ281rf3AFpNk=";
+    hash = "sha256-6G5kpMe58PaOII/8WzHTK2EkwD1cTUn7VP2EMlcuF14=";
   };
 
   passthru = {
-    updateScript = nix-update-script {
-      attrPath = pname;
-    };
+    updateScript = nix-update-script { };
   };
 
   nativeBuildInputs = [ pkg-config autoreconfHook ];
@@ -35,5 +33,6 @@ stdenv.mkDerivation rec {
     license = licenses.gpl2Only;
     maintainers = with maintainers; [ emantor ];
     platforms = with platforms; linux;
+    mainProgram = "ser2net";
   };
 }

@@ -1,6 +1,7 @@
 { lib, buildPythonPackage, unittestCheckHook, fetchFromGitHub, lm_sensors }:
 buildPythonPackage {
   version = "2017-07-13";
+  format = "setuptools";
   pname = "pysensors";
 
   # note that https://pypi.org/project/PySensors/ is a different project
@@ -17,7 +18,7 @@ buildPythonPackage {
   # due to sandboxing
   doCheck = false;
 
-  checkInputs = [ unittestCheckHook ];
+  nativeCheckInputs = [ unittestCheckHook ];
 
   unittestFlagsArray = [ "-s" "tests" ];
 

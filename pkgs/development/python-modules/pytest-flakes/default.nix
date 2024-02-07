@@ -8,6 +8,7 @@ buildPythonPackage rec {
   # retaining package to not break other packages
   pname = "pytest-flakes";
   version = "4.0.5";
+  format = "setuptools";
   disabled = pythonOlder "3.5";
 
   src = fetchPypi {
@@ -17,7 +18,7 @@ buildPythonPackage rec {
 
   buildInputs = [ pytest ];
   propagatedBuildInputs = [ pyflakes ];
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   # no longer passes
   doCheck = false;

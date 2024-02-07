@@ -22,6 +22,9 @@ stdenv.mkDerivation rec {
   # cgit) that are needed here should be included directly in Nixpkgs as
   # files.
   patches = [
+    # Fix implicit function declarations (clang-16 build failure):
+    #     https://github.com/libffi/libffi/pull/764
+    ./fix-implicit-fun-decl.patch
   ];
 
   strictDeps = true;
@@ -34,16 +37,11 @@ stdenv.mkDerivation rec {
   configureFlags = [
     "--with-gcc-arch=generic" # no detection of -march= or -mtune=
     "--enable-pax_emutramp"
-
-    # Causes issues in downstream packages which misuse ffi_closure_alloc
-    # Reenable once these issues are fixed and merged:
-    # https://gitlab.haskell.org/ghc/ghc/-/merge_requests/6155
-    # https://gitlab.gnome.org/GNOME/gobject-introspection/-/merge_requests/283
-    "--disable-exec-static-tramp"
   ];
 
   preCheck = ''
     # The tests use -O0 which is not compatible with -D_FORTIFY_SOURCE.
+    NIX_HARDENING_ENABLE=''${NIX_HARDENING_ENABLE/fortify3/}
     NIX_HARDENING_ENABLE=''${NIX_HARDENING_ENABLE/fortify/}
   '';
 
@@ -51,12 +49,10 @@ stdenv.mkDerivation rec {
 
   inherit doCheck;
 
-  checkInputs = [ dejagnu ];
+  nativeCheckInputs = [ dejagnu ];
 
   passthru = {
-    updateScript = nix-update-script {
-      attrPath = pname;
-    };
+    updateScript = nix-update-script { };
   };
 
   meta = with lib; {

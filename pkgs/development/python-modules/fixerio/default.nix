@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "fixerio";
   version = "1.0.0-alpha";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "amatellanes";
@@ -22,7 +23,7 @@ buildPythonPackage rec {
     requests
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     httpretty
     pytestCheckHook
     responses

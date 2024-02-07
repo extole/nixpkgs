@@ -6,16 +6,17 @@
 
 buildPythonPackage rec {
   version = "0.4.0";
+  format = "setuptools";
   pname = "sshtunnel";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-58sOp3Tbgb+RhE2yLecqQKro97D5u5ug9mbUdO9r+fw=";
+    hash = "sha256-58sOp3Tbgb+RhE2yLecqQKro97D5u5ug9mbUdO9r+fw=";
   };
 
   propagatedBuildInputs = [ paramiko ];
 
-  checkInputs = [ pytestCheckHook mock ];
+  nativeCheckInputs = [ pytestCheckHook mock ];
 
   # disable impure tests
   disabledTests = [

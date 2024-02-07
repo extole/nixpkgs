@@ -1,28 +1,30 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, setuptools
 , pyutil
-, setuptoolsTrial
 , twisted
 }:
 
 buildPythonPackage rec {
   pname = "zfec";
-  version = "1.5.7.2";
+  version = "1.5.7.4";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-TuUZvg3MfaLohIK8/Av5d6Ql4dfoJ4z1u7uNAPiir7Y=";
+    hash = "sha256-EGmFchj4ur5AhEOXEnIIA6Ef6RsU8gvHepak5vThER8=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [ pyutil ];
 
-  checkInputs = [ setuptoolsTrial twisted ];
+  nativeCheckInputs = [ twisted ];
 
-  # argparse is in the stdlib but zfec doesn't know that.
-  postPatch = ''
-    sed -i -e '/argparse/d' setup.py
-  '';
+  checkPhase = "trial zfec";
 
   pythonImportsCheck = [ "zfec" ];
 

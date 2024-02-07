@@ -1,27 +1,28 @@
 { lib
-, buildGoModule
+, buildGo121Module
 , fetchFromGitHub
 , installShellFiles
 }:
 
-buildGoModule rec {
+buildGo121Module rec {
   pname = "k0sctl";
-  version = "0.14.0";
+  version = "0.17.4";
 
   src = fetchFromGitHub {
     owner = "k0sproject";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-m0BdmsqmkB3Q6JzzRPS6Tq68a33heUifY2EgTjbAm3M=";
+    hash = "sha256-E9EIyBDYsLqfKsb25o1SEh0lUAT/xEtcHHlkunS5Meg=";
   };
 
-  vendorSha256 = "sha256-CZ8DmgYXQcpd43qm6YsVHFePuUochHgJG7/ffEK8LL8=";
+  vendorHash = "sha256-0P1v7mZ+k7Th8/cwxRNlhDodzyagv0V9ZBXy1BUGk+k=";
 
   ldflags = [
     "-s"
     "-w"
     "-X github.com/k0sproject/k0sctl/version.Environment=production"
-    "-X github.com/k0sproject/k0sctl/version.Version=${version}"
+    "-X github.com/carlmjohnson/versioninfo.Version=v${version}" # Doesn't work currently: https://github.com/carlmjohnson/versioninfo/discussions/12
+    "-X github.com/carlmjohnson/versioninfo.Revision=v${version}"
   ];
 
   nativeBuildInputs = [ installShellFiles ];
@@ -37,6 +38,7 @@ buildGoModule rec {
     description = "A bootstrapping and management tool for k0s clusters.";
     homepage = "https://k0sproject.io/";
     license = licenses.asl20;
-    maintainers = with maintainers; [ nickcao ];
+    mainProgram = "k0sctl";
+    maintainers = with maintainers; [ nickcao qjoly ];
   };
 }

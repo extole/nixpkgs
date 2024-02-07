@@ -22,13 +22,14 @@ let
 in buildPythonPackage rec {
   pname = "datashape";
   version = "0.5.4";
+  format = "setuptools";
 
   src = fetcher {
     inherit pname version;
     sha256 = "0rhlj2kjj1vx5m73wnc5518rd6cs1zsbgpsvzk893n516k69shcf";
   };
 
-  checkInputs = [ pytest mock ];
+  nativeCheckInputs = [ pytest mock ];
   propagatedBuildInputs = [ numpy multipledispatch python-dateutil ];
 
   # Disable several tests

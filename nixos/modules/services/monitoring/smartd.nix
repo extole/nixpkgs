@@ -4,8 +4,7 @@ with lib;
 
 let
 
-  host = config.networking.hostName or "unknown"
-       + optionalString (config.networking.domain != null) ".${config.networking.domain}";
+  host = config.networking.fqdnOrHostName;
 
   cfg = config.services.smartd;
   opt = options.services.smartd;
@@ -20,7 +19,7 @@ let
       {
       ${pkgs.coreutils}/bin/cat << EOF
       From: smartd on ${host} <${nm.sender}>
-      To: undisclosed-recipients:;
+      To: ${nm.recipient}
       Subject: $SMARTD_SUBJECT
 
       $SMARTD_FULLMESSAGE

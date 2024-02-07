@@ -2,6 +2,11 @@
 , buildPythonPackage
 , pythonOlder
 , fetchPypi
+
+# build-system
+, setuptools
+
+# dependencies
 , argcomplete
 , requests
 , requests-toolbelt
@@ -10,15 +15,19 @@
 
 buildPythonPackage rec {
   pname = "python-gitlab";
-  version = "3.11.0";
-  format = "setuptools";
+  version = "4.2.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-25Rytq5PupaLQJ3DL67iDdZQiQZdqpPgjSG3lqZdZXg=";
+    hash = "sha256-+HDXb5jJXQXEM5nXOx6qtZxnGzJ5ODDNL53fMsyTVB4=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     requests
@@ -44,6 +53,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Interact with GitLab API";
     homepage = "https://github.com/python-gitlab/python-gitlab";
+    changelog = "https://github.com/python-gitlab/python-gitlab/blob/v${version}/CHANGELOG.md";
     license = licenses.lgpl3Only;
     maintainers = with maintainers; [ nyanloutre ];
   };

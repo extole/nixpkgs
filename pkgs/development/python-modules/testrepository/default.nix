@@ -12,13 +12,14 @@
 buildPythonPackage rec {
   pname = "testrepository";
   version = "0.0.20";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
     sha256 = "1ssqb07c277010i6gzzkbdd46gd9mrj0bi0i8vn560n2k2y4j93m";
   };
 
-  checkInputs = [ testresources ];
+  nativeCheckInputs = [ testresources ];
   buildInputs = [ pbr ];
   propagatedBuildInputs = [ fixtures subunit testtools ];
 

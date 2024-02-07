@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "python-owasp-zap-v2-4";
   version = "0.0.18";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "zaproxy";
@@ -24,7 +25,7 @@ buildPythonPackage rec {
     six
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pyhamcrest
     pytestCheckHook
     requests-mock

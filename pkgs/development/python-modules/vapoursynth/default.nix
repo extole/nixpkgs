@@ -2,6 +2,7 @@
 
 buildPythonPackage {
   pname = "vapoursynth";
+  format = "setuptools";
 
   inherit (vapoursynth) version src;
 
@@ -13,7 +14,7 @@ buildPythonPackage {
     vapoursynth
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     unittestCheckHook
   ];
 

@@ -10,10 +10,11 @@
 buildPythonPackage rec {
   pname = "pyfireservicerota";
   version = "0.0.43";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-3+QK1BVuWYii0oYT4xXMOYJZmVKrB4EmqE0EkdFlZvE=";
+    hash = "sha256-3+QK1BVuWYii0oYT4xXMOYJZmVKrB4EmqE0EkdFlZvE=";
   };
 
   propagatedBuildInputs = [

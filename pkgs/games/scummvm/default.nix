@@ -1,25 +1,27 @@
-{ lib, stdenv, fetchurl, nasm
-, alsa-lib, curl, flac, fluidsynth, freetype, libjpeg, libmad, libmpeg2, libogg, libvorbis, libGLU, libGL, SDL2, zlib
+{ lib, stdenv, fetchFromGitHub, nasm
+, alsa-lib, curl, flac, fluidsynth, freetype, libjpeg, libmad, libmpeg2, libogg, libtheora, libvorbis, libGLU, libGL, SDL2, zlib
 , Cocoa, AudioToolbox, Carbon, CoreMIDI, AudioUnit, cctools
 }:
 
 stdenv.mkDerivation rec {
   pname = "scummvm";
-  version = "2.5.1";
+  version = "2.8.0";
 
-  src = fetchurl {
-    url = "http://scummvm.org/frs/scummvm/${version}/${pname}-${version}.tar.xz";
-    sha256 = "sha256-n9jbOORFYUS/jDTazffyBOdfGOjkSOwBzgjOgmoDXwE=";
+  src = fetchFromGitHub {
+    owner = "scummvm";
+    repo = "scummvm";
+    rev = "v${version}";
+    hash = "sha256-W8VZuRVpq0WwaCLH0ODcFmqbE7eKLK6nuyB7qrfqkiY=";
   };
 
   nativeBuildInputs = [ nasm ];
 
   buildInputs = lib.optionals stdenv.isLinux [
-    alsa-lib
+    alsa-lib libGLU libGL
   ] ++ lib.optionals stdenv.isDarwin [
     Cocoa AudioToolbox Carbon CoreMIDI AudioUnit
   ] ++ [
-    curl freetype flac fluidsynth libjpeg libmad libmpeg2 libogg libvorbis libGLU libGL SDL2 zlib
+    curl freetype flac fluidsynth libjpeg libmad libmpeg2 libogg libtheora libvorbis SDL2 zlib
   ];
 
   dontDisableStatic = true;
@@ -28,7 +30,6 @@ stdenv.mkDerivation rec {
 
   configurePlatforms = [ "host" ];
   configureFlags = [
-    "--enable-c++11"
     "--enable-release"
   ];
 
@@ -36,7 +37,9 @@ stdenv.mkDerivation rec {
   postConfigure = ''
     sed -i "s/-c -s/-c -s --strip-program=''${STRIP@Q}/" ports.mk
   '' + lib.optionalString stdenv.isDarwin ''
-    substituteInPlace config.mk --replace x86_64-apple-darwin-ranlib ${cctools}/bin/ranlib
+    substituteInPlace config.mk \
+      --replace x86_64-apple-darwin-ranlib ${cctools}/bin/ranlib \
+      --replace aarch64-apple-darwin-ranlib ${cctools}/bin/ranlib
   '';
 
   meta = with lib; {

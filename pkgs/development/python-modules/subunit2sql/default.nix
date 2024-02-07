@@ -12,10 +12,11 @@
 buildPythonPackage rec {
   pname = "subunit2sql";
   version = "1.10.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-c+Dg6moKiv30M0mmwGQSOEbc94gfH//ZnF7lnBgv8EU=";
+    hash = "sha256-c+Dg6moKiv30M0mmwGQSOEbc94gfH//ZnF7lnBgv8EU=";
   };
 
   propagatedBuildInputs = [
@@ -24,7 +25,7 @@ buildPythonPackage rec {
     python-dateutil
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     oslo-concurrency
     stestr

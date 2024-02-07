@@ -2,6 +2,7 @@
 , apptools
 , buildPythonPackage
 , fetchPypi
+, fetchpatch
 , ipython
 , pytestCheckHook
 , pythonAtLeast
@@ -12,14 +13,14 @@
 
 buildPythonPackage rec {
   pname = "envisage";
-  version = "6.1.0";
-  format = "setuptools";
+  version = "7.0.3";
+  format = "pyproject";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-AATsUNcYLB4vtyvuooAMDZx8p5fayijb6yJoUKTCW40=";
+    hash = "sha256-97GviL86j/8qmsbja7SN6pkp4/YSIEz+lK7WKwMWyeM=";
   };
 
   # for the optional dependency ipykernel, only versions < 6 are
@@ -34,7 +35,7 @@ buildPythonPackage rec {
     export HOME=$PWD/HOME
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     ipython
     pytestCheckHook
   ];

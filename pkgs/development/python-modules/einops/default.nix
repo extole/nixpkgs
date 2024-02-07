@@ -1,48 +1,42 @@
 { lib
 , buildPythonPackage
-, chainer
 , fetchFromGitHub
+, hatchling
 , jupyter
-, keras
-  #, mxnet
 , nbconvert
-, nbformat
-, nose
 , numpy
 , parameterized
+, pillow
 , pytestCheckHook
 , pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "einops";
-  version = "0.4.1";
-  format = "setuptools";
+  version = "0.7.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "arogozhnikov";
     repo = pname;
-    rev = "v${version}";
-    hash = "sha256-n4R4lcRimuOncisCTs2zJWPlqZ+W2yPkvkWAnx4R91s=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-wCs3rMnYCk07kJ3iPItxwCQATflKBYHk6tfBCjiF+bc=";
   };
 
-  checkInputs = [
-    chainer
+  nativeBuildInputs = [ hatchling ];
+
+  nativeCheckInputs = [
     jupyter
-    keras
-    # mxnet (has issues with some CPUs, segfault)
     nbconvert
-    nbformat
-    nose
     numpy
     parameterized
+    pillow
     pytestCheckHook
   ];
 
-  # No CUDA in sandbox
-  EINOPS_SKIP_CUPY = 1;
+  env.EINOPS_TEST_BACKENDS = "numpy";
 
   preCheck = ''
     export HOME=$(mktemp -d);

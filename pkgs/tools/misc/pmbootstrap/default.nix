@@ -1,26 +1,28 @@
-{ stdenv, lib, git, openssl, makeWrapper, buildPythonApplication, pytestCheckHook, ps
-, fetchPypi, fetchFromGitLab, sudo }:
+{ stdenv, lib, git, openssl, buildPythonApplication, pytestCheckHook, ps
+, fetchPypi, fetchFromSourcehut, sudo }:
 
 buildPythonApplication rec {
   pname = "pmbootstrap";
-  version = "1.45.0";
+  version = "2.1.0";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-75ZFzhRsczkwhiUl1upKjSvmqN0RkXaM8cKr4zLgi4w=";
+    hash = "sha256-buCfQsi10LezDzYeplArmFRSc3vbjtl+FuTm/VUS2us=";
   };
 
-  repo = fetchFromGitLab {
-    domain = "gitlab.com";
-    owner = "postmarketOS";
+  repo = fetchFromSourcehut {
+    owner = "~postmarketos";
     repo = pname;
     rev = version;
-    sha256 = "sha256-tG1+vUJW9JIdYpcRn8J0fCIZh29hYo8wSlBKwTUxyMU=";
+    hash = "sha256-3GZ4PeMnG/a46WwvWPQFeYbJPp+NGU7A98QasnlMIL0=";
   };
 
   pmb_test = "${repo}/test";
 
-  checkInputs = [ pytestCheckHook git openssl ps sudo ];
+  # Tests depend on sudo
+  doCheck = stdenv.isLinux;
+
+  nativeCheckInputs = [ pytestCheckHook git openssl ps sudo ];
 
   # Add test dependency in PATH
   preCheck = "export PYTHONPATH=$PYTHONPATH:${pmb_test}";
@@ -42,6 +44,7 @@ buildPythonApplication rec {
     "test_chroot_arguments"
     "test_chroot_interactive_shell"
     "test_chroot_interactive_shell_user"
+    "test_chroot_mount"
     "test_clean_worktree"
     "test_config_user"
     "test_cross_compile_distcc"
@@ -84,6 +87,12 @@ buildPythonApplication rec {
     "test_skip_already_built"
     "test_switch_to_channel_branch"
     "test_version"
+    "test_build_abuild_leftovers"
+    "test_get_all_component_names"
+    "test_check_config"
+    "test_extract_arch"
+    "test_extract_version"
+    "test_check"
   ];
 
   makeWrapperArgs = [ "--prefix PATH : ${lib.makeBinPath [ git openssl ]}" ];
@@ -93,7 +102,6 @@ buildPythonApplication rec {
     homepage = "https://gitlab.com/postmarketOS/pmbootstrap";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ onny ];
-    # https://github.com/NixOS/nixpkgs/pull/146576#issuecomment-974267651
-    broken = stdenv.isDarwin && stdenv.isAarch64;
+    mainProgram = "pmbootstrap";
   };
 }

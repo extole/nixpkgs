@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "pytest-error-for-skips";
   version = "2.0.2";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "jankatins";
@@ -18,7 +19,7 @@ buildPythonPackage rec {
 
   buildInputs = [ pytest ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "pytest_error_for_skips" ];
 

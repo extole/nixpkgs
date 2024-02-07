@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "gtts-token";
   version = "1.1.4";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "boudewijn26";
@@ -20,7 +21,7 @@ buildPythonPackage rec {
     requests
   ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   # requires internet access
   disabledTests = [ "test_real" ];

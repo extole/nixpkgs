@@ -5,6 +5,7 @@
 buildPythonPackage rec {
   pname = "click-plugins";
   version = "1.1.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -15,7 +16,7 @@ buildPythonPackage rec {
     click
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest
   ];
 

@@ -8,11 +8,12 @@
 buildPythonPackage rec {
   pname = "xml-marshaller";
   version = "1.0.2";
+  format = "setuptools";
 
   src = fetchPypi {
     pname = "xml_marshaller";
     inherit version;
-    sha256 = "sha256-QvBALLDD8o5nZQ5Z4bembhadK6jcydWKQpJaSmGqqJM=";
+    hash = "sha256-QvBALLDD8o5nZQ5Z4bembhadK6jcydWKQpJaSmGqqJM=";
   };
 
   propagatedBuildInputs = [ lxml six ];

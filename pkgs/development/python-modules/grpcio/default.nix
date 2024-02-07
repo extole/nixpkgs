@@ -1,5 +1,7 @@
-{ lib, stdenv
+{ lib
+, stdenv
 , buildPythonPackage
+, fetchPypi
 , grpc
 , six
 , protobuf
@@ -14,9 +16,14 @@
 }:
 
 buildPythonPackage rec {
-  inherit (grpc) src version;
   pname = "grpcio";
   format = "setuptools";
+  version = "1.60.0";
+
+  src = fetchPypi {
+    inherit pname version;
+    hash = "sha256-IZkWWhr/tmaqJK3wyXQ2aG0KYbxfwRPAN3Aft8f865Y=";
+  };
 
   outputs = [ "out" "dev" ];
 
@@ -26,7 +33,14 @@ buildPythonPackage rec {
   propagatedBuildInputs = [ six protobuf ]
     ++ lib.optionals (isPy27) [ enum34 futures ];
 
-  preBuild = lib.optionalString stdenv.isDarwin "unset AR";
+  preBuild = ''
+    export GRPC_PYTHON_BUILD_EXT_COMPILER_JOBS="$NIX_BUILD_CORES"
+    if [ -z "$enableParallelBuilding" ]; then
+      GRPC_PYTHON_BUILD_EXT_COMPILER_JOBS=1
+    fi
+  '' + lib.optionalString stdenv.isDarwin ''
+    unset AR
+  '';
 
   GRPC_BUILD_WITH_BORING_SSL_ASM = "";
   GRPC_PYTHON_BUILD_SYSTEM_OPENSSL = 1;
@@ -36,12 +50,14 @@ buildPythonPackage rec {
   # does not contain any tests
   doCheck = false;
 
+  enableParallelBuilding = true;
+
   pythonImportsCheck = [ "grpc" ];
 
   meta = with lib; {
     description = "HTTP/2-based RPC framework";
     license = licenses.asl20;
     homepage = "https://grpc.io/grpc/python/";
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }

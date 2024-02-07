@@ -13,13 +13,19 @@
 
 buildPythonPackage rec {
   pname = "bleach";
-  version = "5.0.1";
-  disabled = pythonOlder "3.7";
+  version = "6.1.0";
+  pyproject = true;
+
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-DQMlXEfrm9Lyaqm7fyEHcy5+j+GVyi9kcJ/POwpKCFw=";
+    hash = "sha256-CjHxg3ljxB1Gu/EzG4d44TCOoHkdsDzE5zV7l89CqP4=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     html5lib
@@ -35,7 +41,7 @@ buildPythonPackage rec {
     ];
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -63,6 +69,7 @@ buildPythonPackage rec {
     '';
     homepage = "https://github.com/mozilla/bleach";
     downloadPage = "https://github.com/mozilla/bleach/releases";
+    changelog = "https://github.com/mozilla/bleach/blob/v${version}/CHANGES";
     license = licenses.asl20;
     maintainers = with maintainers; [ prikhi ];
   };

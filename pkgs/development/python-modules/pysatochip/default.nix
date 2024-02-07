@@ -13,11 +13,12 @@
 buildPythonPackage rec {
   pname = "pysatochip";
   version = "0.14.2";
+  format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-+Z3D6ITZouhLbEotvJ9MDfg6QOhjGVKrLi1QL1kOdkE=";
+    hash = "sha256-+Z3D6ITZouhLbEotvJ9MDfg6QOhjGVKrLi1QL1kOdkE=";
   };
 
   postPatch = ''
@@ -29,7 +30,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ cryptography ecdsa pyaes pyopenssl pyscard ];
 
-  checkInputs = [ certifi ];
+  nativeCheckInputs = [ certifi ];
 
   pythonImportsCheck = [ "pysatochip" ];
 

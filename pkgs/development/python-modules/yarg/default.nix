@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "yarg";
   version = "0.1.9";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "kura";
@@ -13,7 +14,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ requests ];
 
-  checkInputs = [ nose mock ];
+  nativeCheckInputs = [ nose mock ];
   checkPhase = ''
     nosetests
   '';

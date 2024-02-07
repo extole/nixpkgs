@@ -7,16 +7,19 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "nsncd";
-  version = "unstable-2021-10-20";
+  version = "unstable-2023-10-26";
 
+  # https://github.com/twosigma/nsncd/pull/71 has not been upstreamed
+  # to twosigma/nsncd yet. Using the nix-community fork in the
+  # meantime.
   src = fetchFromGitHub {
     owner = "nix-community";
     repo = "nsncd";
-    rev = "b9425070bb308565a6e4dc5aefd568952a07a4ed";
-    hash = "sha256-ZjInzPJo+PWAM2gAKhlasLXiqo+2Df4DIXpNwtqQVc8=";
+    rev =  "d6513421f420e407248c6d0aee39ae2f861a7cec";
+    hash = "sha256-PykzwpPxMDHJOr2HubXuw+Krk9Jbi0E3M2lEAOXhx2M=";
   };
 
-  cargoSha256 = "sha256-hxdI+HHB0PB/zDMI21Pg5Xr9mTDn4T+OcAAenUox4bs=";
+  cargoSha256 = "sha256-cUM7rYXWpJ0aMiurXBp15IlxAmf/x5uiodxEqBPCQT0=";
 
   meta = with lib; {
     description = "the name service non-caching daemon";
@@ -25,6 +28,8 @@ rustPlatform.buildRustPackage rec {
     '';
     homepage = "https://github.com/twosigma/nsncd";
     license = licenses.asl20;
-    maintainers = with maintainers; [ flokli ninjatrappeur ];
+    maintainers = with maintainers; [ flokli picnoir ];
+    # never built on aarch64-darwin, x86_64-darwin since first introduction in nixpkgs
+    broken = stdenv.isDarwin;
   };
 }

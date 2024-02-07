@@ -7,12 +7,13 @@
 buildPythonPackage rec {
   pname = "result";
   version = "0.7.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "rustedpy";
     repo = "result";
      rev = "v${version}";
-    sha256 = "sha256-bEf3OJg6ksDvzZE7ezA58Q2FObb5V7BG8vkKtX284Jg=";
+    hash = "sha256-bEf3OJg6ksDvzZE7ezA58Q2FObb5V7BG8vkKtX284Jg=";
   };
 
   postPatch = ''
@@ -25,7 +26,7 @@ buildPythonPackage rec {
       --replace '"--cov-report=xml",' ""
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

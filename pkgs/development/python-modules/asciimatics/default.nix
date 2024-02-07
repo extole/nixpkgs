@@ -12,11 +12,12 @@
 
 buildPythonPackage rec {
   pname = "asciimatics";
-  version = "1.14.0";
+  version = "1.15.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-FtIM5CIQtDTrBbpGns24KTrH7TwM4N1PcOMNctdgIic=";
+    hash = "sha256-z905gEJydRnYtz5iuO+CwL7P7U60IImcO5bJjQuWgho=";
   };
 
   nativeBuildInputs = [
@@ -30,7 +31,7 @@ buildPythonPackage rec {
     future
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     nose
   ];

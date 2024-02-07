@@ -8,16 +8,16 @@
 
 buildGoModule rec {
   pname = "gitleaks";
-  version = "8.15.0";
+  version = "8.18.1";
 
   src = fetchFromGitHub {
     owner = "zricethezav";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-KqShYaUODClKkbLs3jaj55WXy9HyyBzvY5KdNOqEXPE=";
+    hash = "sha256-v0d/ulxYJRkyyhVctnQjKW2ODWtu+gSwp/qSkVLQ1Jo=";
   };
 
-  vendorSha256 = "sha256-Ev0/CSpwJDmc+Dvu/bFDzsgsq80rWImJWXNAUqYHgoE=";
+  vendorHash = "sha256-lPfvoeHPYWSnFPuAR9CxG6+pQ++cZEw/jYuGgDrm57E=";
 
   ldflags = [
     "-s"
@@ -25,7 +25,9 @@ buildGoModule rec {
     "-X github.com/zricethezav/gitleaks/v${lib.versions.major version}/cmd.Version=${version}"
   ];
 
-  nativeBuildInputs = [ installShellFiles ];
+  nativeBuildInputs = [
+    installShellFiles
+  ];
 
   # With v8 the config tests are are blocking
   doCheck = false;
@@ -49,6 +51,7 @@ buildGoModule rec {
       API keys and tokens in git repos.
     '';
     homepage = "https://github.com/zricethezav/gitleaks";
+    changelog = "https://github.com/zricethezav/gitleaks/releases/tag/v${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

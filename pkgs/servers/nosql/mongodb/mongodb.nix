@@ -1,14 +1,16 @@
 { lib
 , stdenv
 , fetchurl
-, sconsPackages
+, scons_3_1_2
 , boost
 , gperftools
 , pcre-cpp
 , snappy
 , zlib
-, libyamlcpp
+, yaml-cpp
 , sasl
+, net-snmp
+, openldap
 , openssl
 , libpcap
 , python3
@@ -31,7 +33,8 @@ with lib;
 
 let
   variants =
-    if versionAtLeast version "6.0" then rec {
+    if versionAtLeast version "6.0"
+    then rec {
       python = scons.python.withPackages (ps: with ps; [
         pyyaml
         cheetah3
@@ -41,13 +44,13 @@ let
         pymongo
       ]);
 
-      # 4.2 < mongodb <= 6.0.x needs scons 3.x built with python3
-      scons = sconsPackages.scons_3_1_2.override { python = python3; };
+      scons = scons_3_1_2;
 
       mozjsVersion = "60";
       mozjsReplace = "defined(HAVE___SINCOS)";
 
-    } else if versionAtLeast version "4.2" then rec {
+    }
+    else rec {
       python = scons.python.withPackages (ps: with ps; [
         pyyaml
         cheetah3
@@ -55,23 +58,12 @@ let
         setuptools
       ]);
 
-      # 4.2 < mongodb <= 5.0.x needs scons 3.x built with python3
-      scons = sconsPackages.scons_3_1_2.override { python = python3; };
+      scons = scons_3_1_2;
 
       mozjsVersion = "60";
       mozjsReplace = "defined(HAVE___SINCOS)";
 
-    } else rec {
-      python = scons.python.withPackages (ps: with ps; [
-        pyyaml
-        typing
-        cheetah
-      ]);
-
-      scons = sconsPackages.scons_3_1_2;
-      mozjsVersion = "45";
-      mozjsReplace = "defined(HAVE_SINCOS)";
-   };
+    };
 
   system-libraries = [
     "boost"
@@ -96,15 +88,17 @@ in stdenv.mkDerivation rec {
   };
 
   nativeBuildInputs = [ variants.scons ]
-    ++ lib.optionals (versionAtLeast version "4.4") [ xz ];
+                      ++ lib.optionals (versionAtLeast version "4.4") [ xz ];
 
   buildInputs = [
     boost
     curl
     gperftools
     libpcap
-    libyamlcpp
+    yaml-cpp
     openssl
+    net-snmp
+    openldap
     pcre-cpp
     variants.python
     sasl
@@ -121,14 +115,17 @@ in stdenv.mkDerivation rec {
     # fix environment variable reading
     substituteInPlace SConstruct \
         --replace "env = Environment(" "env = Environment(ENV = os.environ,"
-   '' + lib.optionalString (versionAtLeast version "4.4" && versionOlder version "4.6") ''
+   '' + lib.optionalString (versionAtLeast version "4.4") ''
     # Fix debug gcc 11 and clang 12 builds on Fedora
     # https://github.com/mongodb/mongo/commit/e78b2bf6eaa0c43bd76dbb841add167b443d2bb0.patch
     substituteInPlace src/mongo/db/query/plan_summary_stats.h --replace '#include <string>' '#include <optional>
     #include <string>'
     substituteInPlace src/mongo/db/exec/plan_stats.h --replace '#include <string>' '#include <optional>
     #include <string>'
-  '' + lib.optionalString stdenv.isDarwin ''
+  '' + lib.optionalString (versionOlder version "5.0") ''
+    # remove -march overriding, we know better.
+    sed -i 's/env.Append.*-march=.*$/pass/' SConstruct
+  '' + lib.optionalString (stdenv.isDarwin && versionOlder version "6.0") ''
     substituteInPlace src/third_party/mozjs-${variants.mozjsVersion}/extract/js/src/jsmath.cpp --replace '${variants.mozjsReplace}' 0
   '' + lib.optionalString (stdenv.isDarwin && versionOlder version "3.6") ''
     substituteInPlace src/third_party/s2/s1angle.cc --replace drem remainder
@@ -143,7 +140,7 @@ in stdenv.mkDerivation rec {
       --replace 'engine("wiredTiger")' 'engine("mmapv1")'
   '';
 
-  NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isClang
+  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isClang
     "-Wno-unused-command-line-argument";
 
   sconsFlags = [
@@ -156,7 +153,10 @@ in stdenv.mkDerivation rec {
     "--disable-warnings-as-errors"
     "VARIANT_DIR=nixos" # Needed so we don't produce argument lists that are too long for gcc / ld
   ] ++ lib.optionals (versionAtLeast version "4.4") [ "--link-model=static" ]
-    ++ map (lib: "--use-system-${lib}") system-libraries;
+  ++ map (lib: "--use-system-${lib}") system-libraries;
+
+  # This seems to fix mongodb not able to find OpenSSL's crypto.h during build
+  hardeningDisable = [ "fortify3" ];
 
   preBuild = ''
     sconsFlags+=" CC=$CC"
@@ -196,10 +196,8 @@ in stdenv.mkDerivation rec {
     homepage = "http://www.mongodb.org";
     inherit license;
 
-    maintainers = with maintainers; [ bluescreen303 offline cstrahan ];
-    platforms = subtractLists systems.doubles.i686 (
-      if (versionAtLeast version "6.0") then systems.doubles.linux
-      else systems.doubles.unix
-    );
+    maintainers = with maintainers; [ bluescreen303 offline ];
+    platforms = subtractLists systems.doubles.i686 systems.doubles.unix;
+    broken = (versionOlder version "6.0" && stdenv.system == "aarch64-darwin");
   };
 }

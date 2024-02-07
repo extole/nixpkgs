@@ -181,6 +181,20 @@ let
     monA.wait_until_succeeds("ceph osd stat | grep -e '3 osds: 3 up[^,]*, 3 in'")
     monA.wait_until_succeeds("ceph -s | grep 'mgr: ${cfg.monA.name}(active,'")
     monA.wait_until_succeeds("ceph -s | grep 'HEALTH_OK'")
+
+    # This test has been commented out due to the upstream issue with pyo3
+    # that has broken this dashboard
+    # Reference: https://www.spinics.net/lists/ceph-users/msg77812.html
+    # Enable the dashboard and recheck health
+    # monA.succeed(
+    #     "ceph mgr module enable dashboard",
+    #     "ceph config set mgr mgr/dashboard/ssl false",
+    #     # default is 8080 but it's better to be explicit
+    #     "ceph config set mgr mgr/dashboard/server_port 8080",
+    # )
+    # monA.wait_for_open_port(8080)
+    # monA.wait_until_succeeds("curl -q --fail http://localhost:8080")
+    # monA.wait_until_succeeds("ceph -s | grep 'HEALTH_OK'")
   '';
 in {
   name = "basic-single-node-ceph-cluster";

@@ -1,5 +1,6 @@
 { stdenv
 , lib
+, fetchpatch
 , fetchurl
 , vala
 , meson
@@ -36,6 +37,14 @@ stdenv.mkDerivation rec {
     hash = "sha256-Wx0b+6dPNlgifzyC4pbzMN0PzR70Y2tqIYIo/uXqgy0=";
   };
 
+  patches = [
+    (fetchpatch {
+      name = "gpg-2.4.patch";
+      url = "https://gitlab.gnome.org/GNOME/seahorse/-/commit/9260c74779be3d7a378db0671af862ffa3573d42.patch";
+      hash = "sha256-4QiFgH4jC1ucmA9fFozUQZ3Mat76SgpYkMpRz80RH64=";
+    })
+  ];
+
   nativeBuildInputs = [
     meson
     ninja
@@ -48,10 +57,6 @@ stdenv.mkDerivation rec {
     gnupg
     desktop-file-utils
     gcr
-    # error: Package `...' not found in specified Vala API directories or GObject-Introspection GIR directories
-    # TODO: the vala setuphook should look for vala filess in targetOffset instead of hostOffset
-    libhandy
-    libsecret
   ];
 
   buildInputs = [

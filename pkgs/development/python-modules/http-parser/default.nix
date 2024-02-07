@@ -19,15 +19,20 @@ buildPythonPackage rec {
   };
 
   nativeBuildInputs = [
+    cython
     setuptools
   ];
 
+  preBuild = ''
+    # re-run cython
+    make -B
+  '';
 
   pythonImportsCheck = [
     "http_parser"
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -35,6 +40,6 @@ buildPythonPackage rec {
     description = "HTTP request/response parser for python in C";
     homepage = "https://github.com/benoitc/http-parser";
     license = licenses.mit;
-    maintainers = with maintainers; [ hexa ];
+    maintainers = with maintainers; [ ];
   };
 }

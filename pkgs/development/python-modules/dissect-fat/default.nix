@@ -10,19 +10,17 @@
 
 buildPythonPackage rec {
   pname = "dissect-fat";
-  version = "3.1";
-  format = "pyproject";
+  version = "3.7";
+  pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.9";
 
   src = fetchFromGitHub {
     owner = "fox-it";
     repo = "dissect.fat";
-    rev = version;
-    hash = "sha256-GBeacQtNA1onh67Svqo5R43gap/Lzpm+20TXcUMmU5k=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-YfWshytfj4p2MqLpzE3b1/RtrL1/+Xd/5+RNbrH/Jfc=";
   };
-
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   nativeBuildInputs = [
     setuptools
@@ -44,6 +42,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Dissect module implementing a parser for the FAT file system";
     homepage = "https://github.com/fox-it/dissect.fat";
+    changelog = "https://github.com/fox-it/dissect.fat/releases/tag/${version}";
     license = licenses.agpl3Only;
     maintainers = with maintainers; [ fab ];
   };

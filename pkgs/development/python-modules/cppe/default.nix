@@ -33,6 +33,8 @@ buildPythonPackage rec {
 
   dontUseCmakeConfigure = true;
 
+  format = "setuptools";
+
   buildInputs = [ pybind11 ]
     ++ lib.optional stdenv.cc.isClang llvmPackages.openmp;
 
@@ -40,7 +42,7 @@ buildPythonPackage rec {
 
   hardeningDisable = lib.optional stdenv.cc.isClang "strictoverflow";
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest
     h5py
     numba

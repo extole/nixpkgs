@@ -1,44 +1,67 @@
 { lib
-, aiohttp
-, bidict
 , buildPythonPackage
 , fetchFromGitHub
-, mock
-, msgpack
-, pytestCheckHook
-, python-engineio
 , pythonOlder
+
+# build-system
+, setuptools
+
+# dependencies
+, bidict
+, python-engineio
+
+# optional-dependencies
+, aiohttp
 , requests
 , websocket-client
+
+# tests
+, msgpack
+, pytestCheckHook
+, simple-websocket
+, uvicorn
+
 }:
 
 buildPythonPackage rec {
   pname = "python-socketio";
-  version = "5.7.1";
-  format = "setuptools";
+  version = "5.10.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "miguelgrinberg";
     repo = "python-socketio";
-    rev = "v${version}";
-    sha256 = "sha256-KVaBSBWLeFJYiNJYTwoExExUmUaeNJ40c/WTgTc2Y/w=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-nlzTzIswMRjvJ9l9TOtVvRvbKlQPvNH0/P1NIbQCmy8=";
   };
 
-  propagatedBuildInputs = [
-    aiohttp
-    bidict
-    python-engineio
-    requests
-    websocket-client
+  nativeBuildInputs = [
+    setuptools
   ];
 
-  checkInputs = [
-    mock
+  propagatedBuildInputs = [
+    bidict
+    python-engineio
+  ];
+
+  passthru.optional-dependencies = {
+    client = [
+      requests
+      websocket-client
+    ];
+    asyncio_client = [
+      aiohttp
+    ];
+  };
+
+  nativeCheckInputs = [
     msgpack
     pytestCheckHook
-  ];
+    uvicorn
+    simple-websocket
+  ] ++ lib.flatten (lib.attrValues passthru.optional-dependencies);
 
   pythonImportsCheck = [
     "socketio"
@@ -51,6 +74,7 @@ buildPythonPackage rec {
       bidirectional event-based communication between clients and a server.
     '';
     homepage = "https://github.com/miguelgrinberg/python-socketio/";
+    changelog = "https://github.com/miguelgrinberg/python-socketio/blob/v${version}/CHANGES.md";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ mic92 ];
   };

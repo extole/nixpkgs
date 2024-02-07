@@ -4,12 +4,14 @@
 , boost
 , cairo
 , cmake
+, desktopToDarwinBundle
 , fetchurl
 , fetchpatch
 , gettext
 , ghostscript
 , glib
 , glibmm
+, gobject-introspection
 , gsl
 , gspell
 , gtk-mac-integration
@@ -39,6 +41,7 @@
 , python3
 , substituteAll
 , wrapGAppsHook
+, libepoxy
 , zlib
 }:
 let
@@ -47,11 +50,17 @@ let
       appdirs
       beautifulsoup4
       cachecontrol
+    ]
+    # CacheControl requires extra runtime dependencies for FileCache
+    # https://gitlab.com/inkscape/extras/extension-manager/-/commit/9a4acde6c1c028725187ff5972e29e0dbfa99b06
+    ++ cachecontrol.optional-dependencies.filecache
+    ++ [
       numpy
       lxml
       packaging
       pillow
       scour
+      pyparsing
       pyserial
       requests
       pygobject3
@@ -59,11 +68,11 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "inkscape";
-  version = "1.2.1";
+  version = "1.3.2";
 
   src = fetchurl {
-    url = "https://media.inkscape.org/dl/resources/file/inkscape-${version}.tar.xz";
-    sha256 = "Rs59oOunykutwdtw6cu2fgrfm7NCaH3G4ItcohuNTBs=";
+    url = "https://inkscape.org/release/inkscape-${version}/source/archive/xz/dl/inkscape-${version}.tar.xz";
+    sha256 = "sha256-29GETcRD/l4Q0+mohxROX7ciOFL/8ZHPte963qsOCGs=";
   };
 
   # Inkscape hits the ARGMAX when linking on macOS. It appears to be
@@ -79,22 +88,22 @@ stdenv.mkDerivation rec {
       # e.g., those from the "Effects" menu.
       python3 = "${python3Env}/bin/python";
     })
+    (substituteAll {
+      # Fix path to ps2pdf binary
+      src = ./fix-ps2pdf-path.patch;
+      inherit ghostscript;
+    })
 
-    # Fix build with Poppler 22.09
+    # Fix build with libxml2 2.12
+    # https://gitlab.com/inkscape/inkscape/-/merge_requests/6089
     (fetchpatch {
-      url = "https://github.com/archlinux/svntogit-packages/raw/b2f65dfb60ae0c8cd6cd9affd3d71064082a6201/trunk/inkscape-1.2.1-poppler-22.09.0.patch";
-      sha256 = "pArvsS/qoCTMAisF8yj3agZKrb90zRFZkck1TX0KeGc=";
+      url = "https://gitlab.com/inkscape/inkscape/-/commit/694d8ae43d06efff21adebf377ce614d660b24cd.patch";
+      hash = "sha256-9IXJzpZbNU5fnt7XKgqCzUDrwr08qxGwo8TqnL+xc6E=";
     })
   ];
 
   postPatch = ''
     patchShebangs share/extensions
-    substituteInPlace share/extensions/eps_input.inx \
-      --replace "location=\"path\">ps2pdf" "location=\"absolute\">${ghostscript}/bin/ps2pdf"
-    substituteInPlace share/extensions/ps_input.inx \
-      --replace "location=\"path\">ps2pdf" "location=\"absolute\">${ghostscript}/bin/ps2pdf"
-    substituteInPlace share/extensions/ps_input.py \
-      --replace "call('ps2pdf'" "call('${ghostscript}/bin/ps2pdf'"
     patchShebangs share/templates
     patchShebangs man/fix-roff-punct
 
@@ -111,10 +120,13 @@ stdenv.mkDerivation rec {
     glib # for setup hook
     gdk-pixbuf # for setup hook
     wrapGAppsHook
+    gobject-introspection
   ] ++ (with perlPackages; [
     perl
     XMLParser
-  ]);
+  ]) ++ lib.optionals stdenv.isDarwin [
+    desktopToDarwinBundle
+  ];
 
   buildInputs = [
     boehmgc
@@ -145,6 +157,7 @@ stdenv.mkDerivation rec {
     potrace
     python3Env
     zlib
+    libepoxy
   ] ++ lib.optionals (!stdenv.isDarwin) [
     gspell
   ] ++ lib.optionals stdenv.isDarwin [
@@ -154,8 +167,9 @@ stdenv.mkDerivation rec {
 
   # Make sure PyXML modules can be found at run-time.
   postInstall = lib.optionalString stdenv.isDarwin ''
-    install_name_tool -change $out/lib/libinkscape_base.dylib $out/lib/inkscape/libinkscape_base.dylib $out/bin/inkscape
-    install_name_tool -change $out/lib/libinkscape_base.dylib $out/lib/inkscape/libinkscape_base.dylib $out/bin/inkview
+    for f in $out/lib/inkscape/*.dylib; do
+      ln -s $f $out/lib/$(basename $f)
+    done
   '';
 
   meta = with lib; {
@@ -164,6 +178,7 @@ stdenv.mkDerivation rec {
     license = licenses.gpl3Plus;
     maintainers = [ maintainers.jtojnar ];
     platforms = platforms.all;
+    mainProgram = "inkscape";
     longDescription = ''
       Inkscape is a feature-rich vector graphics editor that edits
       files in the W3C SVG (Scalable Vector Graphics) file format.

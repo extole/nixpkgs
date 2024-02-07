@@ -12,12 +12,13 @@
 buildPythonPackage rec {
   pname = "vilfo-api-client";
   version = "0.4.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "ManneW";
     repo = "vilfo-api-client-python";
     rev = version;
-    sha256 = "sha256-j06Bbv0hWSmrlCv8RfgvfGTyOF+vSX+zZnX3AvG5Hys=";
+    hash = "sha256-j06Bbv0hWSmrlCv8RfgvfGTyOF+vSX+zZnX3AvG5Hys=";
   };
 
   postPatch = ''
@@ -29,15 +30,13 @@ buildPythonPackage rec {
     setuptools-scm
   ];
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
-
   propagatedBuildInputs = [
     getmac
     requests
     semver
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     responses
   ];

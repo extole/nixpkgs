@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "versiontag";
   version = "1.2.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "thelabnyc";
@@ -16,7 +17,7 @@ buildPythonPackage rec {
       --replace "get_version(pypi=True)" '"${version}"'
   '';
 
-  checkInputs = [ git ];
+  nativeCheckInputs = [ git ];
 
   pythonImportsCheck = [ "versiontag" ];
 

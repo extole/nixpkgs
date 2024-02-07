@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "aubio";
   version = "0.4.9";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = pname;
@@ -24,7 +25,7 @@ buildPythonPackage rec {
     numpy
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -34,6 +35,6 @@ buildPythonPackage rec {
     description = "a library for audio and music analysis";
     homepage = "https://aubio.org";
     license = licenses.gpl3;
-    maintainers = with maintainers; [ hexa ];
+    maintainers = with maintainers; [ ];
   };
 }

@@ -1,16 +1,15 @@
-{ lib, mkDerivation, fetchgit, qtbase, cmake, asciidoc
+{ lib, mkDerivation, fetchzip, qtbase, cmake, asciidoc
 , docbook_xsl, json_c, mesa_glu, freeglut, trace-cmd, pkg-config
 , libtraceevent, libtracefs, freefont_ttf
 }:
 
 mkDerivation rec {
   pname = "kernelshark";
-  version = "2.1.1";
+  version = "2.2.1";
 
-  src = fetchgit {
-    url = "https://git.kernel.org/pub/scm/utils/trace-cmd/kernel-shark.git/";
-    rev = "kernelshark-v${version}";
-    sha256 = "sha256-1M35y3EkMHbGkVv93Xwo4zApvy9usIcz1spm5Z+1iUs=";
+  src = fetchzip {
+    url = "https://git.kernel.org/pub/scm/utils/trace-cmd/kernel-shark.git/snapshot/kernelshark-v${version}.tar.gz";
+    hash = "sha256-V25IzPDOt6V03wgIa/AJ0T8mRaGmXYuMCcvbSOKleY0=";
   };
 
   outputs = [ "out" ];

@@ -27,7 +27,7 @@ in
       };
 
       port = mkOption {
-        type = types.int;
+        type = types.port;
         default = 8181;
         description = lib.mdDoc "TCP port where Tautulli listens.";
       };
@@ -50,14 +50,7 @@ in
         description = lib.mdDoc "Group under which Tautulli runs.";
       };
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.tautulli;
-        defaultText = literalExpression "pkgs.tautulli";
-        description = lib.mdDoc ''
-          The Tautulli package to use.
-        '';
-      };
+      package = mkPackageOption pkgs "tautulli" { };
     };
   };
 

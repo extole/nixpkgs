@@ -234,12 +234,12 @@ let
 
   headerChecks = concatStringsSep "\n" (map (x: "${x.pattern} ${x.action}") cfg.headerChecks) + cfg.extraHeaderChecks;
 
-  aliases = let seperator = if cfg.aliasMapType == "hash" then ":" else ""; in
+  aliases = let separator = optionalString (cfg.aliasMapType == "hash") ":"; in
     optionalString (cfg.postmasterAlias != "") ''
-      postmaster${seperator} ${cfg.postmasterAlias}
+      postmaster${separator} ${cfg.postmasterAlias}
     ''
     + optionalString (cfg.rootAlias != "") ''
-      root${seperator} ${cfg.rootAlias}
+      root${separator} ${cfg.rootAlias}
     ''
     + cfg.extraAliases
   ;
@@ -747,7 +747,7 @@ in
 
             ${concatStringsSep "\n" (mapAttrsToList (to: from: ''
               ln -sf ${from} /var/lib/postfix/conf/${to}
-              ${pkgs.postfix}/bin/postalias /var/lib/postfix/conf/${to}
+              ${pkgs.postfix}/bin/postalias -o -p /var/lib/postfix/conf/${to}
             '') cfg.aliasFiles)}
             ${concatStringsSep "\n" (mapAttrsToList (to: from: ''
               ln -sf ${from} /var/lib/postfix/conf/${to}
@@ -779,6 +779,19 @@ in
             ExecStart = "${pkgs.postfix}/bin/postfix start";
             ExecStop = "${pkgs.postfix}/bin/postfix stop";
             ExecReload = "${pkgs.postfix}/bin/postfix reload";
+
+            # Hardening
+            PrivateTmp = true;
+            PrivateDevices = true;
+            ProtectSystem = "full";
+            CapabilityBoundingSet = [ "~CAP_NET_ADMIN CAP_SYS_ADMIN CAP_SYS_BOOT CAP_SYS_MODULE" ];
+            MemoryDenyWriteExecute = true;
+            ProtectKernelModules = true;
+            ProtectKernelTunables = true;
+            ProtectControlGroups = true;
+            RestrictAddressFamilies = [ "AF_INET" "AF_INET6" "AF_NETLINK" "AF_UNIX" ];
+            RestrictNamespaces = true;
+            RestrictRealtime = true;
           };
         };
 
@@ -809,7 +822,7 @@ in
       // optionalAttrs (cfg.relayHost != "") { relayhost = if cfg.lookupMX
                                                            then "${cfg.relayHost}:${toString cfg.relayPort}"
                                                            else "[${cfg.relayHost}]:${toString cfg.relayPort}"; }
-      // optionalAttrs config.networking.enableIPv6 { inet_protocols = mkDefault "all"; }
+      // optionalAttrs (!config.networking.enableIPv6) { inet_protocols = mkDefault "ipv4"; }
       // optionalAttrs (cfg.networks != null) { mynetworks = cfg.networks; }
       // optionalAttrs (cfg.networksStyle != "") { mynetworks_style = cfg.networksStyle; }
       // optionalAttrs (cfg.hostname != "") { myhostname = cfg.hostname; }

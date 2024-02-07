@@ -34,17 +34,10 @@ in {
       '';
     };
 
-    package = mkOption {
-      type = types.package;
-      # NOTE: We don't use top-level jupyter because we don't
-      # want to pass in JUPYTER_PATH but use .environment instead,
-      # saving a rebuild.
-      default = pkgs.python3.pkgs.notebook;
-      defaultText = literalExpression "pkgs.python3.pkgs.notebook";
-      description = lib.mdDoc ''
-        Jupyter package to use.
-      '';
-    };
+    # NOTE: We don't use top-level jupyter because we don't
+    # want to pass in JUPYTER_PATH but use .environment instead,
+    # saving a rebuild.
+    package = mkPackageOption pkgs [ "python3" "pkgs" "notebook" ] { };
 
     command = mkOption {
       type = types.str;
@@ -57,7 +50,7 @@ in {
     };
 
     port = mkOption {
-      type = types.int;
+      type = types.port;
       default = 8888;
       description = lib.mdDoc ''
         Port number Jupyter will be listening on.
@@ -119,7 +112,7 @@ in {
 
     kernels = mkOption {
       type = types.nullOr (types.attrsOf(types.submodule (import ./kernel-options.nix {
-        inherit lib;
+        inherit lib pkgs;
       })));
 
       default = null;

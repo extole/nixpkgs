@@ -25,7 +25,7 @@
 , udev
 , libxcb
 , libxkbcommon
-, libxcrypt
+, libxcrypt-legacy
 , lshw
 , mesa
 , nspr
@@ -49,18 +49,23 @@
 , xcbutilrenderutil
 , xcbutilwm
 , p7zip
+, tbb
 , wayland
 , libXScrnSaver
 }:
 
 stdenv.mkDerivation rec {
   pname = "webex";
-  version = "42.10.0.24000";
+  version = "43.11.0.27795";
 
   src = fetchurl {
-    url = "https://binaries.webex.com/WebexDesktop-Ubuntu-Gold/20221019145240/Webex_ubuntu.7z";
-    sha256 = "03b77a3fcce76f04cf684bcdecb3bcce97c5a8b6cc36b40967cc14fa9a46c102";
+    url = "https://binaries.webex.com/WebexDesktop-Ubuntu-Gold/20231108131957/Webex_ubuntu.7z";
+    sha256 = "e7a30481840a4a56c7ac38fa9efb487c722758ad9ac875432e86232d6a8e6466";
   };
+
+  nativeBuildInputs = [
+    p7zip
+  ];
 
   buildInputs = [
     alsa-lib
@@ -92,7 +97,7 @@ stdenv.mkDerivation rec {
     udev
     libxcb
     libxkbcommon
-    libxcrypt
+    libxcrypt-legacy
     libX11
     libXcomposite
     libXcursor
@@ -110,7 +115,7 @@ stdenv.mkDerivation rec {
     xcbutilkeysyms
     xcbutilrenderutil
     xcbutilwm
-    p7zip
+    tbb
     wayland
   ];
 

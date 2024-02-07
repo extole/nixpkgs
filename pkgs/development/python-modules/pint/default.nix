@@ -2,12 +2,18 @@
 , buildPythonPackage
 , fetchPypi
 , pythonOlder
+
+# build-system
+, setuptools
 , setuptools-scm
-, importlib-metadata
-, packaging
-# Check Inputs
+
+# propagates
+, typing-extensions
+
+# tests
 , pytestCheckHook
 , pytest-subtests
+, pytest-benchmark
 , numpy
 , matplotlib
 , uncertainties
@@ -15,39 +21,49 @@
 
 buildPythonPackage rec {
   pname = "pint";
-  version = "0.19.2";
+  version = "0.23";
+  format = "pyproject";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit version;
     pname = "Pint";
-    sha256 = "sha256-4dSYn/UQs3ja1k+RcR572r5cp411sGoYVprEVGeMS68=";
+    hash = "sha256-4VCbkWBtvFJSfGAKTvdP+sEv/3Boiv8g6QckCTRuybQ=";
   };
 
-  nativeBuildInputs = [ setuptools-scm ];
+  nativeBuildInputs = [
+    setuptools
+    setuptools-scm
+  ];
 
-  propagatedBuildInputs = [ packaging ]
-    ++ lib.optionals (pythonOlder "3.8") [ importlib-metadata ];
+  propagatedBuildInputs = [
+    typing-extensions
+  ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-subtests
+    pytest-benchmark
     numpy
     matplotlib
     uncertainties
   ];
 
-  dontUseSetuptoolsCheck = true;
-
   preCheck = ''
     export HOME=$(mktemp -d)
   '';
 
+  disabledTests = [
+    # https://github.com/hgrecco/pint/issues/1898
+    "test_load_definitions_stage_2"
+  ];
+
   meta = with lib; {
+    changelog = "https://github.com/hgrecco/pint/blob/${version}/CHANGES";
     description = "Physical quantities module";
     license = licenses.bsd3;
     homepage = "https://github.com/hgrecco/pint/";
-    maintainers = with maintainers; [ costrouc doronbehar ];
+    maintainers = with maintainers; [ doronbehar ];
   };
 }

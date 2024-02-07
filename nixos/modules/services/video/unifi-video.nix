@@ -32,7 +32,7 @@ let
     name = "mongo.conf";
     executable = false;
     text = ''
-      # for documentation of all options, see http://docs.mongodb.org/manual/reference/configuration-options/
+      # for documentation of all options, see https://www.mongodb.com/docs/manual/reference/configuration-options/
 
       storage:
          dbPath: ${cfg.dataDir}/db
@@ -63,7 +63,7 @@ let
     executable = false;
     text = ''
       # for documentation of all options, see:
-      #   http://docs.mongodb.org/manual/reference/configuration-options/
+      #   https://www.mongodb.com/docs/manual/reference/configuration-options/
 
       storage:
          dbPath: ${cfg.dataDir}/db-wt
@@ -103,31 +103,12 @@ in
       '';
     };
 
-    jrePackage = mkOption {
-      type = types.package;
-      default = pkgs.jre8;
-      defaultText = literalExpression "pkgs.jre8";
-      description = lib.mdDoc ''
-        The JRE package to use. Check the release notes to ensure it is supported.
-      '';
-    };
+    jrePackage = mkPackageOption pkgs "jre8" { };
 
-    unifiVideoPackage = mkOption {
-      type = types.package;
-      default = pkgs.unifi-video;
-      defaultText = literalExpression "pkgs.unifi-video";
-      description = lib.mdDoc ''
-        The unifi-video package to use.
-      '';
-    };
+    unifiVideoPackage = mkPackageOption pkgs "unifi-video" { };
 
-    mongodbPackage = mkOption {
-      type = types.package;
-      default = pkgs.mongodb-4_0;
-      defaultText = literalExpression "pkgs.mongodb";
-      description = lib.mdDoc ''
-        The mongodb package to use.
-      '';
+    mongodbPackage = mkPackageOption pkgs "mongodb" {
+      default = "mongodb-4_4";
     };
 
     logDir = mkOption {
@@ -148,7 +129,7 @@ in
 
     openFirewall = mkOption {
       type = types.bool;
-      default = true;
+      default = false;
       description = lib.mdDoc ''
         Whether or not to open the required ports on the firewall.
       '';
@@ -159,7 +140,7 @@ in
       default = 1024;
       example = 4096;
       description = lib.mdDoc ''
-        Set the maximimum heap size for the JVM in MB.
+        Set the maximum heap size for the JVM in MB.
       '';
     };
 

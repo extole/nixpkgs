@@ -8,7 +8,7 @@ let
   # Escaping is done according to https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS
   setDatabaseOption = key: value:
     "UPDATE settings SET value = '${
-      lib.replaceChars [ "'" ] [ "''" ] (builtins.toJSON value)
+      lib.replaceStrings [ "'" ] [ "''" ] (builtins.toJSON value)
     }' WHERE key = '${key}';";
   updateDatabaseConfigSQL = pkgs.writeText "update-database-config.sql"
     (concatStringsSep "\n" (mapAttrsToList setDatabaseOption
@@ -54,7 +54,7 @@ let
 
       smtp = mkOption {
         type = listOf (submodule {
-          freeformType = with types; attrsOf (oneOf [ str int bool ]);
+          freeformType = with types; attrsOf anything;
 
           options = {
             enabled = mkEnableOption (lib.mdDoc "this SMTP server for listmonk");
@@ -86,7 +86,7 @@ let
       # TODO: refine this type based on the smtp one.
       "bounce.mailboxes" = mkOption {
         type = listOf
-          (submodule { freeformType = with types; oneOf [ str int bool ]; });
+          (submodule { freeformType = with types; listOf (attrsOf anything); });
         default = [ ];
         description = lib.mdDoc "List of bounce mailboxes";
       };
@@ -168,7 +168,7 @@ in {
 
       ensureUsers = [{
         name = "listmonk";
-        ensurePermissions = { "DATABASE listmonk" = "ALL PRIVILEGES"; };
+        ensureDBOwnership = true;
       }];
 
       ensureDatabases = [ "listmonk" ];
@@ -201,13 +201,12 @@ in {
         DynamicUser = true;
         NoNewPrivileges = true;
         CapabilityBoundingSet = "";
-        SystemCallArchitecture = "native";
+        SystemCallArchitectures = "native";
         SystemCallFilter = [ "@system-service" "~@privileged" ];
-        ProtectDevices = true;
+        PrivateDevices = true;
         ProtectControlGroups = true;
         ProtectKernelTunables = true;
         ProtectHome = true;
-        DeviceAllow = false;
         RestrictNamespaces = true;
         RestrictRealtime = true;
         UMask = "0027";

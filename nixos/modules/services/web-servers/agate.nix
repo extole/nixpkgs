@@ -10,12 +10,7 @@ in
     services.agate = {
       enable = mkEnableOption (lib.mdDoc "Agate Server");
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.agate;
-        defaultText = literalExpression "pkgs.agate";
-        description = lib.mdDoc "The package to use";
-      };
+      package = mkPackageOption pkgs "agate" { };
 
       addresses = mkOption {
         type = types.listOf types.str;
@@ -43,7 +38,7 @@ in
         type = types.listOf types.str;
         description = lib.mdDoc ''
           Domain name of this Gemini server, enables checking hostname and port
-          in requests. (multiple occurences means basic vhosts)
+          in requests. (multiple occurrences means basic vhosts)
         '';
       };
 
@@ -76,6 +71,7 @@ in
     systemd.services.agate = {
       description = "Agate";
       wantedBy = [ "multi-user.target" ];
+      wants = [ "network-online.target" ];
       after = [ "network.target" "network-online.target" ];
 
       script =

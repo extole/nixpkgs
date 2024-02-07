@@ -2,6 +2,10 @@
 , pythonOlder
 , buildPythonPackage
 , fetchFromGitHub
+
+# build-system
+, setuptools
+
   # Python Inputs
 , qiskit-aer
 , qiskit-ibmq-provider
@@ -28,7 +32,8 @@ in
 buildPythonPackage rec {
   pname = "qiskit";
   # NOTE: This version denotes a specific set of subpackages. See https://qiskit.org/documentation/release_notes.html#version-history
-  version = "0.37.0";
+  version = "0.45.1";
+  pyproject = true;
 
   disabled = pythonOlder "3.6";
 
@@ -36,8 +41,12 @@ buildPythonPackage rec {
     owner = "Qiskit";
     repo = "qiskit";
     rev = "refs/tags/${version}";
-    sha256 = "sha256-TsDDiSWSjk2iXaxFjGXQxPFEPCR242dR26H0cpA6ZxY=";
+    hash = "sha256-XAAQc6oX9zy9MFze1UQbalUBfhbkY5u/0xOmc5J66kM=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     qiskit-aer
@@ -46,7 +55,7 @@ buildPythonPackage rec {
     qiskit-terra
   ] ++ lib.optionals withOptionalPackages optionalQiskitPackages;
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [
     "qiskit"

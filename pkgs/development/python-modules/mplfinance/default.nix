@@ -3,10 +3,11 @@
 buildPythonPackage rec {
   pname = "mplfinance";
   version = "0.12.7a7";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-pATiprTELt8GrEkeKjILPfpdNDVoex5t+Mc+6Gg7cPY=";
+    hash = "sha256-pATiprTELt8GrEkeKjILPfpdNDVoex5t+Mc+6Gg7cPY=";
   };
 
   propagatedBuildInputs = [ matplotlib pandas ];

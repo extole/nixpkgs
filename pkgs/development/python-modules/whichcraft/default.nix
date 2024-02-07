@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "whichcraft";
   version = "0.6.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -12,7 +13,7 @@ buildPythonPackage rec {
   LC_ALL="en_US.utf-8";
   buildInputs = [ glibcLocales ];
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   checkPhase = ''
     py.test

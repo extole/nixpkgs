@@ -1,18 +1,18 @@
 { lib, stdenv, fetchurl, fetchpatch, pkg-config, musl-fts
 , musl-obstack, m4, zlib, zstd, bzip2, bison, flex, gettext, xz, setupDebugInfoDirs
 , argp-standalone
-, enableDebuginfod ? false, sqlite, curl, libmicrohttpd, libarchive
+, enableDebuginfod ? true, sqlite, curl, libmicrohttpd, libarchive
 , gitUpdater
 }:
 
 # TODO: Look at the hardcoded paths to kernel, modules etc.
 stdenv.mkDerivation rec {
   pname = "elfutils";
-  version = "0.187";
+  version = "0.190";
 
   src = fetchurl {
     url = "https://sourceware.org/elfutils/ftp/${version}/${pname}-${version}.tar.bz2";
-    sha256 = "sha256-5wsN++YQ+QxNH+DXGvFCpOJcPE7566uNLXK2UVnUVMg=";
+    hash = "sha256-jgCjqbXwS8HcJzroYoHS0m7UEgILOR/8wjGY8QIx1pI=";
   };
 
   patches = [
@@ -41,6 +41,11 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     patchShebangs tests/*.sh
+  '' + lib.optionalString stdenv.hostPlatform.isRiscV ''
+    # disable failing test:
+    #
+    # > dwfl_thread_getframes: No DWARF information found
+    sed -i s/run-backtrace-dwarf.sh//g tests/Makefile.in
   '';
 
   outputs = [ "bin" "dev" "out" "man" ];

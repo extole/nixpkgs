@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "citeproc-py";
   version = "0.6.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -20,7 +21,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ lxml ];
 
-  checkInputs = [ nose git ];
+  nativeCheckInputs = [ nose git ];
   checkPhase = "nosetests tests";
   doCheck = false;  # seems to want a Git repository, but fetchgit with leaveDotGit also fails
   pythonImportsCheck = [ "citeproc" ];

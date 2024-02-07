@@ -61,7 +61,7 @@ in
       };
 
       listenPort = mkOption {
-        type = types.int;
+        type = types.port;
         default = 8092;
         description = lib.mdDoc "Port to listen on.";
       };
@@ -95,7 +95,7 @@ in
         };
 
         port = mkOption {
-          type = types.int;
+          type = types.port;
           default = 443;
           example = 80;
           description = lib.mdDoc "Port used at the proxy";
@@ -115,18 +115,14 @@ in
         };
       };
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.atlassian-crowd;
-        defaultText = literalExpression "pkgs.atlassian-crowd";
-        description = lib.mdDoc "Atlassian Crowd package to use.";
-      };
+      package = mkPackageOption pkgs "atlassian-crowd" { };
 
-      jrePackage = mkOption {
-        type = types.package;
-        default = pkgs.oraclejre8;
-        defaultText = literalExpression "pkgs.oraclejre8";
-        description = lib.mdDoc "Note that Atlassian only support the Oracle JRE (JRASERVER-46152).";
+      jrePackage = mkPackageOption pkgs "oraclejre8" {
+        extraDescription = ''
+        ::: {.note }
+        Atlassian only supports the Oracle JRE (JRASERVER-46152).
+        :::
+        '';
       };
     };
   };

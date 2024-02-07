@@ -15,6 +15,7 @@
 buildPythonPackage rec {
   pname = "mapbox";
   version = "0.18.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "mapbox";
@@ -24,7 +25,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ boto3 cachecontrol iso3166 python-dateutil requests polyline uritemplate ];
-  checkInputs = [ pytestCheckHook responses ];
+  nativeCheckInputs = [ pytestCheckHook responses ];
 
   meta = with lib; {
     homepage = "https://github.com/mapbox/mapbox-sdk-py";

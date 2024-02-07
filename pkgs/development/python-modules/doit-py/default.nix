@@ -12,12 +12,13 @@
 buildPythonPackage rec {
   pname = "doit-py";
   version = "0.5.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "pydoit";
     repo = pname;
     rev = version;
-    sha256 = "sha256-DBl6/no04ZGRHHmN9gkEtBmAMgmyZWcfPCcFz0uxAv4=";
+    hash = "sha256-DBl6/no04ZGRHHmN9gkEtBmAMgmyZWcfPCcFz0uxAv4=";
   };
 
   propagatedBuildInputs = [
@@ -26,7 +27,7 @@ buildPythonPackage rec {
     mergedict
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     hunspell
     hunspellDicts.en_US
     pytestCheckHook

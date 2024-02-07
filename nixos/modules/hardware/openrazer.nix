@@ -50,7 +50,7 @@ in
   options = {
     hardware.openrazer = {
       enable = mkEnableOption (lib.mdDoc ''
-        OpenRazer drivers and userspace daemon.
+        OpenRazer drivers and userspace daemon
       '');
 
       verboseLogging = mkOption {
@@ -110,7 +110,7 @@ in
     boot.extraModulePackages = [ kernelPackages.openrazer ];
     boot.kernelModules = drivers;
 
-    # Makes the man pages available so you can succesfully run
+    # Makes the man pages available so you can successfully run
     # > systemctl --user help openrazer-daemon
     environment.systemPackages = [ pkgs.python3Packages.openrazer-daemon.man ];
 

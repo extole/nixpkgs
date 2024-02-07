@@ -16,7 +16,7 @@
 
 buildPythonPackage rec {
   pname = "renault-api";
-  version = "0.1.11";
+  version = "0.2.1";
   format = "pyproject";
 
   disabled = pythonOlder "3.7";
@@ -24,8 +24,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "hacf-fr";
     repo = pname;
-    rev = "v${version}";
-    sha256 = "sha256-71UFVXfww3wgSO2qoRCuV80+33B91Bjl2+nuuCbQRLg=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-HDaX94XHkyrIA0hWYwcpUItEIeRK2ACvS6jg1YA6Wv4=";
   };
 
   nativeBuildInputs = [
@@ -41,14 +41,14 @@ buildPythonPackage rec {
     tabulate
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aioresponses
     pytest-asyncio
     pytestCheckHook
   ];
 
   pytestFlagsArray = [
-    "--asyncio-mode=legacy"
+    "--asyncio-mode=auto"
   ];
 
   pythonImportsCheck = [
@@ -58,6 +58,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python library to interact with the Renault API";
     homepage = "https://github.com/hacf-fr/renault-api";
+    changelog = "https://github.com/hacf-fr/renault-api/releases/tag/v${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ fab ];
   };

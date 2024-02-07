@@ -1,23 +1,27 @@
 { lib
 , buildPythonPackage
-, certifi
-, configparser
-, faker
 , fetchFromGitHub
-, future
-, mock
-, nose
-, pytestCheckHook
-, python-dateutil
 , pythonOlder
-, pytz
+
+# build-system
+, setuptools
+
+# dependencies
+, argon2-cffi
+, certifi
 , urllib3
+, pycryptodome
+
+# test
+, faker
+, mock
+, pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "minio";
-  version = "7.1.12";
-  format = "setuptools";
+  version = "7.2.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
@@ -25,22 +29,23 @@ buildPythonPackage rec {
     owner = "minio";
     repo = "minio-py";
     rev = "refs/tags/${version}";
-    hash = "sha256-9BjKoBQdkqkNK6StsiP0L3S5Dn8y53K5VghUIpIt46k=";
+    hash = "sha256-hZn1T75JbnJ5lIyWnX3f8r6OET/d6ZltuRr6jjYOp2o=";
   };
 
-  propagatedBuildInputs = [
-    certifi
-    configparser
-    future
-    python-dateutil
-    pytz
-    urllib3
+  nativeBuildInputs = [
+    setuptools
   ];
 
-  checkInputs = [
+  propagatedBuildInputs = [
+    argon2-cffi
+    certifi
+    urllib3
+    pycryptodome
+  ];
+
+  nativeCheckInputs = [
     faker
     mock
-    nose
     pytestCheckHook
   ];
 
@@ -56,6 +61,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Simple APIs to access any Amazon S3 compatible object storage server";
     homepage = "https://github.com/minio/minio-py";
+    changelog = "https://github.com/minio/minio-py/releases/tag/${version}";
     maintainers = with maintainers; [ peterromfeldhk ];
     license = licenses.asl20;
   };

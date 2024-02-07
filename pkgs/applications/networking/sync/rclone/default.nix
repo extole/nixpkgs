@@ -1,20 +1,21 @@
 { lib, stdenv, buildGoModule, fetchFromGitHub, buildPackages, installShellFiles
 , makeWrapper
 , enableCmount ? true, fuse, macfuse-stubs
+, librclone
 }:
 
 buildGoModule rec {
   pname = "rclone";
-  version = "1.60.0";
+  version = "1.65.1";
 
   src = fetchFromGitHub {
     owner = pname;
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-UFA4mPzpHnyx6+tVw0QwhTlALdu8YLNAleWxXuFJczs=";
+    hash = "sha256-wRksCRQR6JZjYtXgq3iARCoYck76O17Kd2Ht1XpA9KE=";
   };
 
-  vendorSha256 = "sha256-si5fzyPQUUTKkm/UVt8xfpJGK/4F6GM4HuAg1R0hzqQ=";
+  vendorHash = "sha256-kWaMo6ALieuwf53H05UdoI7xtH1LAnsD6Ak9bJTa6jc=";
 
   subPackages = [ "." ];
 
@@ -30,7 +31,7 @@ buildGoModule rec {
   postInstall =
     let
       rcloneBin =
-        if stdenv.buildPlatform == stdenv.hostPlatform
+        if stdenv.buildPlatform.canExecute stdenv.hostPlatform
         then "$out"
         else lib.getBin buildPackages.rclone;
     in
@@ -40,20 +41,29 @@ buildGoModule rec {
         ${rcloneBin}/bin/rclone genautocomplete $shell rclone.$shell
         installShellCompletion rclone.$shell
       done
+
+      # filesystem helpers
+      ln -s $out/bin/rclone $out/bin/rclonefs
+      ln -s $out/bin/rclone $out/bin/mount.rclone
     '' + lib.optionalString (enableCmount && !stdenv.isDarwin)
       # use --suffix here to ensure we don't shadow /run/wrappers/bin/fusermount,
       # as the setuid wrapper is required as non-root on NixOS.
       ''
       wrapProgram $out/bin/rclone \
-                  --suffix PATH : "${lib.makeBinPath [ fuse ] }" \
-                  --prefix LD_LIBRARY_PATH : "${fuse}/lib"
+        --suffix PATH : "${lib.makeBinPath [ fuse ] }" \
+        --prefix LD_LIBRARY_PATH : "${fuse}/lib"
     '';
+
+  passthru.tests = {
+    inherit librclone;
+  };
 
   meta = with lib; {
     description = "Command line program to sync files and directories to and from major cloud storage";
     homepage = "https://rclone.org";
     changelog = "https://github.com/rclone/rclone/blob/v${version}/docs/content/changelog.md";
     license = licenses.mit;
-    maintainers = with maintainers; [ danielfullmer marsam SuperSandro2000 ];
+    mainProgram = "rclone";
+    maintainers = with maintainers; [ marsam SuperSandro2000 ];
   };
 }

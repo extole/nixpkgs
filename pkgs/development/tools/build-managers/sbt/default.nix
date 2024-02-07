@@ -6,13 +6,13 @@
 , zlib
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "sbt";
-  version = "1.7.3";
+  version = "1.9.8";
 
   src = fetchurl {
-    url = "https://github.com/sbt/sbt/releases/download/v${version}/sbt-${version}.tgz";
-    sha256 = "sha256-J4bDI5bLiH9Gz8OlU5eHJRPsdahJ6uqfTwFGkoycsGA=";
+    url = "https://github.com/sbt/sbt/releases/download/v${finalAttrs.version}/sbt-${finalAttrs.version}.tgz";
+    hash = "sha256-qG//418Ga2XV4C67SiytHPu0GPgwv19z0n8wc+7K/c0=";
   };
 
   postPatch = ''
@@ -47,7 +47,7 @@ stdenv.mkDerivation rec {
       binaryNativeCode
     ];
     description = "A build tool for Scala, Java and more";
-    maintainers = with maintainers; [ nequissimus ];
+    maintainers = with maintainers; [ nequissimus kashw2 ];
     platforms = platforms.unix;
   };
-}
+})

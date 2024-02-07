@@ -2,16 +2,16 @@
 
 buildGoModule rec {
   pname = "odo";
-  version = "3.1.0";
+  version = "3.15.0";
 
   src = fetchFromGitHub {
     owner = "redhat-developer";
     repo = "odo";
     rev = "v${version}";
-    sha256 = "sha256-+QLRm01JTV7nnMiIvitdkm38E08TsmU6EfrNTUCTddY=";
+    sha256 = "sha256-UPq211Lo95r2b/Ov/a7uhb5p9M3MlNd72VwkMXPHy2Y=";
   };
 
-  vendorSha256 = null;
+  vendorHash = null;
 
   buildPhase = ''
     make bin
@@ -34,6 +34,5 @@ buildGoModule rec {
     homepage = "https://odo.dev";
     changelog = "https://github.com/redhat-developer/odo/releases/v${version}";
     maintainers = with maintainers; [ stehessel ];
-    platforms = platforms.unix;
   };
 }

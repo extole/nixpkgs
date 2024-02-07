@@ -107,6 +107,10 @@ let
       stopIfChanged = false;
 
       path = [ package ];
+      # if `userControl.enable`, the supplicant automatically changes the permissions
+      #  and owning group of the runtime dir; setting `umask` ensures the generated
+      #  config file isn't readable (except to root);  see nixpkgs#267693
+      serviceConfig.UMask = "066";
       serviceConfig.RuntimeDirectory = "wpa_supplicant";
       serviceConfig.RuntimeDirectoryMode = "700";
       serviceConfig.EnvironmentFile = mkIf (cfg.environmentFile != null)
@@ -121,11 +125,15 @@ let
         ''}
 
         # substitute environment variables
-        ${pkgs.gawk}/bin/awk '{
-          for(varname in ENVIRON)
-            gsub("@"varname"@", ENVIRON[varname])
-          print
-        }' "${configFile}" > "${finalConfig}"
+        if [ -f "${configFile}" ]; then
+          ${pkgs.gawk}/bin/awk '{
+            for(varname in ENVIRON)
+              gsub("@"varname"@", ENVIRON[varname])
+            print
+          }' "${configFile}" > "${finalConfig}"
+        else
+          touch "${finalConfig}"
+        fi
 
         iface_args="-s ${optionalString cfg.dbusControlled "-u"} -D${cfg.driver} ${configStr}"
 
@@ -526,5 +534,5 @@ in {
     '';
   };
 
-  meta.maintainers = with lib.maintainers; [ globin rnhmjoj ];
+  meta.maintainers = with lib.maintainers; [ rnhmjoj ];
 }

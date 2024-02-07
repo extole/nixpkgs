@@ -1,7 +1,6 @@
 { lib
 , aiohttp
 , aresponses
-, asynctest
 , buildPythonPackage
 , fetchFromGitHub
 , poetry-core
@@ -13,17 +12,26 @@
 
 buildPythonPackage rec {
   pname = "omnikinverter";
-  version = "0.8.1";
-  format = "pyproject";
+  version = "1.0.0";
+  pyproject = true;
 
-  disabled = pythonOlder "3.9";
+  disabled = pythonOlder "3.11";
 
   src = fetchFromGitHub {
     owner = "klaasnicolaas";
     repo = "python-omnikinverter";
-    rev = "v${version}";
-    hash = "sha256-OQWk+ae+hSLLdH0uLVPauoNeQpXgxkvflXFyaiFe108=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-W9VeRhsCXLLgOgvJcNNCGNmPvakPtKHAtwQAGtYJbcY=";
   };
+
+  __darwinAllowLocalNetworking = true;
+
+  postPatch = ''
+    # Upstream doesn't set a version for the pyproject.toml
+    substituteInPlace pyproject.toml \
+      --replace "0.0.0" "${version}" \
+      --replace "--cov" ""
+  '';
 
   nativeBuildInputs = [
     poetry-core
@@ -34,19 +42,11 @@ buildPythonPackage rec {
     yarl
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aresponses
-    asynctest
     pytest-asyncio
     pytestCheckHook
   ];
-
-  postPatch = ''
-    # Upstream doesn't set a version for the pyproject.toml
-    substituteInPlace pyproject.toml \
-      --replace "0.0.0" "${version}" \
-      --replace "--cov" ""
-  '';
 
   pythonImportsCheck = [
     "omnikinverter"
@@ -55,6 +55,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python module for the Omnik Inverter";
     homepage = "https://github.com/klaasnicolaas/python-omnikinverter";
+    changelog = "https://github.com/klaasnicolaas/python-omnikinverter/releases/tag/v${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

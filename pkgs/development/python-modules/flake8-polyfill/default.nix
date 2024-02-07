@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "flake8-polyfill";
   version = "1.0.2";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -21,7 +22,7 @@ buildPythonPackage rec {
     flake8
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pep8
     pytestCheckHook

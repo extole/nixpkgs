@@ -27,7 +27,7 @@ let
 
       propagatedBuildInputs = with pypkgs; [
         twisted
-        Mako
+        mako
         chardet
         pyxdg
         pyopenssl
@@ -39,7 +39,7 @@ let
         pillow
         rencode
         six
-        zope_interface
+        zope-interface
         dbus-python
         pycairo
         librsvg
@@ -57,7 +57,7 @@ let
         wrapGAppsHook
       ];
 
-      checkInputs = with pypkgs; [
+      nativeCheckInputs = with pypkgs; [
         pytestCheckHook
         pytest-twisted
         pytest-cov

@@ -1,7 +1,8 @@
-{ lib, stdenv
+{ lib
+, stdenv
 , fetchurl
 , makeDesktopItem
-, jre
+, openjdk19
 , gtk3
 , glib
 , gnome
@@ -9,14 +10,16 @@
 , libXtst
 , which
 }:
-
+let
+  jre = openjdk19;
+in
 stdenv.mkDerivation rec {
   pname = "smartgithg";
-  version = "21.2.2";
+  version = "23.1.1";
 
   src = fetchurl {
     url = "https://www.syntevo.com/downloads/smartgit/smartgit-linux-${builtins.replaceStrings [ "." ] [ "_" ] version}.tar.gz";
-    sha256 = "10v6sg0lmjby3v8g3sk2rzzvdx5p69ia4zz2c0hbf30rk0p6gqn3";
+    sha256 = "sha256-LXB+OymApJjL4bgOZ8Vfd193jZHVbQ6G2zmrHNE/OJk=";
   };
 
   nativeBuildInputs = [ wrapGAppsHook ];
@@ -86,6 +89,7 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     description = "GUI for Git, Mercurial, Subversion";
     homepage = "https://www.syntevo.com/smartgit/";
+    changelog = "https://www.syntevo.com/smartgit/changelog.txt";
     license = licenses.unfree;
     platforms = platforms.linux;
     maintainers = with lib.maintainers; [ jraygauthier ];

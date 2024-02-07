@@ -15,20 +15,26 @@ let
 
   tlsEnabled = cfg.nginx.addSSL || cfg.nginx.forceSSL || cfg.nginx.onlySSL || cfg.nginx.enableACME;
 
+  inherit (snipe-it.passthru) phpPackage;
+
   # shell script for local administration
-  artisan = pkgs.writeScriptBin "snipe-it" ''
+  artisan = (pkgs.writeScriptBin "snipe-it" ''
     #! ${pkgs.runtimeShell}
-    cd ${snipe-it}
+    cd "${snipe-it}/share/php/snipe-it"
     sudo=exec
     if [[ "$USER" != ${user} ]]; then
       sudo='exec /run/wrappers/bin/sudo -u ${user}'
     fi
-    $sudo ${pkgs.php}/bin/php artisan $*
-  '';
+    $sudo ${phpPackage}/bin/php artisan $*
+  '').overrideAttrs (old: {
+    meta = old.meta // {
+      mainProgram = "snipe-it";
+    };
+  });
 in {
   options.services.snipe-it = {
 
-    enable = mkEnableOption (lib.mdDoc "A free open source IT asset/license management system");
+    enable = mkEnableOption (lib.mdDoc "snipe-it, a free open source IT asset/license management system");
 
     user = mkOption {
       default = "snipeit";
@@ -54,11 +60,8 @@ in {
 
     hostName = lib.mkOption {
       type = lib.types.str;
-      default = if config.networking.domain != null then
-                  config.networking.fqdn
-                else
-                  config.networking.hostName;
-      defaultText = lib.literalExpression "config.networking.fqdn";
+      default = config.networking.fqdnOrHostName;
+      defaultText = lib.literalExpression "config.networking.fqdnOrHostName";
       example = "snipe-it.example.com";
       description = lib.mdDoc ''
         The hostname to serve Snipe-IT on.
@@ -343,8 +346,7 @@ in {
     };
 
     services.phpfpm.pools.snipe-it = {
-      inherit user group;
-      phpPackage = pkgs.php81;
+      inherit user group phpPackage;
       phpOptions = ''
         post_max_size = ${cfg.maxUploadSize}
         upload_max_filesize = ${cfg.maxUploadSize}
@@ -359,7 +361,7 @@ in {
     services.nginx = {
       enable = mkDefault true;
       virtualHosts."${cfg.hostName}" = mkMerge [ cfg.nginx {
-        root = mkForce "${snipe-it}/public";
+        root = mkForce "${snipe-it}/share/php/snipe-it/public";
         extraConfig = optionalString (cfg.nginx.addSSL || cfg.nginx.forceSSL || cfg.nginx.onlySSL || cfg.nginx.enableACME) "fastcgi_param HTTPS on;";
         locations = {
           "/" = {
@@ -384,7 +386,7 @@ in {
     };
 
     systemd.services.snipe-it-setup = {
-      description = "Preperation tasks for snipe-it";
+      description = "Preparation tasks for snipe-it";
       before = [ "phpfpm-snipe-it.service" ];
       after = optional db.createLocally "mysql.service";
       wantedBy = [ "multi-user.target" ];
@@ -396,7 +398,7 @@ in {
         RuntimeDirectory = "snipe-it/cache";
         RuntimeDirectoryMode = "0700";
       };
-      path = [ pkgs.replace-secret ];
+      path = [ pkgs.replace-secret artisan ];
       script =
         let
           isSecret  = v: isAttrs v && v ? _secret && (isString v._secret || builtins.isPath v._secret);
@@ -453,12 +455,13 @@ in {
           rm "${cfg.dataDir}"/bootstrap/cache/*.php || true
 
           # migrate db
-          ${pkgs.php}/bin/php artisan migrate --force
+          ${lib.getExe artisan} migrate --force
 
           # A placeholder file for invalid barcodes
           invalid_barcode_location="${cfg.dataDir}/public/uploads/barcodes/invalid_barcode.gif"
-          [ ! -e "$invalid_barcode_location" ] \
-              && cp ${snipe-it}/share/snipe-it/invalid_barcode.gif "$invalid_barcode_location"
+          if [ ! -e "$invalid_barcode_location" ]; then
+              cp ${snipe-it}/share/snipe-it/invalid_barcode.gif "$invalid_barcode_location"
+          fi
         '';
     };
 

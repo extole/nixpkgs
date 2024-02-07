@@ -8,17 +8,18 @@
 buildPythonPackage rec {
   pname = "pycountry";
   version = "22.3.5";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-shY6JGxYWJTYCPGHg+GRN8twoMGPs2dI3AH8bxCcFkY=";
+    hash = "sha256-shY6JGxYWJTYCPGHg+GRN8twoMGPs2dI3AH8bxCcFkY=";
   };
 
   propagatedBuildInputs = [
     setuptools
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

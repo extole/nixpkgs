@@ -2,6 +2,7 @@
 , buildPythonPackage
 , fetchPypi
 , isPy27
+, setuptools
 , six
 , pytestCheckHook
 , hypothesis
@@ -9,24 +10,23 @@
 
 buildPythonPackage rec {
   pname = "pyrsistent";
-  version = "0.18.1";
+  version = "0.20.0";
+  pyproject = true;
 
   disabled = isPy27;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-1NYfi5k6clW6cU3zrKUnAPgSUon4T3BM+AkWUXxG65Y=";
+    hash = "sha256-TEj3j2KrWWxnkIYITQ3RMlSuTz1scqg//fXr3vjyZaQ=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [ six ];
 
-  checkInputs = [ pytestCheckHook hypothesis ];
-
-  postPatch = ''
-    substituteInPlace setup.py \
-      --replace 'pytest<5' 'pytest' \
-      --replace 'hypothesis<5' 'hypothesis'
-  '';
+  nativeCheckInputs = [ pytestCheckHook hypothesis ];
 
   pythonImportsCheck = [ "pyrsistent" ];
 

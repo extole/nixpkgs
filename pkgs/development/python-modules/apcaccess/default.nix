@@ -7,12 +7,13 @@
 buildPythonPackage rec {
   pname = "apcaccess";
   version = "0.0.13";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "flyte";
     repo = "apcaccess";
     rev = version;
-    sha256 = "sha256-XLoNRh6MgXCfRtWD9NpVZSyroW6E9nRYw6Grxa+AQkc=";
+    hash = "sha256-XLoNRh6MgXCfRtWD9NpVZSyroW6E9nRYw6Grxa+AQkc=";
   };
 
   postPatch = ''
@@ -24,7 +25,7 @@ buildPythonPackage rec {
     "apcaccess"
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

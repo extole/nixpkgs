@@ -7,13 +7,14 @@
 buildPythonPackage rec {
   pname = "pytest-lazy-fixture";
   version = "0.6.3";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
     sha256 = "1b0hmnsxw4s2wf9pks8dg6dfy5cx3zcbzs8517lfccxsfizhqz8f";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

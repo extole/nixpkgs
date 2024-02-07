@@ -2,9 +2,7 @@
 , stdenv
 , fetchFromGitHub
 , pkg-config
-, docutils
 , libuuid
-, libscrypt
 , libsodium
 , keyutils
 , liburcu
@@ -12,53 +10,93 @@
 , libaio
 , zstd
 , lz4
-, python3Packages
+, attr
 , udev
-, valgrind
 , nixosTests
 , fuse3
+, cargo
+, rustc
+, rustPlatform
+, makeWrapper
+, writeScript
 , fuseSupport ? false
 }:
 
-stdenv.mkDerivation {
+stdenv.mkDerivation (finalAttrs: {
   pname = "bcachefs-tools";
-  version = "unstable-2022-09-28";
+  version = "1.4.1";
+
 
   src = fetchFromGitHub {
     owner = "koverstreet";
     repo = "bcachefs-tools";
-    rev = "99caca2c70f312c4a2504a7e7a9c92a91426d885";
-    sha256 = "sha256-9bFTBFkQq8SvhYa9K4+MH2zvKZviNaq0sFWoeGgch7g=";
+    rev = "v${finalAttrs.version}";
+    hash = "sha256-+KqTiIp9dIJWG2KvgvPwXC7p754XfgvKHjvwjCdbvCs=";
   };
 
-  postPatch = ''
-    patchShebangs .
-    substituteInPlace Makefile \
-      --replace "pytest-3" "pytest --verbose" \
-      --replace "INITRAMFS_DIR=/etc/initramfs-tools" \
-                "INITRAMFS_DIR=${placeholder "out"}/etc/initramfs-tools"
-  '';
+  nativeBuildInputs = [
+    pkg-config
+    cargo
+    rustc
+    rustPlatform.cargoSetupHook
+    rustPlatform.bindgenHook
+    makeWrapper
+  ];
 
-  nativeBuildInputs = [ pkg-config docutils python3Packages.python ];
+  cargoRoot = "rust-src";
+  cargoDeps = rustPlatform.importCargoLock {
+    lockFile = ./Cargo.lock;
+    outputHashes = {
+      "bindgen-0.64.0" = "sha256-GNG8as33HLRYJGYe0nw6qBzq86aHiGonyynEM7gaEE4=";
+    };
+  };
 
   buildInputs = [
-    libuuid libscrypt libsodium keyutils liburcu zlib libaio
-    zstd lz4 python3Packages.pytest udev valgrind
+    libaio
+    keyutils
+    lz4
+
+    libsodium
+    liburcu
+    libuuid
+    zstd
+    zlib
+    attr
+    udev
   ] ++ lib.optional fuseSupport fuse3;
 
   doCheck = false; # needs bcachefs module loaded on builder
   checkFlags = [ "BCACHEFS_TEST_USE_VALGRIND=no" ];
-  checkInputs = [ valgrind ];
 
-  preCheck = lib.optionalString fuseSupport ''
+  makeFlags = [
+    "DESTDIR=${placeholder "out"}"
+    "PREFIX="
+    "VERSION=${finalAttrs.version}"
+    "INITRAMFS_DIR=${placeholder "out"}/etc/initramfs-tools"
+  ];
+
+  preCheck = lib.optionalString (!fuseSupport) ''
     rm tests/test_fuse.py
   '';
 
-  installFlags = [ "PREFIX=${placeholder "out"}" ];
+  passthru = {
+    tests = {
+      smoke-test = nixosTests.bcachefs;
+      inherit (nixosTests.installer) bcachefsSimple bcachefsEncrypted bcachefsMulti;
+    };
 
-  passthru.tests = {
-    smoke-test = nixosTests.bcachefs;
-    inherit (nixosTests.installer) bcachefsSimple bcachefsEncrypted bcachefsMulti;
+    updateScript = writeScript "update-bcachefs-tools-and-cargo-lock.sh" ''
+      #!/usr/bin/env nix-shell
+      #!nix-shell -i bash -p curl jq common-updater-scripts
+      res="$(curl ''${GITHUB_TOKEN:+-u ":$GITHUB_TOKEN"} \
+        -sL "https://api.github.com/repos/${finalAttrs.src.owner}/${finalAttrs.src.repo}/tags?per_page=1")"
+
+      version="$(echo $res | jq '.[0].name | split("v") | .[1]' --raw-output)"
+      update-source-version ${finalAttrs.pname} "$version" --ignore-same-hash
+
+      curl "https://raw.githubusercontent.com/${finalAttrs.src.owner}/${finalAttrs.src.repo}/v$version/rust-src/Cargo.lock" > \
+        "$(git rev-parse --show-toplevel)/pkgs/tools/filesystems/bcachefs-tools/Cargo.lock"
+    '';
   };
 
   enableParallelBuilding = true;
@@ -70,4 +108,4 @@ stdenv.mkDerivation {
     maintainers = with maintainers; [ davidak Madouura ];
     platforms = platforms.linux;
   };
-}
+})

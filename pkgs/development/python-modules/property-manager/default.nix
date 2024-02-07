@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "property-manager";
   version = "3.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "xolox";
@@ -12,7 +13,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ coloredlogs humanfriendly verboselogs ];
-  checkInputs = [ pytest pytest-cov ];
+  nativeCheckInputs = [ pytest pytest-cov ];
 
   meta = with lib; {
     description = "Useful property variants for Python programming";

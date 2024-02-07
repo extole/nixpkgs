@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "imaplib2";
   version = "3.6";
+  format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
@@ -18,7 +19,7 @@ buildPythonPackage rec {
     sha256 = "14asi3xnvf4bb394k5j8c3by6svvmrr75pawzy6kaax5jx0h793m";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

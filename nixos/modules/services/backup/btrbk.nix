@@ -6,14 +6,17 @@ let
     concatMapStringsSep
     concatStringsSep
     filterAttrs
+    flatten
+    getAttr
     isAttrs
     literalExpression
     mapAttrs'
     mapAttrsToList
     mkIf
     mkOption
+    optional
     optionalString
-    sort
+    sortOn
     types
     ;
 
@@ -37,7 +40,7 @@ let
   genConfig = set:
     let
       pairs = mapAttrsToList (name: value: { inherit name value; }) set;
-      sortedPairs = sort (a: b: prioOf a < prioOf b) pairs;
+      sortedPairs = sortOn prioOf pairs;
     in
       concatMap genPair sortedPairs;
   genSection = sec: secName: value:
@@ -47,7 +50,25 @@ let
     then [ "${name} ${value}" ]
     else concatLists (mapAttrsToList (genSection name) value);
 
-  addDefaults = settings: { backend = "btrfs-progs-sudo"; } // settings;
+  sudoRule = {
+    users = [ "btrbk" ];
+    commands = [
+      { command = "${pkgs.btrfs-progs}/bin/btrfs"; options = [ "NOPASSWD" ]; }
+      { command = "${pkgs.coreutils}/bin/mkdir"; options = [ "NOPASSWD" ]; }
+      { command = "${pkgs.coreutils}/bin/readlink"; options = [ "NOPASSWD" ]; }
+      # for ssh, they are not the same than the one hard coded in ${pkgs.btrbk}
+      { command = "/run/current-system/sw/bin/btrfs"; options = [ "NOPASSWD" ]; }
+      { command = "/run/current-system/sw/bin/mkdir"; options = [ "NOPASSWD" ]; }
+      { command = "/run/current-system/sw/bin/readlink"; options = [ "NOPASSWD" ]; }
+    ];
+  };
+
+  sudo_doas =
+    if config.security.sudo.enable || config.security.sudo-rs.enable then "sudo"
+    else if config.security.doas.enable then "doas"
+    else throw "The btrbk nixos module needs either sudo or doas enabled in the configuration";
+
+  addDefaults = settings: { backend = "btrfs-progs-${sudo_doas}"; } // settings;
 
   mkConfigFile = name: settings: pkgs.writeTextFile {
     name = "btrbk-${name}.conf";
@@ -66,6 +87,18 @@ let
     '';
   };
 
+  streamCompressMap = {
+    gzip = pkgs.gzip;
+    pigz = pkgs.pigz;
+    bzip2 = pkgs.bzip2;
+    pbzip2 = pkgs.pbzip2;
+    bzip3 = pkgs.bzip3;
+    xz = pkgs.xz;
+    lzo = pkgs.lzo;
+    lz4 = pkgs.lz4;
+    zstd = pkgs.zstd;
+  };
+
   cfg = config.services.btrbk;
   sshEnabled = cfg.sshAccess != [ ];
   serviceEnabled = cfg.instances != { };
@@ -76,7 +109,14 @@ in
   options = {
     services.btrbk = {
       extraPackages = mkOption {
-        description = lib.mdDoc "Extra packages for btrbk, like compression utilities for `stream_compress`";
+        description = lib.mdDoc ''
+          Extra packages for btrbk, like compression utilities for `stream_compress`.
+
+          **Note**: This option will get deprecated in future releases.
+          Required compression programs will get automatically provided to btrbk
+          depending on configured compression method in
+          `services.btrbk.instances.<name>.settings` option.
+        '';
         type = types.listOf types.package;
         default = [ ];
         example = literalExpression "[ pkgs.xz ]";
@@ -106,7 +146,19 @@ in
                   '';
                 };
                 settings = mkOption {
-                  type = let t = types.attrsOf (types.either types.str (t // { description = "instances of this type recursively"; })); in t;
+                  type = types.submodule {
+                    freeformType = let t = types.attrsOf (types.either types.str (t // { description = "instances of this type recursively"; })); in t;
+                    options = {
+                      stream_compress = mkOption {
+                        description = lib.mdDoc ''
+                          Compress the btrfs send stream before transferring it from/to remote locations using a
+                          compression command.
+                        '';
+                        type = types.enum ["gzip" "pigz" "bzip2" "pbzip2" "bzip3" "xz" "lzo" "lz4" "zstd" "no"];
+                        default = "no";
+                      };
+                    };
+                  };
                   default = { };
                   example = {
                     snapshot_preserve_min = "2d";
@@ -151,21 +203,35 @@ in
 
   };
   config = mkIf (sshEnabled || serviceEnabled) {
+
+    warnings = optional (cfg.extraPackages != []) ''
+      extraPackages option will be deprecated in future releases. Programs required for compression are now automatically selected depending on services.btrbk.instances.<name>.settings.stream_compress option.
+    '';
+
     environment.systemPackages = [ pkgs.btrbk ] ++ cfg.extraPackages;
-    security.sudo.extraRules = [
-      {
-        users = [ "btrbk" ];
-        commands = [
-          { command = "${pkgs.btrfs-progs}/bin/btrfs"; options = [ "NOPASSWD" ]; }
-          { command = "${pkgs.coreutils}/bin/mkdir"; options = [ "NOPASSWD" ]; }
-          { command = "${pkgs.coreutils}/bin/readlink"; options = [ "NOPASSWD" ]; }
-          # for ssh, they are not the same than the one hard coded in ${pkgs.btrbk}
-          { command = "/run/current-system/bin/btrfs"; options = [ "NOPASSWD" ]; }
-          { command = "/run/current-system/sw/bin/mkdir"; options = [ "NOPASSWD" ]; }
-          { command = "/run/current-system/sw/bin/readlink"; options = [ "NOPASSWD" ]; }
+
+    security.sudo.extraRules = mkIf (sudo_doas == "sudo") [ sudoRule ];
+    security.sudo-rs.extraRules = mkIf (sudo_doas == "sudo") [ sudoRule ];
+
+    security.doas = mkIf (sudo_doas == "doas") {
+      extraRules = let
+        doasCmdNoPass = cmd: { users = [ "btrbk" ]; cmd = cmd; noPass = true; };
+      in
+        [
+            (doasCmdNoPass "${pkgs.btrfs-progs}/bin/btrfs")
+            (doasCmdNoPass "${pkgs.coreutils}/bin/mkdir")
+            (doasCmdNoPass "${pkgs.coreutils}/bin/readlink")
+            # for ssh, they are not the same than the one hard coded in ${pkgs.btrbk}
+            (doasCmdNoPass "/run/current-system/sw/bin/btrfs")
+            (doasCmdNoPass "/run/current-system/sw/bin/mkdir")
+            (doasCmdNoPass "/run/current-system/sw/bin/readlink")
+
+            # doas matches command, not binary
+            (doasCmdNoPass "btrfs")
+            (doasCmdNoPass "mkdir")
+            (doasCmdNoPass "readlink")
         ];
-      }
-    ];
+    };
     users.users.btrbk = {
       isSystemUser = true;
       # ssh needs a home directory
@@ -183,8 +249,9 @@ in
               "best-effort" = 2;
               "realtime" = 1;
             }.${cfg.ioSchedulingClass};
+            sudo_doas_flag = "--${sudo_doas}";
           in
-          ''command="${pkgs.util-linux}/bin/ionice -t -c ${toString ioniceClass} ${optionalString (cfg.niceness >= 1) "${pkgs.coreutils}/bin/nice -n ${toString cfg.niceness}"} ${pkgs.btrbk}/share/btrbk/scripts/ssh_filter_btrbk.sh --sudo ${options}" ${v.key}''
+          ''command="${pkgs.util-linux}/bin/ionice -t -c ${toString ioniceClass} ${optionalString (cfg.niceness >= 1) "${pkgs.coreutils}/bin/nice -n ${toString cfg.niceness}"} ${pkgs.btrbk}/share/btrbk/scripts/ssh_filter_btrbk.sh ${sudo_doas_flag} ${options}" ${v.key}''
         )
         cfg.sshAccess;
     };
@@ -204,12 +271,15 @@ in
       cfg.instances;
     systemd.services = mapAttrs'
       (
-        name: _: {
+        name: instance: {
           name = "btrbk-${name}";
           value = {
             description = "Takes BTRFS snapshots and maintains retention policies.";
             unitConfig.Documentation = "man:btrbk(1)";
-            path = [ "/run/wrappers" ] ++ cfg.extraPackages;
+            path = [ "/run/wrappers" ]
+              ++ cfg.extraPackages
+              ++ optional (instance.settings.stream_compress != "no")
+                (getAttr instance.settings.stream_compress streamCompressMap);
             serviceConfig = {
               User = "btrbk";
               Group = "btrbk";

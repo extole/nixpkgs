@@ -7,10 +7,11 @@
 buildPythonPackage rec {
   pname = "watchgod";
   version = "0.8.2";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-yxH/ZmV777qU2CjjtiLV+3byL72hN281Xz5uUel9lFA=";
+    hash = "sha256-yxH/ZmV777qU2CjjtiLV+3byL72hN281Xz5uUel9lFA=";
   };
 
   propagatedBuildInputs = [

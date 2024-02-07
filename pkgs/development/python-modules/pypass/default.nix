@@ -23,6 +23,7 @@
 buildPythonPackage rec {
   pname = "pypass";
   version = "0.2.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -54,7 +55,7 @@ buildPythonPackage rec {
     pexpect
   ] ++ lib.optional (pythonOlder "3.4") enum34;
 
-  checkInputs = [ nose ];
+  nativeCheckInputs = [ nose ];
 
   # Configuration so that the tests work
   preCheck = ''

@@ -1,24 +1,29 @@
 { lib, buildGoModule, fetchFromGitHub, installShellFiles, testers, sq }:
+
 buildGoModule rec {
   pname = "sq";
-  version = "0.15.6";
+  version = "0.46.1";
 
   src = fetchFromGitHub {
     owner = "neilotoole";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-QEg80di2DmMfIrvsRFp7nELs7LiJRVa/wENDnf1zQ2Y=";
+    hash = "sha256-TjJ3XDyHHZWMAYV5bJQffH4a9AheZWraov3d4HB/yno=";
   };
 
-  nativeBuildInputs = [ installShellFiles ];
+  vendorHash = "sha256-DIYSUIUHEiRv+pPZ2hE/2X4GmT3lvdWd/mkl1wbjID4=";
 
-  vendorSha256 = "sha256-P1NxcjRA0g9NK2EaEG5E9G2TywTp5uvHesQE7+EG4ag=";
+  proxyVendor = true;
+
+  nativeBuildInputs = [ installShellFiles ];
 
   # Some tests violates sandbox constraints.
   doCheck = false;
 
   ldflags = [
-    "-s" "-w" "-X github.com/neilotoole/sq/cli/buildinfo.Version=${version}"
+    "-s"
+    "-w"
+    "-X=github.com/neilotoole/sq/cli/buildinfo.Version=v${version}"
   ];
 
   postInstall = ''
@@ -29,7 +34,10 @@ buildGoModule rec {
   '';
 
   passthru.tests = {
-    version = testers.testVersion { package = sq; };
+    version = testers.testVersion {
+      package = sq;
+      version = "v${version}";
+    };
   };
 
   meta = with lib; {

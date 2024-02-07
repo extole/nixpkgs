@@ -35,7 +35,7 @@ in
       description = lib.mdDoc ''
         If enabled, starts the ArchisSteamFarm service.
         For configuring the SteamGuard token you will need to use the web-ui, which is enabled by default over on 127.0.0.1:1242.
-        You cannot configure ASF in any way outside of nix, since all the config files get wiped on restart and replaced with the programatically set ones by nix.
+        You cannot configure ASF in any way outside of nix, since all the config files get wiped on restart and replaced with the programnatically set ones by nix.
       '';
       default = false;
     };
@@ -43,20 +43,21 @@ in
     web-ui = mkOption {
       type = types.submodule {
         options = {
-          enable = mkEnableOption
-            (lib.mdDoc "Wheter to start the web-ui. This is the preferred way of configuring things such as the steam guard token");
+          enable = mkEnableOption "" // {
+            description = lib.mdDoc "Whether to start the web-ui. This is the preferred way of configuring things such as the steam guard token.";
+          };
 
-          package = mkOption {
-            type = types.package;
-            default = pkgs.ArchiSteamFarm.ui;
-            description =
-              lib.mdDoc "Web-UI package to use. Contents must be in lib/dist.";
+          package = mkPackageOption pkgs [ "ArchiSteamFarm" "ui" ] {
+            extraDescription = ''
+              ::: {.note}
+              Contents must be in lib/dist
+              :::
+            '';
           };
         };
       };
       default = {
         enable = true;
-        package = pkgs.ArchiSteamFarm.ui;
       };
       example = {
         enable = false;
@@ -64,11 +65,13 @@ in
       description = lib.mdDoc "The Web-UI hosted on 127.0.0.1:1242.";
     };
 
-    package = mkOption {
-      type = types.package;
-      default = pkgs.ArchiSteamFarm;
-      description =
-        lib.mdDoc "Package to use. Should always be the latest version, for security reasons, since this module uses very new features and to not get out of sync with the Steam API.";
+    package = mkPackageOption pkgs "ArchiSteamFarm" {
+      extraDescription = ''
+        ::: {.warning}
+        Should always be the latest version, for security reasons,
+        since this module uses very new features and to not get out of sync with the Steam API.
+        :::
+      '';
     };
 
     dataDir = mkOption {
@@ -96,7 +99,7 @@ in
     ipcPasswordFile = mkOption {
       type = types.nullOr types.path;
       default = null;
-      description = lib.mdDoc "Path to a file containig the password. The file must be readable by the `asf` user/group.";
+      description = lib.mdDoc "Path to a file containing the password. The file must be readable by the `asf` user/group.";
     };
 
     ipcSettings = mkOption {
@@ -127,7 +130,7 @@ in
           };
           passwordFile = mkOption {
             type = types.path;
-            description = lib.mdDoc "Path to a file containig the password. The file must be readable by the `asf` user/group.";
+            description = lib.mdDoc "Path to a file containing the password. The file must be readable by the `asf` user/group.";
           };
           enabled = mkOption {
             type = types.bool;
@@ -185,29 +188,41 @@ in
             Group = "asf";
             WorkingDirectory = cfg.dataDir;
             Type = "simple";
-            ExecStart = "${cfg.package}/bin/ArchiSteamFarm --path ${cfg.dataDir} --process-required --no-restart --service --no-config-migrate";
+            ExecStart = "${lib.getExe cfg.package} --no-restart --process-required --service --system-required --path ${cfg.dataDir}";
             Restart = "always";
 
-            # mostly copied from the default systemd service
-            PrivateTmp = true;
+            # copied from the default systemd service at
+            # https://github.com/JustArchiNET/ArchiSteamFarm/blob/main/ArchiSteamFarm/overlay/variant-base/linux/ArchiSteamFarm%40.service
+            CapabilityBoundingSet = "";
+            DevicePolicy = "closed";
             LockPersonality = true;
+            NoNewPrivileges = true;
             PrivateDevices = true;
             PrivateIPC = true;
             PrivateMounts = true;
+            PrivateTmp = true; # instead of rw /tmp
             PrivateUsers = true;
+            ProcSubset = "pid";
             ProtectClock = true;
             ProtectControlGroups = true;
+            ProtectHome = true;
             ProtectHostname = true;
             ProtectKernelLogs = true;
             ProtectKernelModules = true;
             ProtectKernelTunables = true;
             ProtectProc = "invisible";
-            ProtectSystem = "full";
+            ProtectSystem = "strict";
             RemoveIPC = true;
-            RestrictAddressFamilies = "AF_INET AF_INET6";
+            RestrictAddressFamilies = "AF_INET AF_INET6 AF_NETLINK AF_UNIX";
             RestrictNamespaces = true;
             RestrictRealtime = true;
             RestrictSUIDSGID = true;
+            SystemCallArchitectures = "native";
+            UMask = "0077";
+
+            # we luckily already have systemd v247+
+            SecureBits = "noroot-locked";
+            SystemCallFilter = [ "@system-service" "~@privileged" ];
           }
         ];
 
@@ -243,7 +258,7 @@ in
 
             rm -f www
             ${optionalString cfg.web-ui.enable ''
-              ln -s ${cfg.web-ui.package}/lib/dist www
+              ln -s ${cfg.web-ui.package}/ www
             ''}
           '';
       };

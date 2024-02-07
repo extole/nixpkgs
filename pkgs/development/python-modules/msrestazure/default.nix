@@ -13,6 +13,7 @@
 
 buildPythonPackage rec {
   version = "0.6.4";
+  format = "setuptools";
   pname = "msrestazure";
 
   # Pypi tarball doesnt include tests
@@ -26,7 +27,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ adal msrest ];
 
-  checkInputs = [ httpretty mock pytest ]
+  nativeCheckInputs = [ httpretty mock pytest ]
                 ++ lib.optionals isPy3k [ pytest-asyncio ];
 
   checkPhase = ''

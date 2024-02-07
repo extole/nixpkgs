@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "imagecodecs-lite";
   version = "2019.12.3";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -18,7 +19,7 @@ buildPythonPackage rec {
     cython
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest
   ];
 

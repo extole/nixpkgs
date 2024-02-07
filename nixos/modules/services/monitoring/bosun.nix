@@ -22,22 +22,9 @@ in {
 
     services.bosun = {
 
-      enable = mkOption {
-        type = types.bool;
-        default = false;
-        description = lib.mdDoc ''
-          Whether to run bosun.
-        '';
-      };
+      enable = mkEnableOption (lib.mdDoc "bosun");
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.bosun;
-        defaultText = literalExpression "pkgs.bosun";
-        description = lib.mdDoc ''
-          bosun binary to use.
-        '';
-      };
+      package = mkPackageOption pkgs "bosun" { };
 
       user = mkOption {
         type = types.str;
@@ -114,7 +101,7 @@ in {
           option.
 
           A detailed description of the supported syntax can be found at-spi2-atk
-          http://bosun.org/configuration.html
+          https://bosun.org/configuration.html
         '';
       };
 

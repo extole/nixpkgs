@@ -11,19 +11,17 @@
 , lndir
 , perl
 , pkg-config
-, python3
 , which
 , cmake
 , ninja
-, ccache
 , xmlstarlet
 , libproxy
-, xlibsWrapper
 , xorg
 , zstd
 , double-conversion
 , util-linux
 , systemd
+, systemdSupport ? stdenv.isLinux
 , libb2
 , md4c
 , mtdev
@@ -32,7 +30,6 @@
 , libsepol
 , vulkan-headers
 , vulkan-loader
-, valgrind
 , libthai
 , libdrm
 , libdatrie
@@ -71,6 +68,17 @@
 , at-spi2-core
 , unixODBC
 , unixODBCDrivers
+  # darwin
+, moveBuildTree
+, xcbuild
+, AGL
+, AVFoundation
+, AppKit
+, Contacts
+, CoreBluetooth
+, EventKit
+, GSS
+, MetalKit
   # optional dependencies
 , cups
 , libmysqlclient
@@ -79,10 +87,11 @@
 , dconf
 , gtk3
   # options
-, libGLSupported ? true
+, libGLSupported ? stdenv.isLinux
 , libGL
 , debug ? false
 , developerBuild ? false
+, qttranslations ? null
 }:
 
 let
@@ -111,13 +120,20 @@ stdenv.mkDerivation rec {
     pcre2
     pcre
     libproxy
-    xlibsWrapper
     zstd
     double-conversion
-    util-linux
-    systemd
     libb2
     md4c
+    dbus
+    glib
+    # unixODBC drivers
+    unixODBCDrivers.psql
+    unixODBCDrivers.sqlite
+    unixODBCDrivers.mariadb
+  ] ++ lib.optionals systemdSupport [
+    systemd
+  ] ++ lib.optionals stdenv.isLinux [
+    util-linux
     mtdev
     lksctp-tools
     libselinux
@@ -128,9 +144,6 @@ stdenv.mkDerivation rec {
     libthai
     libdrm
     libdatrie
-    valgrind
-    dbus
-    glib
     udev
     # Text rendering
     fontconfig
@@ -152,16 +165,24 @@ stdenv.mkDerivation rec {
     xorg.libXtst
     xorg.xcbutilcursor
     libepoxy
-  ] ++ (with unixODBCDrivers; [
-    psql
-    sqlite
-    mariadb
-  ]) ++ lib.optional libGLSupported libGL;
+  ] ++ lib.optionals stdenv.isDarwin [
+    AGL
+    AVFoundation
+    AppKit
+    Contacts
+    CoreBluetooth
+    EventKit
+    GSS
+    MetalKit
+  ] ++ lib.optional libGLSupported libGL;
 
   buildInputs = [
-    python3
     at-spi2-core
+  ] ++ lib.optionals (!stdenv.isDarwin) [
     libinput
+  ] ++ lib.optionals (stdenv.isDarwin && stdenv.isx86_64) [
+    AppKit
+    CoreBluetooth
   ]
   ++ lib.optional withGtk3 gtk3
   ++ lib.optional developerBuild gdb
@@ -169,9 +190,12 @@ stdenv.mkDerivation rec {
   ++ lib.optional (libmysqlclient != null) libmysqlclient
   ++ lib.optional (postgresql != null) postgresql;
 
-  nativeBuildInputs = [ bison flex gperf lndir perl pkg-config which cmake xmlstarlet ninja ];
+  nativeBuildInputs = [ bison flex gperf lndir perl pkg-config which cmake xmlstarlet ninja ]
+    ++ lib.optionals stdenv.isDarwin [ moveBuildTree ];
 
   propagatedNativeBuildInputs = [ lndir ];
+
+  strictDeps = true;
 
   enableParallelBuilding = true;
 
@@ -180,6 +204,8 @@ stdenv.mkDerivation rec {
   # https://bugreports.qt.io/browse/QTBUG-97568
   postPatch = ''
     substituteInPlace src/corelib/CMakeLists.txt --replace /bin/ls ${coreutils}/bin/ls
+  '' + lib.optionalString stdenv.isDarwin ''
+    substituteInPlace cmake/QtAutoDetect.cmake --replace "/usr/bin/xcrun" "${xcbuild}/bin/xcrun"
   '';
 
   fix_qt_builtin_paths = ../hooks/fix-qt-builtin-paths.sh;
@@ -187,67 +213,42 @@ stdenv.mkDerivation rec {
   preHook = ''
     . "$fix_qt_builtin_paths"
     . "$fix_qt_module_paths"
-    . ${../hooks/move-qt-dev-tools.sh}
-    . ${../hooks/fix-qmake-libtool.sh}
   '';
 
   qtPluginPrefix = "lib/qt-6/plugins";
   qtQmlPrefix = "lib/qt-6/qml";
 
   cmakeFlags = [
+    "-DQT_EMBED_TOOLCHAIN_COMPILER=OFF"
     "-DINSTALL_PLUGINSDIR=${qtPluginPrefix}"
     "-DINSTALL_QMLDIR=${qtQmlPrefix}"
-    "-DQT_FEATURE_journald=ON"
-    "-DQT_FEATURE_sctp=ON"
     "-DQT_FEATURE_libproxy=ON"
     "-DQT_FEATURE_system_sqlite=ON"
-    "-DQT_FEATURE_vulkan=ON"
     "-DQT_FEATURE_openssl_linked=ON"
-  ];
+  ] ++ lib.optionals (!stdenv.isDarwin) [
+    "-DQT_FEATURE_sctp=ON"
+    "-DQT_FEATURE_journald=${if systemdSupport then "ON" else "OFF"}"
+    "-DQT_FEATURE_vulkan=ON"
+  ] ++ lib.optionals stdenv.isDarwin [
+    # error: 'path' is unavailable: introduced in macOS 10.15
+    "-DQT_FEATURE_cxx17_filesystem=OFF"
+  ] ++ lib.optional (qttranslations != null) "-DINSTALL_TRANSLATIONSDIR=${qttranslations}/translations";
+
+  env.NIX_LDFLAGS = toString (lib.optionals stdenv.isDarwin [
+    # Undefined symbols for architecture arm64: "___gss_c_nt_hostbased_service_oid_desc"
+    "-framework GSS"
+  ]);
+
+  env.NIX_CFLAGS_COMPILE = "-DNIXPKGS_QT_PLUGIN_PREFIX=\"${qtPluginPrefix}\"";
 
   outputs = [ "out" "dev" ];
 
-  postInstall = ''
-    moveToOutput "mkspecs" "$dev"
-  '';
-
-  devTools = [
-    "libexec/moc"
-    "libexec/rcc"
-    "libexec/syncqt.pl"
-    "libexec/qlalr"
-    "libexec/ensure_pro_file.cmake"
-    "libexec/cmake_automoc_parser"
-    "libexec/qvkgen"
-    "libexec/tracegen"
-    "libexec/uic"
-    "bin/fixqt4headers.pl"
-    "bin/moc"
-    "bin/qdbuscpp2xml"
-    "bin/qdbusxml2cpp"
-    "bin/qlalr"
-    "bin/qmake"
-    "bin/rcc"
-    "bin/syncqt.pl"
-    "bin/uic"
-  ];
+  moveToDev = false;
 
   postFixup = ''
-    # Don't retain build-time dependencies like gdb.
-    sed '/QMAKE_DEFAULT_.*DIRS/ d' -i $dev/mkspecs/qconfig.pri
-    fixQtModulePaths "''${!outputDev}/mkspecs/modules"
-    fixQtBuiltinPaths "''${!outputDev}" '*.pr?'
-
-    # Move development tools to $dev
-    moveQtDevTools
-    moveToOutput bin "$dev"
-    moveToOutput libexec "$dev"
-
-    # fixup .pc file (where to find 'moc' etc.)
-    sed -i "$dev/lib/pkgconfig/Qt6Core.pc" \
-      -e "/^bindir=/ c bindir=$dev/bin"
-
-    patchShebangs $out $dev
+    moveToOutput      "mkspecs/modules" "$dev"
+    fixQtModulePaths  "$dev/mkspecs/modules"
+    fixQtBuiltinPaths "$out" '*.pr?'
   '';
 
   dontStrip = debugSymbols;
@@ -257,8 +258,8 @@ stdenv.mkDerivation rec {
   meta = with lib; {
     homepage = "https://www.qt.io/";
     description = "A cross-platform application framework for C++";
-    license = with licenses; [ fdl13 gpl2 lgpl21 lgpl3 ];
+    license = with licenses; [ fdl13Plus gpl2Plus lgpl21Plus lgpl3Plus ];
     maintainers = with maintainers; [ milahu nickcao LunNova ];
-    platforms = platforms.linux;
+    platforms = platforms.unix;
   };
 }

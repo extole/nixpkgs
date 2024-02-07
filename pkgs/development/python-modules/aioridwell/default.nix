@@ -2,6 +2,7 @@
 , aiohttp
 , aresponses
 , buildPythonPackage
+, certifi
 , fetchFromGitHub
 , freezegun
 , poetry-core
@@ -17,7 +18,7 @@
 
 buildPythonPackage rec {
   pname = "aioridwell";
-  version = "2022.10.0";
+  version = "2024.01.0";
   format = "pyproject";
 
   disabled = pythonOlder "3.8";
@@ -25,8 +26,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "bachya";
     repo = pname;
-    rev = version;
-    hash = "sha256-cc5l72QHcyCBFZtw3F9EFFtmz58NnZ9gkDTcFZFlL4E=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-B5k8uXDHq0U6fJVW8oy2sWUj5OIVGUfe9EtCjnIr3OE=";
   };
 
   nativeBuildInputs = [
@@ -35,12 +36,15 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [
     aiohttp
+    certifi
     pyjwt
     pytz
     titlecase
   ];
 
-  checkInputs = [
+  __darwinAllowLocalNetworking = true;
+
+  nativeCheckInputs = [
     aresponses
     freezegun
     pytest-aiohttp
@@ -66,6 +70,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python library for interacting with Ridwell waste recycling";
     homepage = "https://github.com/bachya/aioridwell";
+    changelog = "https://github.com/bachya/aioridwell/releases/tag/${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

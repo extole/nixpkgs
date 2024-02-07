@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "nampa";
   version = "1.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "thebabush";
@@ -20,7 +21,7 @@ buildPythonPackage rec {
     future
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

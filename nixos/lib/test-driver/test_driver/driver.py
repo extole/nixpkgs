@@ -1,13 +1,16 @@
+import os
+import re
+import signal
+import tempfile
+import threading
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Union, Optional, Callable, ContextManager
-import os
-import tempfile
+from typing import Any, Callable, ContextManager, Dict, Iterator, List, Optional, Union
 
 from test_driver.logger import rootlog
 from test_driver.machine import Machine, NixStartScript, retry
-from test_driver.vlan import VLan
 from test_driver.polling_condition import PollingCondition
+from test_driver.vlan import VLan
 
 
 def get_tmp_dir() -> Path:
@@ -19,17 +22,17 @@ def get_tmp_dir() -> Path:
     tmp_dir.mkdir(mode=0o700, exist_ok=True)
     if not tmp_dir.is_dir():
         raise NotADirectoryError(
-            "The directory defined by TMPDIR, TEMP, TMP or CWD: {0} is not a directory".format(
-                tmp_dir
-            )
+            f"The directory defined by TMPDIR, TEMP, TMP or CWD: {tmp_dir} is not a directory"
         )
     if not os.access(tmp_dir, os.W_OK):
         raise PermissionError(
-            "The directory defined by TMPDIR, TEMP, TMP, or CWD: {0} is not writeable".format(
-                tmp_dir
-            )
+            f"The directory defined by TMPDIR, TEMP, TMP, or CWD: {tmp_dir} is not writeable"
         )
     return tmp_dir
+
+
+def pythonize_name(name: str) -> str:
+    return re.sub(r"^[^A-z_]|[^A-z0-9_]", "_", name)
 
 
 class Driver:
@@ -40,6 +43,8 @@ class Driver:
     vlans: List[VLan]
     machines: List[Machine]
     polling_conditions: List[PollingCondition]
+    global_timeout: int
+    race_timer: threading.Timer
 
     def __init__(
         self,
@@ -48,9 +53,12 @@ class Driver:
         tests: str,
         out_dir: Path,
         keep_vm_state: bool = False,
+        global_timeout: int = 24 * 60 * 60 * 7,
     ):
         self.tests = tests
         self.out_dir = out_dir
+        self.global_timeout = global_timeout
+        self.race_timer = threading.Timer(global_timeout, self.terminate_test)
 
         tmp_dir = get_tmp_dir()
 
@@ -81,6 +89,7 @@ class Driver:
 
     def __exit__(self, *_: Any) -> None:
         with rootlog.nested("cleanup"):
+            self.race_timer.cancel()
             for machine in self.machines:
                 machine.release()
 
@@ -117,7 +126,7 @@ class Driver:
             polling_condition=self.polling_condition,
             Machine=Machine,  # for typing
         )
-        machine_symbols = {m.name: m for m in self.machines}
+        machine_symbols = {pythonize_name(m.name): m for m in self.machines}
         # If there's exactly one machine, make it available under the name
         # "machine", even if it's not called that.
         if len(self.machines) == 1:
@@ -143,6 +152,10 @@ class Driver:
 
     def run_tests(self) -> None:
         """Run the test script (for non-interactive test runs)"""
+        rootlog.info(
+            f"Test will time out and terminate in {self.global_timeout} seconds"
+        )
+        self.race_timer.start()
         self.test_script()
         # TODO: Collect coverage data
         for machine in self.machines:
@@ -160,13 +173,21 @@ class Driver:
         with rootlog.nested("wait for all VMs to finish"):
             for machine in self.machines:
                 machine.wait_for_shutdown()
+            self.race_timer.cancel()
+
+    def terminate_test(self) -> None:
+        # This will be usually running in another thread than
+        # the thread actually executing the test script.
+        with rootlog.nested("timeout reached; test terminating..."):
+            for machine in self.machines:
+                machine.release()
+            # As we cannot `sys.exit` from another thread
+            # We can at least force the main thread to get SIGTERM'ed.
+            # This will prevent any user who caught all the exceptions
+            # to swallow them and prevent itself from terminating.
+            os.kill(os.getpid(), signal.SIGTERM)
 
     def create_machine(self, args: Dict[str, Any]) -> Machine:
-        rootlog.warning(
-            "Using legacy create_machine(), please instantiate the"
-            "Machine class directly, instead"
-        )
-
         tmp_dir = get_tmp_dir()
 
         if args.get("startCommand"):
@@ -183,7 +204,6 @@ class Driver:
             start_command=cmd,
             name=name,
             keep_vm_state=args.get("keep_vm_state", False),
-            allow_reboot=args.get("allow_reboot", False),
         )
 
     def serial_stdout_on(self) -> None:
@@ -219,6 +239,20 @@ class Driver:
             def __exit__(self, a, b, c) -> None:  # type: ignore
                 res = driver.polling_conditions.pop()
                 assert res is self.condition
+
+            def wait(self, timeout: int = 900) -> None:
+                def condition(last: bool) -> bool:
+                    if last:
+                        rootlog.info(f"Last chance for {self.condition.description}")
+                    ret = self.condition.check(force=True)
+                    if not ret and not last:
+                        rootlog.info(
+                            f"({self.condition.description} failure not fatal yet)"
+                        )
+                    return ret
+
+                with rootlog.nested(f"waiting for {self.condition.description}"):
+                    retry(condition, timeout=timeout)
 
         if fun_ is None:
             return Poll

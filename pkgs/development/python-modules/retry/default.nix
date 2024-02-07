@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "retry";
   version = "0.9.2";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -26,7 +27,7 @@ buildPythonPackage rec {
     py
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytest
   ];

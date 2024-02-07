@@ -52,7 +52,7 @@ stdenv.mkDerivation rec {
     "-Dgtk_doc=${lib.boolToString (!isCross)}" # gtk-doc does do some gobject introspection, which doesn't yet cross-compile.
   ] ++ lib.optional isCross "-Dvapi=false";
 
-  checkInputs = [
+  nativeCheckInputs = [
     dbus # for dbus-daemon
   ];
 
@@ -76,5 +76,6 @@ stdenv.mkDerivation rec {
     license = licenses.lgpl21Plus;
     platforms = platforms.unix;
     maintainers = teams.gnome.members;
+    mainProgram = "dconf";
   };
 }

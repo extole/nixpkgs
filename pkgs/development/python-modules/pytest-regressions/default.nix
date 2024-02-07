@@ -1,6 +1,7 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, pythonAtLeast
 , pythonOlder
 , matplotlib
 , numpy
@@ -15,17 +16,15 @@
 
 buildPythonPackage rec {
   pname = "pytest-regressions";
-  version = "2.3.1";
+  version = "2.5.0";
   format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-s+xM2zTo9idgYnXYuDTGXmDhowc+MmuzcnpCcnPQIh0=";
+    hash = "sha256-gYx4hMHP87q/ie67AsvCezB4VrGYVCfCTVLLgSoQb9k=";
   };
-
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   nativeBuildInputs = [
     setuptools-scm
@@ -36,23 +35,36 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [
-    numpy
-    pandas
-    pillow
     pytest-datadir
     pyyaml
   ];
 
 
-  checkInputs = [
-    pytestCheckHook
+  nativeCheckInputs = [
     matplotlib
+    pandas
+    pytestCheckHook
+  ];
+
+  pytestFlagsArray = [
+    "-W" "ignore::DeprecationWarning"
+  ];
+
+  disabledTestPathss = lib.optionals (pythonAtLeast "3.12") [
+    # AttributeError: partially initialized module 'pandas' has no attribute '_pandas_datetime_CAPI' (most likely due to a circular import)
+    "tests/test_num_regression.py"
   ];
 
   pythonImportsCheck = [
     "pytest_regressions"
     "pytest_regressions.plugin"
   ];
+
+  passthru.optional-dependencies = {
+    dataframe = [ pandas numpy ];
+    image = [ numpy pillow ];
+    num = [ numpy pandas ];
+  };
 
   meta = with lib; {
     description = "Pytest fixtures to write regression tests";

@@ -11,14 +11,14 @@
 
 buildPythonPackage rec {
   pname = "importlib-resources";
-  version = "5.9.0";
+  version = "6.1.1";
   format = "pyproject";
   disabled = isPy27;
 
   src = fetchPypi {
     pname = "importlib_resources";
     inherit version;
-    sha256 = "sha256-VIHpf7Ra+Nzy95iVJiVZHFj+WZ0HNdhrEPVN4IamFoE=";
+    hash = "sha256-OJOgASLq/eaJTFmRREalEvcooMGkX5u5tjchtrrPC0o=";
   };
 
   nativeBuildInputs = [
@@ -31,7 +31,7 @@ buildPythonPackage rec {
     typing
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     unittestCheckHook
   ];
 

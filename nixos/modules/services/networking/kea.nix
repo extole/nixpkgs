@@ -47,7 +47,7 @@ in
             type = listOf str;
             default = [];
             description = lib.mdDoc ''
-              List of additonal arguments to pass to the daemon.
+              List of additional arguments to pass to the daemon.
             '';
           };
 
@@ -86,7 +86,7 @@ in
             type = listOf str;
             default = [];
             description = lib.mdDoc ''
-              List of additonal arguments to pass to the daemon.
+              List of additional arguments to pass to the daemon.
             '';
           };
 
@@ -146,7 +146,7 @@ in
             type = listOf str;
             default = [];
             description = lib.mdDoc ''
-              List of additonal arguments to pass to the daemon.
+              List of additional arguments to pass to the daemon.
             '';
           };
 
@@ -207,7 +207,7 @@ in
             type = listOf str;
             default = [];
             description = lib.mdDoc ''
-              List of additonal arguments to pass to the daemon.
+              List of additional arguments to pass to the daemon.
             '';
           };
 
@@ -255,6 +255,7 @@ in
       User = "kea";
       ConfigurationDirectory = "kea";
       RuntimeDirectory = "kea";
+      RuntimeDirectoryPreserve = true;
       StateDirectory = "kea";
       UMask = "0077";
     };
@@ -324,6 +325,9 @@ in
         "network-online.target"
         "time-sync.target"
       ];
+      wants = [
+        "network-online.target"
+      ];
       wantedBy = [
         "multi-user.target"
       ];
@@ -371,6 +375,9 @@ in
         "network-online.target"
         "time-sync.target"
       ];
+      wants = [
+        "network-online.target"
+      ];
       wantedBy = [
         "multi-user.target"
       ];
@@ -412,6 +419,7 @@ in
         "https://kea.readthedocs.io/en/kea-${package.version}/arm/ddns.html"
       ];
 
+      wants = [ "network-online.target" ];
       after = [
         "network-online.target"
         "time-sync.target"

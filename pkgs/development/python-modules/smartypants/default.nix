@@ -9,6 +9,7 @@
 
 buildPythonPackage rec {
   version = "2.0.1";
+  format = "setuptools";
   pname = "smartypants";
   disabled = isPyPy;
 
@@ -19,7 +20,7 @@ buildPythonPackage rec {
     sha256 = "00p1gnb9pzb3svdq3c5b9b332gsp50wrqqa39gj00m133zadanjp";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     docutils
     pygments
     pytestCheckHook

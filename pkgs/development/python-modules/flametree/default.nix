@@ -11,15 +11,16 @@
 buildPythonPackage rec {
   pname = "flametree";
   version = "0.1.12";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "Edinburgh-Genome-Foundry";
     repo = "Flametree";
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-oyiuhsYouGDKRssKc0aYIoG32H7GS6Bn4RtI7/9N158=";
+    hash = "sha256-oyiuhsYouGDKRssKc0aYIoG32H7GS6Bn4RtI7/9N158=";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     matplotlib
     pandas
     pytestCheckHook

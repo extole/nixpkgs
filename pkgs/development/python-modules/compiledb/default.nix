@@ -12,6 +12,7 @@
 buildPythonPackage rec {
   pname = "compiledb";
   version = "0.10.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "nickdiego";
@@ -26,7 +27,7 @@ buildPythonPackage rec {
                       --replace /bin/echo ${coreutils}/bin/echo
   '';
 
-  checkInputs = [ pytest gcc coreutils ];
+  nativeCheckInputs = [ pytest gcc coreutils ];
   propagatedBuildInputs = [ click bashlex shutilwhich ];
 
   checkPhase = ''

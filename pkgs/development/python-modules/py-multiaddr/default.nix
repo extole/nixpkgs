@@ -14,13 +14,14 @@
 buildPythonPackage rec {
   pname = "py-multiaddr";
   version = "0.0.9";
+  format = "setuptools";
   disabled = pythonOlder "3.5";
 
   src = fetchFromGitHub {
     owner = "multiformats";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-cGM7iYQPP+UOkbTxRhzuED0pkcydFCO8vpx9wTc0/HI=";
+    hash = "sha256-cGM7iYQPP+UOkbTxRhzuED0pkcydFCO8vpx9wTc0/HI=";
   };
 
   postPatch = ''
@@ -36,7 +37,7 @@ buildPythonPackage rec {
     py-multicodec
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

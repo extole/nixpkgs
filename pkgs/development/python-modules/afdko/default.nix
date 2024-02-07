@@ -1,9 +1,28 @@
-{ lib, stdenv, buildPythonPackage, fetchPypi, fetchpatch, pythonOlder
-, fonttools, defcon, lxml, fs, unicodedata2, zopfli, brotlipy, fontpens
-, brotli, fontmath, mutatormath, booleanoperations
-, ufoprocessor, ufonormalizer, psautohint, tqdm
-, setuptools-scm, scikit-build
+{ lib
+, stdenv
+, buildPythonPackage
+, fetchFromGitHub
+, pythonOlder
+, fonttools
+, defcon
+, lxml
+, fs
+, unicodedata2
+, zopfli
+, brotlipy
+, fontpens
+, brotli
+, fontmath
+, mutatormath
+, booleanoperations
+, ufoprocessor
+, ufonormalizer
+, psautohint
+, tqdm
+, setuptools-scm
+, scikit-build
 , cmake
+, ninja
 , antlr4_9
 , libxml2
 , pytestCheckHook
@@ -14,21 +33,23 @@
 
 buildPythonPackage rec {
   pname = "afdko";
-  version = "3.9.0";
+  version = "4.0.0+unstable-2023-11-07";
+  format = "pyproject";
 
   disabled = pythonOlder "3.7";
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "1fjsaz6bp028fbmry6fzfcih78mdzycqmky1wsz5y0bg4kfk4shh";
+  src = fetchFromGitHub {
+    owner = "adobe-type-tools";
+    repo = pname;
+    rev = "6c832edbd81ecf689dbe66e840bf18ae61cf4bca";
+    hash = "sha256-XXkksHggUIs2O0/OSGsft8ofogcbtAa3w5JdldIAJAI=";
   };
-
-  format = "pyproject";
 
   nativeBuildInputs = [
     setuptools-scm
     scikit-build
     cmake
+    ninja
   ];
 
   buildInputs = [
@@ -42,9 +63,17 @@ buildPythonPackage rec {
 
     # Use antlr4 runtime from nixpkgs and link it dynamically
     ./use-dynamic-system-antlr4-runtime.patch
-
-    ./libxml2-cmake-find-package.patch
   ];
+
+  # Happy new year
+  postPatch = ''
+    substituteInPlace tests/tx_data/expected_output/alt-missing-glif.pfb --replace 2023 2024
+  '';
+
+  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isClang (toString [
+    "-Wno-error=incompatible-function-pointer-types"
+    "-Wno-error=int-conversion"
+  ]);
 
   # setup.py will always (re-)execute cmake in buildPhase
   dontConfigure = true;
@@ -68,14 +97,18 @@ buildPythonPackage rec {
     tqdm
   ];
 
-  checkInputs = [ pytestCheckHook ];
+  # Use system libxml2
+  FORCE_SYSTEM_LIBXML2 = true;
+
+  nativeCheckInputs = [ pytestCheckHook ];
+
   preCheck = ''
     export PATH=$PATH:$out/bin
 
-    # Update tests to match ufinormalizer-0.6.1 expectations:
-    #   https://github.com/adobe-type-tools/afdko/issues/1418
-    find tests -name layerinfo.plist -delete
+    # Remove build artifacts to prevent them from messing with the tests
+    rm -rf _skbuild
   '';
+
   disabledTests = lib.optionals (!runAllTests) [
     # Disable slow tests, reduces test time ~25 %
     "test_report"
@@ -90,6 +123,7 @@ buildPythonPackage rec {
     # https://github.com/adobe-type-tools/afdko/issues/1425
     "test_spec"
   ] ++ lib.optionals (stdenv.hostPlatform.isi686) [
+    "test_dump_option"
     "test_type1mm_inputs"
   ];
 
@@ -98,8 +132,9 @@ buildPythonPackage rec {
   };
 
   meta = with lib; {
+    changelog = "https://github.com/adobe-type-tools/afdko/blob/${version}/NEWS.md";
     description = "Adobe Font Development Kit for OpenType";
-    homepage = "https://adobe-type-tools.github.io/afdko/";
+    homepage = "https://adobe-type-tools.github.io/afdko";
     license = licenses.asl20;
     maintainers = [ maintainers.sternenseemann ];
   };

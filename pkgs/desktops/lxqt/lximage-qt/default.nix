@@ -18,24 +18,24 @@
 
 mkDerivation rec {
   pname = "lximage-qt";
-  version = "1.1.0";
+  version = "1.4.0";
 
   src = fetchFromGitHub {
     owner = "lxqt";
     repo = pname;
     rev = version;
-    sha256 = "QvQ0LBGP9XD7vwuUD+A1x8oGDvqTeCkYyd2XyjU0fUo=";
+    hash = "sha256-Igfd8lhKDjdseQeARiirj+tEoJdcaeHuyd4mfQHOVg0=";
   };
 
   nativeBuildInputs = [
     cmake
     pkg-config
     lxqt-build-tools
+    qttools
   ];
 
   buildInputs = [
     qtbase
-    qttools
     qtx11extras
     qtsvg
     qtimageformats # add-on module to support more image file formats

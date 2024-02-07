@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "yanc";
   version = "0.3.3";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -12,7 +13,7 @@ buildPythonPackage rec {
   # Tests fail on Python>=3.5. See: https://github.com/0compute/yanc/issues/10
   doCheck = pythonOlder "3.5";
 
-  checkInputs = [ nose ];
+  nativeCheckInputs = [ nose ];
 
   checkPhase = ''
     nosetests .

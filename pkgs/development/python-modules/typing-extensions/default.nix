@@ -2,21 +2,20 @@
 , buildPythonPackage
 , fetchPypi
 , flit-core
-, python
 , pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "typing-extensions";
-  version = "4.3.0";
-  format = "pyproject";
+  version = "4.8.0";
+  pyproject = true;
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     pname = "typing_extensions";
     inherit version;
-    hash = "sha256-5tJnejL0f8frJ5XbHdFcHzTv9ha8ryz7Xpl/hU+hxKY=";
+    hash = "sha256-345DOenLdzV1WMvbzsozwwNxTPhh0e7xXhBwBVrot+8=";
   };
 
   nativeBuildInputs = [
@@ -32,7 +31,8 @@ buildPythonPackage rec {
   ];
 
   meta = with lib; {
-    description = "Backported and Experimental Type Hints for Python 3.5+";
+    description = "Backported and Experimental Type Hints for Python";
+    changelog = "https://github.com/python/typing_extensions/blob/${version}/CHANGELOG.md";
     homepage = "https://github.com/python/typing";
     license = licenses.psfl;
     maintainers = with maintainers; [ pmiddend ];

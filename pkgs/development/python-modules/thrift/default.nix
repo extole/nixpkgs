@@ -7,10 +7,11 @@
 buildPythonPackage rec {
   pname = "thrift";
   version = "0.16.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-K1tkiPze0h+dMSqiPJ/2oBldD2ribdvVrZ4+Jd/BRAg=";
+    hash = "sha256-K1tkiPze0h+dMSqiPJ/2oBldD2ribdvVrZ4+Jd/BRAg=";
   };
 
   propagatedBuildInputs = [ six ];

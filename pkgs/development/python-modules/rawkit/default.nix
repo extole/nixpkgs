@@ -5,6 +5,7 @@
 buildPythonPackage rec {
   pname = "rawkit";
   version = "0.6.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -21,7 +22,7 @@ buildPythonPackage rec {
 
   buildInputs = [ libraw ];
 
-  checkInputs = [ pytest mock ];
+  nativeCheckInputs = [ pytest mock ];
 
   checkPhase = ''
     py.test tests
@@ -31,6 +32,6 @@ buildPythonPackage rec {
     description = "CTypes based LibRaw bindings for Python";
     homepage = "https://rawkit.readthedocs.org/";
     license = licenses.mit;
-    maintainers = with maintainers; [ jfrankenau ];
+    maintainers = with maintainers; [ ];
   };
 }

@@ -8,23 +8,24 @@ let
 
 in stdenv.mkDerivation rec {
   pname = "oath-toolkit";
-  version = "2.6.7";
+  version = "2.6.10";
 
   src = fetchurl {
     url = "mirror://savannah/${pname}/${pname}-${version}.tar.gz";
-    sha256 = "1aa620k05lsw3l3slkp2mzma40q3p9wginspn9zk8digiz7dzv9n";
+    sha256 = "sha256-hsJyJPfW19rUek9r7mX2uIS/W70VxemM8sxpYl2/I5E=";
   };
 
   buildInputs = [ securityDependency ];
 
   configureFlags = lib.optionals stdenv.isDarwin [ "--disable-pam" ];
 
-  passthru.updateScript = nix-update-script { attrPath = pname; };
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
     description = "Components for building one-time password authentication systems";
     homepage = "https://www.nongnu.org/oath-toolkit/";
     maintainers = with maintainers; [ schnusch ];
     platforms = with platforms; linux ++ darwin;
+    mainProgram = "oathtool";
   };
 }

@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "helper";
   version = "2.5.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "gmr";
@@ -21,7 +22,7 @@ buildPythonPackage rec {
     pyyaml
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     mock
   ];

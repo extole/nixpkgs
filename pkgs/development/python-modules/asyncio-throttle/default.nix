@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "asyncio-throttle";
   version = "1.0.2";
+  format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
@@ -18,7 +19,7 @@ buildPythonPackage rec {
     sha256 = "1hsjcymdcm0hf4l68scf9n8j7ba89azgh96xhxrnyvwxfs5acnmv";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest-asyncio
     pytestCheckHook
   ];

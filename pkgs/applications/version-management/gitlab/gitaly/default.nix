@@ -1,38 +1,33 @@
-{ lib, fetchFromGitLab, fetchFromGitHub, buildGoModule, ruby
-, bundlerEnv, pkg-config
-# libgit2 + dependencies
-, libgit2_1_3_0, openssl, zlib, pcre, http-parser }:
+{ lib
+, fetchFromGitLab
+, fetchFromGitHub
+, buildGoModule
+, pkg-config
+}:
 
 let
-  rubyEnv = bundlerEnv rec {
-    name = "gitaly-env";
-    inherit ruby;
-    copyGemFiles = true;
-    gemdir = ./.;
-  };
-
-  version = "15.4.4";
+  version = "16.7.2";
   package_version = "v${lib.versions.major version}";
   gitaly_package = "gitlab.com/gitlab-org/gitaly/${package_version}";
 
   commonOpts = {
     inherit version;
 
+    # nixpkgs-update: no auto update
     src = fetchFromGitLab {
       owner = "gitlab-org";
       repo = "gitaly";
       rev = "v${version}";
-      sha256 = "sha256-b8ChQYaj+7snlrLP4P9FIUSIq/SNMh9hFlFajOPcBEU=";
+      hash = "sha256-3R7x8eaUJqJ1mKlQ4kYThKyaSfSaow7lGx5EfNo+GNY=";
     };
 
-    vendorSha256 = "sha256-CUFYHjmOfosM3mfw0qEY+AQcR8U3J/1lU2Ml6wSZ/QM=";
+    vendorHash = "sha256-btWHZMy1aBSsUVs30IqrdBCO79XQvTMXxkxYURF2Nqs=";
 
     ldflags = [ "-X ${gitaly_package}/internal/version.version=${version}" "-X ${gitaly_package}/internal/version.moduleVersion=${version}" ];
 
-    tags = [ "static,system_libgit2" ];
+    tags = [ "static" ];
 
     nativeBuildInputs = [ pkg-config ];
-    buildInputs = [ rubyEnv.wrappedRuby libgit2_1_3_0 openssl zlib pcre http-parser ];
 
     doCheck = false;
   };
@@ -40,15 +35,11 @@ let
   auxBins = buildGoModule ({
     pname = "gitaly-aux";
 
-    subPackages = [ "cmd/gitaly-hooks" "cmd/gitaly-ssh" "cmd/gitaly-git2go" "cmd/gitaly-lfs-smudge" ];
+    subPackages = [ "cmd/gitaly-hooks" "cmd/gitaly-ssh" "cmd/gitaly-lfs-smudge" "cmd/gitaly-gpg" ];
   } // commonOpts);
 in
 buildGoModule ({
   pname = "gitaly";
-
-  passthru = {
-    inherit rubyEnv;
-  };
 
   subPackages = [ "cmd/gitaly" "cmd/gitaly-backup" ];
 
@@ -57,18 +48,13 @@ buildGoModule ({
     cp -r ${auxBins}/bin/* _build/bin
   '';
 
-  postInstall = ''
-    mkdir -p $ruby
-    cp -rv $src/ruby/{bin,lib,proto} $ruby
-  '';
-
-  outputs = [ "out" "ruby" ];
+  outputs = [ "out" ];
 
   meta = with lib; {
     homepage = "https://gitlab.com/gitlab-org/gitaly";
     description = "A Git RPC service for handling all the git calls made by GitLab";
     platforms = platforms.linux ++ [ "x86_64-darwin" ];
-    maintainers = with maintainers; [ roblabla globin talyz yayayayaka ];
+    maintainers = teams.gitlab.members;
     license = licenses.mit;
   };
 } // commonOpts)

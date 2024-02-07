@@ -1,5 +1,6 @@
 { lib, stdenv, fetchFromGitHub, autoreconfHook, pkg-config, zlib, readline, openssl
 , libiconv, pcsclite, libassuan, libXt
+, fetchpatch
 , docbook_xsl, libxslt, docbook_xml_dtd_412
 , Carbon, PCSC, buildPackages
 , withApplePCSC ? stdenv.isDarwin
@@ -7,13 +8,13 @@
 
 stdenv.mkDerivation rec {
   pname = "opensc";
-  version = "0.22.0";
+  version = "0.24.0";
 
   src = fetchFromGitHub {
     owner = "OpenSC";
     repo = "OpenSC";
     rev = version;
-    sha256 = "sha256-0IFpiG1SJq4cpS5z6kwpWSPVWjO0q0SHs+doD2vbUKs=";
+    sha256 = "sha256-1mm0b4AAtX0AgjShpU1FR6e7pUkea5TOJdIGkNQgjuE=";
   };
 
   nativeBuildInputs = [ pkg-config autoreconfHook ];
@@ -24,7 +25,7 @@ stdenv.mkDerivation rec {
   ++ lib.optional stdenv.isDarwin Carbon
   ++ (if withApplePCSC then [ PCSC ] else [ pcsclite ]);
 
-  NIX_CFLAGS_COMPILE = "-Wno-error";
+  env.NIX_CFLAGS_COMPILE = "-Wno-error";
 
   configureFlags = [
     "--enable-zlib"

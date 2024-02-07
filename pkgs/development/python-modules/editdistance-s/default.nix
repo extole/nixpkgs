@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "editdistance-s";
   version = "1.0.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "asottile";
@@ -20,7 +21,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ cffi ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "editdistance_s" ];
 

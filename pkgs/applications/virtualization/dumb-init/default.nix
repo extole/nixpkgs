@@ -11,7 +11,11 @@ stdenv.mkDerivation rec {
     sha256 = "sha256-aRh0xfmp+ToXIYjYaducTpZUHndZ5HlFZpFhzJ3yKgs=";
   };
 
-  buildInputs = [ glibc.static ];
+  postPatch = lib.optionalString (!stdenv.hostPlatform.isStatic) ''
+    substituteInPlace Makefile --replace "-static" ""
+  '';
+
+  buildInputs = lib.optional (stdenv.hostPlatform.isGnu && stdenv.hostPlatform.isStatic) glibc.static;
 
   installPhase = ''
     runHook preInstall
@@ -27,5 +31,6 @@ stdenv.mkDerivation rec {
     license = licenses.mit;
     maintainers = [ maintainers.marsam ];
     platforms = platforms.linux;
+    mainProgram = "dumb-init";
   };
 }

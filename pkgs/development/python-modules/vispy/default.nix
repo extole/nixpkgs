@@ -3,24 +3,31 @@
 , buildPythonPackage
 , substituteAll
 , fetchPypi
-, cython
+, cython_3
 , fontconfig
 , freetype-py
 , hsluv
 , kiwisolver
 , libGL
 , numpy
+, oldest-supported-numpy
+, packaging
+, pythonOlder
+, setuptools
 , setuptools-scm
-, setuptools-scm-git-archive
+, wheel
 }:
 
 buildPythonPackage rec {
   pname = "vispy";
-  version = "0.11.0";
+  version = "0.14.1";
+  pyproject = true;
+
+  disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-zi0lalMdQF8pWTPHSZaRL79D9lUhbbX8ao/zp4dHhBo=";
+    hash = "sha256-JJpQl5/ACotlEJKDNU3PEs9BXBpdz5gh4RP25ZC5uTw=";
   };
 
   patches = [
@@ -32,9 +39,11 @@ buildPythonPackage rec {
   ];
 
   nativeBuildInputs = [
-    cython
+    cython_3
+    oldest-supported-numpy
+    setuptools
     setuptools-scm
-    setuptools-scm-git-archive
+    wheel
   ];
 
   buildInputs = [
@@ -42,11 +51,11 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [
-    fontconfig
     freetype-py
     hsluv
     kiwisolver
     numpy
+    packaging
   ];
 
   doCheck = false;  # otherwise runs OSX code on linux.
@@ -65,8 +74,9 @@ buildPythonPackage rec {
   ];
 
   meta = with lib; {
-    homepage = "https://vispy.org/index.html";
     description = "Interactive scientific visualization in Python";
+    homepage = "https://vispy.org/index.html";
+    changelog = "https://github.com/vispy/vispy/blob/v${version}/CHANGELOG.md";
     license = licenses.bsd3;
     maintainers = with maintainers; [ goertzenator ];
   };

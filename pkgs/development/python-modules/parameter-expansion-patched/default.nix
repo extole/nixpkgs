@@ -18,13 +18,11 @@ buildPythonPackage rec {
     hash = "sha256-/128ifveWC8zNlYtGWtxB3HpK6p7bVk1ahSwhaC2dAs=";
   };
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
-
   nativeBuildInputs = [
     setuptools-scm
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

@@ -2,7 +2,6 @@
 , stdenv
 , fetchFromGitHub
 , fetchpatch
-, fetchzip
 , autoconf
 , automake
 , binutils
@@ -13,7 +12,6 @@
 , git
 , libtool
 , linkFarmFromDrvs
-, nasm
 , ocaml
 , ocamlPackages
 , openssl
@@ -29,15 +27,15 @@
 stdenv.mkDerivation rec {
   pname = "sgx-sdk";
   # Version as given in se_version.h
-  version = "2.16.100.4";
+  version = "2.21.100.1";
   # Version as used in the Git tag
-  versionTag = "2.16";
+  versionTag = "2.21";
 
   src = fetchFromGitHub {
     owner = "intel";
     repo = "linux-sgx";
     rev = "sgx_${versionTag}";
-    hash = "sha256-qgXuJJWiqmcU11umCsE3DnlK4VryuTDAsNf53YPw6UY=";
+    hash = "sha256-Yo2G0H0XUI2p9W7lDRLkFHw2t8X1220brGohQJ0r2WY=";
     fetchSubmodules = true;
   };
 
@@ -55,10 +53,32 @@ stdenv.mkDerivation rec {
     })
   ];
 
+  # There's a `make preparation` step that downloads some prebuilt binaries and
+  # applies some patches to the in-repo git submodules. We can't just run it,
+  # since it downloads things, so this step just extracts the patching steps.
   postPatch = ''
     patchShebangs linux/installer/bin/build-installpkg.sh \
       linux/installer/common/sdk/createTarball.sh \
-      linux/installer/common/sdk/install.sh
+      linux/installer/common/sdk/install.sh \
+      external/sgx-emm/create_symlink.sh
+
+    echo "Running 'make preparation' but without download steps"
+
+    # Seems to download something. Build currently uses ipp-crypto and not
+    # sgxssl so probably not an issue.
+    # $ ./external/dcap_source/QuoteVerification/prepare_sgxssl.sh nobuild
+
+    pushd external/openmp/openmp_code
+      git apply ../0001-Enable-OpenMP-in-SGX.patch >/dev/null 2>&1 \
+        || git apply ../0001-Enable-OpenMP-in-SGX.patch --check -R
+    popd
+
+    pushd external/protobuf/protobuf_code
+      git apply ../sgx_protobuf.patch >/dev/null 2>&1 \
+        || git apply ../sgx_protobuf.patch --check -R
+    popd
+
+    ./external/sgx-emm/create_symlink.sh
   '';
 
   # We need `cmake` as a build input but don't use it to kick off the build phase
@@ -109,7 +129,7 @@ stdenv.mkDerivation rec {
       };
     in
     ''
-      header "Setting up IPP crypto build artifacts"
+      echo "Setting up IPP crypto build artifacts"
 
       pushd 'external/ippcp_internal'
 
@@ -123,7 +143,7 @@ stdenv.mkDerivation rec {
         lib/linux/intel64/cve_2020_0551_cf/libippcp.a
 
       rm inc/ippcp.h
-      patch ${ipp-crypto-no_mitigation}/include/ippcp.h -i inc/ippcp21u3.patch -o inc/ippcp.h
+      patch ${ipp-crypto-no_mitigation}/include/ippcp.h -i inc/ippcp21u7.patch -o inc/ippcp.h
 
       install -D ${ipp-crypto-no_mitigation.src}/LICENSE license/LICENSE
 
@@ -136,8 +156,6 @@ stdenv.mkDerivation rec {
     "DEBUG=1"
   ];
 
-  enableParallelBuilding = true;
-
   postBuild = ''
     patchShebangs linux/installer/bin/sgx_linux_x64_sdk_${version}.bin
   '';
@@ -149,7 +167,7 @@ stdenv.mkDerivation rec {
     ./linux/installer/bin/sgx_linux_x64_sdk_${version}.bin -prefix $installDir
     installDir=$installDir/sgxsdk
 
-    header "Move files created by installer"
+    echo "Move files created by installer"
 
     mkdir -p $out/bin
     pushd $out
@@ -165,6 +183,11 @@ stdenv.mkDerivation rec {
     # Move `lib64` to `lib` and symlink `lib64`
     mv $installDir/lib64 lib
     ln -s lib/ lib64
+
+    # Fixup the symlinks for libsgx_urts.so.* -> libsgx_urts.so
+    for file in lib/libsgx_urts.so.*; do
+      ln -srf lib/libsgx_urts.so $file
+    done
 
     mv $installDir/include/ .
 
@@ -204,17 +227,16 @@ stdenv.mkDerivation rec {
     runHook postInstall
   '';
 
-
   preFixup = ''
-    header "Strip sgxsdk prefix"
+    echo "Strip sgxsdk prefix"
     for path in "$out/share/bin/environment" "$out/bin/sgx-gdb"; do
       substituteInPlace $path --replace "$TMPDIR/sgxsdk" "$out"
     done
 
-    header "Fixing pkg-config files"
+    echo "Fixing pkg-config files"
     sed -i "s|prefix=.*|prefix=$out|g" $out/lib/pkgconfig/*.pc
 
-    header "Fixing SGX_SDK default in samples"
+    echo "Fixing SGX_SDK default in samples"
     substituteInPlace $out/share/SampleCode/LocalAttestation/buildenv.mk \
       --replace '/opt/intel/sgxsdk' "$out"
     for file in $out/share/SampleCode/*/Makefile; do
@@ -222,12 +244,12 @@ stdenv.mkDerivation rec {
         --replace '/opt/intel/sgxsdk' "$out"
     done
 
-    header "Fixing BINUTILS_DIR in buildenv.mk"
+    echo "Fixing BINUTILS_DIR in buildenv.mk"
     substituteInPlace $out/share/bin/buildenv.mk \
       --replace 'BINUTILS_DIR ?= /usr/local/bin' \
                 'BINUTILS_DIR ?= ${BINUTILS_DIR}'
 
-    header "Fixing GDB path in bin/sgx-gdb"
+    echo "Fixing GDB path in bin/sgx-gdb"
     substituteInPlace $out/bin/sgx-gdb --replace '/usr/local/bin/gdb' '${gdb}/bin/gdb'
   '';
 

@@ -10,6 +10,7 @@
 let
   pname = "gmpy2";
   version = "2.1.2";
+  format = "setuptools";
 in
 
 buildPythonPackage {
@@ -21,7 +22,7 @@ buildPythonPackage {
     owner = "aleaxit";
     repo = "gmpy";
     rev = "gmpy2-${version}";
-    sha256 = "sha256-ARCttNzRA+Ji2j2NYaSCDXgvoEg01T9BnYadyqON2o0=";
+    hash = "sha256-ARCttNzRA+Ji2j2NYaSCDXgvoEg01T9BnYadyqON2o0=";
   };
 
   buildInputs = [ gmp mpfr libmpc ];

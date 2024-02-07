@@ -16,7 +16,7 @@ stdenv.mkDerivation rec {
 
   # outputs = [ "out" "man" ];
 
-  NIX_CFLAGS_COMPILE = "-D_GNU_SOURCE";
+  env.NIX_CFLAGS_COMPILE = "-D_GNU_SOURCE";
 
   patches = [
     ./ubuntu-0.17-9.patch
@@ -42,6 +42,7 @@ stdenv.mkDerivation rec {
       else "Remote user information server";
     platforms = platforms.linux;
     license = licenses.bsdOriginal;
+    mainProgram = "finger";
   };
 }
 # TODO: multiple outputs (manpage)

@@ -5,19 +5,22 @@
 , fixtures
 , future
 , pbr
+, setuptools
 , subunit
 , testtools
+, tomlkit
 , voluptuous
 , callPackage
 }:
 
 buildPythonPackage rec {
   pname = "stestr";
-  version = "4.0.0";
+  version = "4.1.0";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-A2Y+q62KcxaoRJFo78WCVmpdOvnHf8QALX3IPnf28q0=";
+    hash = "sha256-X2HDae7OY8KS0TWZ4SqhWK92hZkGQ/JN1vp/q/406Yo=";
   };
 
   postPatch = ''
@@ -26,6 +29,11 @@ buildPythonPackage rec {
     rm test-requirements.txt
   '';
 
+  nativeBuildInputs = [
+    pbr
+    setuptools
+  ];
+
   propagatedBuildInputs = [
     cliff
     fixtures
@@ -33,6 +41,7 @@ buildPythonPackage rec {
     pbr
     subunit
     testtools
+    tomlkit
     voluptuous
   ];
 

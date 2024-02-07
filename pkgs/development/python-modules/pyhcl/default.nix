@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "pyhcl";
   version = "0.4.4";
+  format = "setuptools";
   disabled = !isPy3k;
 
   src = fetchFromGitHub {
@@ -25,7 +26,7 @@ buildPythonPackage rec {
     echo '__version__ = "${version}"' > ./src/hcl/version.py
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     coverage
     pytest
   ];

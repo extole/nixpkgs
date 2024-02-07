@@ -8,19 +8,20 @@
 buildPythonPackage rec {
   pname = "microdata";
   version = "0.8.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "edsu";
     repo = "microdata";
     rev = "v${version}";
-    sha256 = "sha256-BAygCLBLxZ033ZWRFSR52dSM2nPY8jXplDXQ8WW3KPo=";
+    hash = "sha256-BAygCLBLxZ033ZWRFSR52dSM2nPY8jXplDXQ8WW3KPo=";
   };
 
   propagatedBuildInputs = [
     html5lib
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     unittestCheckHook
   ];
 

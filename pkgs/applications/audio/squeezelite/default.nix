@@ -1,13 +1,15 @@
 { lib
 , stdenv
 , fetchFromGitHub
-, alsa-lib
 , flac
+, libgpiod
 , libmad
 , libpulseaudio
 , libvorbis
 , mpg123
-, audioBackend ? "alsa"
+, audioBackend ? if stdenv.isLinux then "alsa" else "portaudio"
+, alsaSupport ? stdenv.isLinux
+, alsa-lib
 , dsdSupport ? true
 , faad2Support ? true
 , faad2
@@ -19,10 +21,19 @@
 , soxr
 , sslSupport ? true
 , openssl
+, portaudioSupport ? stdenv.isDarwin
+, portaudio
+, slimserver
+, AudioToolbox
+, AudioUnit
+, Carbon
+, CoreAudio
+, CoreVideo
+, VideoDecodeAcceleration
 }:
 
 let
-  inherit (lib) optional optionalString;
+  inherit (lib) optional optionals optionalString;
 
   pulseSupport = audioBackend == "pulse";
 
@@ -34,22 +45,26 @@ stdenv.mkDerivation {
   pname = binName;
   # versions are specified in `squeezelite.h`
   # see https://github.com/ralph-irving/squeezelite/issues/29
-  version = "1.9.9.1403";
+  version = "2.0.0.1465";
 
   src = fetchFromGitHub {
     owner = "ralph-irving";
     repo = "squeezelite";
-    rev = "bc72c0de3fff771540a2a45aaafafed539387b3c";
-    hash = "sha256-205i61mbeQG2MzSE9NtPHSuNeyMbjZzbZVCFFzjqKqQ=";
+    rev = "6de9e229aa4cc7c3131ff855f3ead39581127090";
+    hash = "sha256-qSRmiX1+hbsWQsU9cRQ7QRkdXs5Q6aE7n7lxZsx8+Hs=";
   };
 
   buildInputs = [ flac libmad libvorbis mpg123 ]
-    ++ lib.singleton (if pulseSupport then libpulseaudio else alsa-lib)
+    ++ optional pulseSupport libpulseaudio
+    ++ optional alsaSupport alsa-lib
+    ++ optional portaudioSupport portaudio
+    ++ optionals stdenv.isDarwin [ CoreVideo VideoDecodeAcceleration CoreAudio AudioToolbox AudioUnit Carbon ]
     ++ optional faad2Support faad2
     ++ optional ffmpegSupport ffmpeg
     ++ optional opusSupport opusfile
     ++ optional resampleSupport soxr
-    ++ optional sslSupport openssl;
+    ++ optional sslSupport openssl
+    ++ optional (stdenv.isAarch32 or stdenv.isAarch64) libgpiod;
 
   enableParallelBuilding = true;
 
@@ -60,14 +75,20 @@ stdenv.mkDerivation {
 
   EXECUTABLE = binName;
 
-  OPTS = [ "-DLINKALL" ]
+  OPTS = [ "-DLINKALL" "-DGPIO" ]
     ++ optional dsdSupport "-DDSD"
     ++ optional (!faad2Support) "-DNO_FAAD"
     ++ optional ffmpegSupport "-DFFMPEG"
     ++ optional opusSupport "-DOPUS"
+    ++ optional portaudioSupport "-DPORTAUDIO"
     ++ optional pulseSupport "-DPULSEAUDIO"
     ++ optional resampleSupport "-DRESAMPLE"
-    ++ optional sslSupport "-DUSE_SSL";
+    ++ optional sslSupport "-DUSE_SSL"
+    ++ optional (stdenv.isAarch32 or stdenv.isAarch64) "-DRPI";
+
+  env = lib.optionalAttrs stdenv.isDarwin {
+    LDADD = "-lportaudio -lpthread";
+  };
 
   installPhase = ''
     runHook preInstall
@@ -78,11 +99,17 @@ stdenv.mkDerivation {
     runHook postInstall
   '';
 
+  passthru = {
+    inherit (slimserver) tests;
+    updateScript = ./update.sh;
+  };
+
   meta = with lib; {
     description = "Lightweight headless squeezebox client emulator";
     homepage = "https://github.com/ralph-irving/squeezelite";
     license = with licenses; [ gpl3Plus ] ++ optional dsdSupport bsd2;
-    maintainers = with maintainers; [ samdoshi ];
-    platforms = platforms.linux;
+    mainProgram = binName;
+    maintainers = with maintainers; [ adamcstephens ];
+    platforms = if (audioBackend == "pulse") then platforms.linux else platforms.linux ++ platforms.darwin;
   };
 }

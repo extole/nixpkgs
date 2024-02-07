@@ -9,14 +9,14 @@
 
 buildPythonPackage rec {
   pname = "twill";
-  version = "3.0.2";
+  version = "3.2.1";
   format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-dWtrdkiR1+IBfeF9jwbOjKE2UMXDJji0iOb+USbY7zk=";
+    hash = "sha256-JJheUl/Ar8BWNpzJzMvVgk4KeitoQZ8GjbFPN9dEd+g=";
   };
 
   propagatedBuildInputs = [

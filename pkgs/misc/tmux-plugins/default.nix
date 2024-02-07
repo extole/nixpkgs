@@ -90,6 +90,27 @@ in rec {
     };
   };
 
+  catppuccin = mkTmuxPlugin {
+    pluginName = "catppuccin";
+    version = "unstable-2023-08-21";
+    src = fetchFromGitHub {
+      owner = "catppuccin";
+      repo = "tmux";
+      rev = "7a284c98e5df4cc84a1a45ad633916f0b2b916b2";
+      hash = "sha256-jxcxW0gEfXaSt8VM3UIs0dKNKaHb8JSEQBBV3SVjW/A=";
+    };
+    postInstall = ''
+      sed -i -e 's|''${PLUGIN_DIR}/catppuccin-selected-theme.tmuxtheme|''${TMUX_TMPDIR}/catppuccin-selected-theme.tmuxtheme|g' $target/catppuccin.tmux
+    '';
+    meta = with lib; {
+      homepage = "https://github.com/catppuccin/tmux";
+      description = "Soothing pastel theme for Tmux!";
+      license = licenses.mit;
+      platforms = platforms.unix;
+      maintainers = with maintainers; [ jnsgruk ];
+    };
+  };
+
   continuum = mkTmuxPlugin {
     pluginName = "continuum";
     version = "unstable-2022-01-25";
@@ -101,7 +122,7 @@ in rec {
     };
     meta = {
       homepage = "https://github.com/tmux-plugins/tmux-continuum";
-      description = "continous saving of tmux environment";
+      description = "continuous saving of tmux environment";
       longDescription =
       ''
         Features:
@@ -119,6 +140,29 @@ in rec {
     };
   };
 
+  copy-toolkit = mkTmuxPlugin rec {
+    pluginName = "copy-toolkit";
+    rtpFilePath = "copytk.tmux";
+    version = "1.1";
+    src = fetchFromGitHub {
+      owner = "CrispyConductor";
+      repo = "tmux-copy-toolkit";
+      rev = "v${version}";
+      sha256 = "MEMC9klm+PH66UHwrB2SqdCaZX0LAujL+Woo/hV84m4=";
+    };
+    postInstall = ''
+      sed -i -e 's|python3 |${pkgs.python3}/bin/python3 |g' $target/copytk.tmux
+      sed -i -e 's|/bin/bash|${pkgs.bash}/bin/bash|g;s|/bin/cat|${pkgs.coreutils}/bin/cat|g' $target/copytk.py
+    '';
+    meta = {
+      homepage = "https://github.com/CrispyConductor/tmux-copy-toolkit";
+      description = "Various copy-mode tools";
+      license = lib.licenses.mit;
+      platforms = lib.platforms.unix;
+      maintainers = with lib.maintainers; [ deejayem ];
+    };
+  };
+
   copycat = mkTmuxPlugin {
     pluginName = "copycat";
     version = "unstable-2020-01-09";
@@ -132,12 +176,12 @@ in rec {
 
   cpu = mkTmuxPlugin {
     pluginName = "cpu";
-    version = "unstable-2021-12-15";
+    version = "unstable-2023-01-06";
     src = fetchFromGitHub {
       owner = "tmux-plugins";
       repo = "tmux-cpu";
-      rev = "9eb3dba66672c5b43065e144cc3a1031f77ad67e";
-      sha256 = "sha256-v/jZxsa+JwsSKjmA32VK/4gBNHP/SyOzTaYSSz2c0+4=";
+      rev = "98d787191bc3e8f19c3de54b96ba1caf61385861";
+      sha256 = "sha256-ymmCI6VYvf94Ot7h2GAboTRBXPIREP+EB33+px5aaJk=";
     };
   };
 
@@ -154,12 +198,12 @@ in rec {
 
   dracula = mkTmuxPlugin rec {
     pluginName = "dracula";
-    version = "2.0.0";
+    version = "2.2.0";
     src = fetchFromGitHub {
       owner = "dracula";
       repo = "tmux";
       rev = "v${version}";
-      sha256 = "ILs+GMltb2AYNUecFMyQZ/AuETB0PCFF2InSnptVBos=";
+      sha256 = "9p+KO3/SrASHGtEk8ioW+BnC4cXndYx4FL0T70lKU2w=";
     };
     meta = with lib; {
       homepage = "https://draculatheme.com/tmux";
@@ -199,24 +243,27 @@ in rec {
   };
 
   fingers = mkTmuxPlugin rec {
-    pluginName = "fingers";
-    rtpFilePath = "tmux-fingers.tmux";
-    version = "1.0.1";
+    pluginName = "tmux-fingers";
+    rtpFilePath = "load-config.tmux";
+    version = "2.1.1";
     src = fetchFromGitHub {
       owner = "Morantron";
       repo = "tmux-fingers";
-      rev = version;
-      sha256 = "0gp37m3d0irrsih96qv2yalvr1wmf1n64589d4qzyzq16lzyjcr0";
-      fetchSubmodules = true;
+      rev = "${version}";
+      sha256 = "sha256-1YMh6m8M6FKf8RPXsOfWCVC5CXSr/MynguwkG7O+oEY=";
     };
-    nativeBuildInputs = [ pkgs.makeWrapper ];
+    nativeBuildInputs = [ pkgs.makeWrapper pkgs.crystal pkgs.shards ];
     postInstall = ''
-      for f in config.sh tmux-fingers.sh setup-fingers-mode-bindings.sh; do
-      wrapProgram $target/scripts/$f \
+      shards build --production
+      rm -rf $target/* $target/.*
+      cp -r bin $target/bin
+      echo "$target/bin/${pluginName} load-config" > $target/${rtpFilePath}
+      chmod +x $target/${rtpFilePath}
+
+      wrapProgram $target/${rtpFilePath} \
         --prefix PATH : ${with pkgs; lib.makeBinPath (
           [ gawk ] ++ lib.optionals stdenv.isDarwin [ reattach-to-user-namespace ]
         )}
-      done
     '';
   };
 
@@ -232,6 +279,32 @@ in rec {
     postInstall = ''
       sed -i -e 's|fpp |${pkgs.fpp}/bin/fpp |g' $target/fpp.tmux
     '';
+  };
+
+  fuzzback = mkTmuxPlugin {
+    pluginName = "fuzzback";
+    version = "unstable-2022-11-21";
+    src = fetchFromGitHub {
+      owner = "roosta";
+      repo = "tmux-fuzzback";
+      rev = "bfd9cf0ef1c35488f0080f0c5ca4fddfdd7e18ec";
+      sha256 = "w788xDBkfiLdUVv1oJi0YikFPqVk6LiN6PDfHu8on5E=";
+    };
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postInstall = ''
+      for f in fuzzback.sh preview.sh supported.sh; do
+        chmod +x $target/scripts/$f
+        wrapProgram $target/scripts/$f \
+          --prefix PATH : ${with pkgs; lib.makeBinPath [ coreutils fzf gawk gnused ]}
+      done
+    '';
+    meta = {
+      homepage = "https://github.com/roosta/tmux-fuzzback";
+      description = "Fuzzy search for terminal scrollback";
+      license = lib.licenses.mit;
+      platforms = lib.platforms.unix;
+      maintainers = with lib.maintainers; [ deejayem ];
+    };
   };
 
   fzf-tmux-url = mkTmuxPlugin {
@@ -288,6 +361,24 @@ in rec {
       repo = "tmux-logging";
       rev = "b085ad423b5d59a2c8b8d71772352e7028b8e1d0";
       sha256 = "0p0sawysalhi8k2a5hdxniqx6kb24kd8rnvfzkjqigzid5ik37js";
+    };
+  };
+
+  mode-indicator = mkTmuxPlugin rec {
+    pluginName = "mode-indicator";
+    version = "unstable-2021-10-01";
+    src = fetchFromGitHub {
+      owner = "MunifTanjim";
+      repo = "tmux-mode-indicator";
+      rev = "11520829210a34dc9c7e5be9dead152eaf3a4423";
+      sha256 = "sha256-hlhBKC6UzkpUrCanJehs2FxK5SoYBoiGiioXdx6trC4=";
+    };
+    meta = with lib; {
+      homepage = "https://github.com/MunifTanjim/tmux-mode-indicator";
+      description = "Plugin that displays prompt indicating currently active Tmux mode";
+      license = licenses.mit;
+      platforms = platforms.unix;
+      maintainers = with maintainers; [ aacebedo ];
     };
   };
 
@@ -492,12 +583,12 @@ in rec {
 
   tilish = mkTmuxPlugin {
     pluginName = "tilish";
-    version = "2020-08-12";
+    version = "unstable-2023-09-20";
     src = fetchFromGitHub {
       owner = "jabirali";
       repo = "tmux-tilish";
-      rev = "73d2404cdc0ef6bd7fbc8982edae0b0e2a4dd860";
-      sha256 = "1x58h3bg9d69j40fh8rcjpxvg0i6j04pj8p3jk57l3cghxis5j05";
+      rev = "22f7920837d827dc6cb31143ea916afa677c24c1";
+      sha256 = "wP3c+p/DM6ve7GUhi0QEzggct7NS4XUa78sVQFSKrfo=";
     };
 
     meta = with lib; {
@@ -523,12 +614,12 @@ in rec {
   tmux-fzf = mkTmuxPlugin {
     pluginName = "tmux-fzf";
     rtpFilePath = "main.tmux";
-    version = "unstable-2022-08-02";
+    version = "unstable-2023-10-24";
     src = fetchFromGitHub {
       owner = "sainnhe";
       repo = "tmux-fzf";
-      rev = "3e261309ad367c3fe56c0ef14af00078684b1035";
-      sha256 = "13wlcq3f7944v74lcnfbmabcy2c0ca83ya21s3qn3j0lw3wqj6vj";
+      rev = "d62b6865c0e7c956ad1f0396823a6f34cf7452a7";
+      hash = "sha256-hVkSQYvBXrkXbKc98V9hwwvFp6z7/mX1K4N3N9j4NN4=";
     };
     postInstall = ''
       find $target -type f -print0 | xargs -0 sed -i -e 's|fzf |${pkgs.fzf}/bin/fzf |g'
@@ -570,7 +661,7 @@ in rec {
       sha256 = "1jp4jq57cn116b3i34v6yy69izd8s6mp2ijr260cw86g0470k0fn";
     };
     postInstall = ''
-      sed -i -e '14,20{s|urlview|${pkgs.urlview}/bin/urlview|g}' $target/urlview.tmux
+      sed -i -e '14,20{s|extract_url|${pkgs.extract_url}/bin/extract_url|g}' $target/urlview.tmux
     '';
   };
 
@@ -602,6 +693,25 @@ in rec {
       repo = "vim-tmux-navigator";
       rev = "afb45a55b452b9238159047ce7c6e161bd4a9907";
       hash = "sha256-8A+Yt9uhhAP76EiqUopE8vl7/UXkgU2x000EOcF7pl0=";
+    };
+  };
+
+  weather = mkTmuxPlugin {
+    pluginName = "weather";
+    version = "unstable-2020-02-08";
+    src = fetchFromGitHub {
+      owner = "xamut";
+      repo = "tmux-weather";
+      rev = "28a5fbe75bb25a408193d454304e28ddd75e9338";
+      hash = "sha256-of9E/npEsF1JVc9ttwrbC5WkIAwCNBJAgTfExfj79i4=";
+    };
+
+    meta = with lib; {
+      homepage = "https://github.com/xamut/tmux-weather";
+      description = "Shows weather in the status line";
+      license = licenses.mit;
+      platforms = platforms.unix;
+      maintainers = with maintainers; [ jfvillablanca ];
     };
   };
 

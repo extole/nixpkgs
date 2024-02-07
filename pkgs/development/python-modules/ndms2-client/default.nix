@@ -1,21 +1,28 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
+, setuptools
 , pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "ndms2-client";
-  version = "0.1.1";
+  version = "0.1.3";
+
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "foxel";
     repo = "python_ndms2_client";
     rev = version;
-    sha256 = "1sc39d10hm1y8xf3gdqzq1akrx94k590l106242j9bvfqyr8lrk9";
+    hash = "sha256-A19olC1rTHTy0xyeSP45fqvv9GUynQSrMgXBgW8ySOs=";
   };
 
-  checkInputs = [
+  nativeBuildInputs = [
+    setuptools
+  ];
+
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

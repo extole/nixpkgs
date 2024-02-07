@@ -1,11 +1,16 @@
 { lib
 , stdenv
+, python
 , buildPythonPackage
 , pythonOlder
 , fetchPypi
 , babel
 , markupsafe
 , pytestCheckHook
+, sphinxHook
+, pallets-sphinx-themes
+, sphinxcontrib-log-cabinet
+, sphinx-issues
 }:
 
 buildPythonPackage rec {
@@ -16,7 +21,7 @@ buildPythonPackage rec {
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-MTUacCpAip51laj8YVD8P0O7a/fjGXcMvA2535Q36FI=";
+    hash = "sha256-MTUacCpAip51laj8YVD8P0O7a/fjGXcMvA2535Q36FI=";
   };
 
   propagatedBuildInputs = [
@@ -28,7 +33,7 @@ buildPythonPackage rec {
   # See https://github.com/pallets/jinja/issues/1158
   doCheck = !stdenv.is32bit;
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -38,6 +43,35 @@ buildPythonPackage rec {
     # Remove after cpython 3.9.8
     "-p no:warnings"
   ];
+
+  passthru = {
+    doc = stdenv.mkDerivation {
+      # Forge look and feel of multi-output derivation as best as we can.
+      #
+      # Using 'outputs = [ "doc" ];' breaks a lot of assumptions.
+      name = "${pname}-${version}-doc";
+      inherit src pname version;
+
+      patches = [
+        # Fix import of "sphinxcontrib-log-cabinet"
+        ./patches/import-order.patch
+      ];
+
+      postInstallSphinx = ''
+        mv $out/share/doc/* $out/share/doc/python$pythonVersion-$pname-$version
+      '';
+
+      nativeBuildInputs = [
+        sphinxHook
+        sphinxcontrib-log-cabinet
+        pallets-sphinx-themes
+        sphinx-issues
+      ];
+
+      inherit (python) pythonVersion;
+      inherit meta;
+    };
+  };
 
   meta = with lib; {
     homepage = "https://jinja.palletsprojects.com/";

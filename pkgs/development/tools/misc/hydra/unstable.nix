@@ -4,10 +4,8 @@
 , perlPackages
 , buildEnv
 , makeWrapper
-, libtool
 , unzip
 , pkg-config
-, sqlite
 , libpqxx
 , top-git
 , mercurial
@@ -22,7 +20,6 @@
 , prometheus-cpp
 , nukeReferences
 , git
-, boehmgc
 , nlohmann_json
 , docbook_xsl
 , openssh
@@ -46,7 +43,7 @@
 , cacert
 , glibcLocales
 , fetchFromGitHub
-, fetchpatch
+, fetchpatch2
 , nixosTests
 }:
 
@@ -127,43 +124,46 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "hydra";
-  version = "2022-10-22";
+  version = "2023-12-24";
 
   src = fetchFromGitHub {
     owner = "NixOS";
     repo = "hydra";
-    rev = "312cb42275e593eea5c44d8430ab09375fdb2fdb";
-    sha256 = "sha256-ablHzPwN2Pvju0kyo8N5Wavqkl60gKHCPLnruwqvwTg=";
+    rev = "02e453fc8c39751843220eaecdeaf7d539b7e765";
+    hash = "sha256-hIXRgu2MGqFYCALDKAiP+8lE859zftRe4OVIgGOTkvc=";
   };
 
   patches = [
-    # https://github.com/NixOS/hydra/pull/1215: scmdiff: Hardcode --git-dir
-    (fetchpatch {
-      url = "https://github.com/NixOS/hydra/commit/b6ea85a601ddac9cb0716d8cb4d446439fa0778f.patch";
-      sha256 = "sha256-QHjwLYQucdkBs6OsFI8kWo5ugkPXXlTgdbGFxKBHAHo=";
+    # hydra-eval-jobs: don't use restrict-eval for Flakes
+    # https://github.com/NixOS/hydra/pull/1257
+    # should be removed when https://github.com/NixOS/nix/pull/9547
+    # lands in the nix version used by hydra
+    (fetchpatch2 {
+      url = "https://github.com/NixOS/hydra/commit/9370b0ef977bff7e84ac07a81a0e31e75989276b.patch";
+      hash = "sha256-BRenC0lpWPgzfx42MPJBQ9VBamh5hZXuuVe6TXYKkdE=";
     })
   ];
 
-  buildInputs =
-    [
-      libpqxx
-      top-git
-      mercurial
-      darcs
-      subversion
-      breezy
-      openssl
-      bzip2
-      libxslt
-      nix
-      perlDeps
-      perl
-      pixz
-      boost
-      postgresql
-      nlohmann_json
-      prometheus-cpp
-    ];
+  buildInputs = [
+    unzip
+    libpqxx
+    top-git
+    mercurial
+    darcs
+    subversion
+    breezy
+    openssl
+    bzip2
+    libxslt
+    nix
+    perlDeps
+    perl
+    pixz
+    boost
+    postgresql
+    nlohmann_json
+    prometheus-cpp
+  ];
 
   hydraPath = lib.makeBinPath (
     [
@@ -192,11 +192,10 @@ stdenv.mkDerivation rec {
     makeWrapper
     pkg-config
     mdbook
-    unzip
     nukeReferences
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     cacert
     foreman
     glibcLocales
@@ -207,7 +206,7 @@ stdenv.mkDerivation rec {
 
   configureFlags = [ "--with-docbook-xsl=${docbook_xsl}/xml/xsl/docbook" ];
 
-  NIX_CFLAGS_COMPILE = "-pthread";
+  env.NIX_CFLAGS_COMPILE = "-pthread";
 
   OPENLDAP_ROOT = openldap;
 
@@ -258,8 +257,9 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "Nix-based continuous build system";
+    homepage = "https://nixos.org/hydra";
     license = licenses.gpl3;
     platforms = platforms.linux;
-    maintainers = with maintainers; [ lheckemann mindavi das_j ];
+    maintainers = with maintainers; [ lheckemann mindavi ] ++ teams.helsinki-systems.members;
   };
 }

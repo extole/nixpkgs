@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "pivy";
   version = "0.6.8";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "coin3d";
@@ -23,7 +24,7 @@ buildPythonPackage rec {
     libXi libXext libSM libICE libX11
   ];
 
-  NIX_CFLAGS_COMPILE = toString [
+  env.NIX_CFLAGS_COMPILE = toString [
     "-I${qtbase.dev}/include/QtCore"
     "-I${qtbase.dev}/include/QtGui"
     "-I${qtbase.dev}/include/QtOpenGL"

@@ -31,7 +31,7 @@
 
 buildPythonPackage rec {
   pname = "qiskit-aer";
-  version = "0.10.4";
+  version = "0.13.1";
   format = "pyproject";
 
   disabled = pythonOlder "3.6";
@@ -39,8 +39,8 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "Qiskit";
     repo = "qiskit-aer";
-    rev = version;
-    sha256 = "sha256-mf+Pgw/daFkt1bvqSeYzlO/Sd2F2MtwZcLr+h1u+eb0=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-GxQgqCUDwalgM9m+XeRiZCRL93KrCSUPoLvDgHJJGCQ=";
   };
 
   postPatch = ''
@@ -120,7 +120,7 @@ buildPythonPackage rec {
     "test_extended_stabilizer_sparse_output_probs"
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     ddt
     fixtures
@@ -147,7 +147,7 @@ buildPythonPackage rec {
   postCheck = "popd";
 
   meta = with lib; {
-    broken = (stdenv.isLinux && stdenv.isAarch64);
+    broken = true;
     description = "High performance simulators for Qiskit";
     homepage = "https://qiskit.org/aer";
     downloadPage = "https://github.com/QISKit/qiskit-aer/releases";

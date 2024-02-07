@@ -1,15 +1,23 @@
-{ lib, stdenv, fetchurl, python, qmake,
+{ lib, stdenv, fetchFromGitHub, fetchpatch, python, qmake,
   qtwebengine, qtxmlpatterns,
   qttools, unzip }:
 
 stdenv.mkDerivation rec {
-  version = "3.2";
   pname = "python-qt";
+  version = "3.4.2";
 
-  src = fetchurl {
-    url="mirror://sourceforge/pythonqt/PythonQt${version}.zip";
-    sha256="13hzprk58m3yj39sj0xn6acg8796lll1256mpd81kw0z3yykyl8c";
+  src = fetchFromGitHub {
+    owner = "MeVisLab";
+    repo = "pythonqt";
+    rev = "v${version}";
+    hash = "sha256-xJYOD07ACOKtY3psmfHNSCjm6t0fr8JU9CrL0w5P5G0=";
   };
+
+  # https://github.com/CsoundQt/CsoundQt/blob/develop/BUILDING.md#pythonqt
+  postPatch = ''
+    substituteInPlace build/python.prf \
+      --replace "PYTHON_VERSION=2.7" "PYTHON_VERSION=${python.pythonVersion}"
+  '';
 
   hardeningDisable = [ "all" ];
 
@@ -17,10 +25,10 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ python ];
 
-  qmakeFlags = [ "PythonQt.pro"
-                 "INCLUDEPATH+=${python}/include/python3.6"
-                 "PYTHON_PATH=${python}/bin"
-                 "PYTHON_LIB=${python}/lib"];
+  qmakeFlags = [
+    "PythonQt.pro"
+    "PYTHON_DIR=${python}"
+  ];
 
   dontWrapQtApps = true;
 
@@ -36,7 +44,7 @@ stdenv.mkDerivation rec {
 
   meta = with lib; {
     description = "PythonQt is a dynamic Python binding for the Qt framework. It offers an easy way to embed the Python scripting language into your C++ Qt applications";
-    homepage = "http://pythonqt.sourceforge.net/";
+    homepage = "https://pythonqt.sourceforge.net/";
     license = licenses.lgpl21;
     platforms = platforms.all;
     maintainers = with maintainers; [ hlolli ];

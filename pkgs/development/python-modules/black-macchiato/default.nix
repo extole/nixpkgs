@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "black-macchiato";
   version = "1.3.0";
+  format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
@@ -21,7 +22,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ black ];
 
-  checkInputs = [ pytestCheckHook black ];
+  nativeCheckInputs = [ pytestCheckHook black ];
 
   pythonImportsCheck = [ "black" ];
 

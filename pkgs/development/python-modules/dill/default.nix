@@ -1,48 +1,50 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
-, pytestCheckHook
+, python
+, pythonOlder
+, setuptools
+
+# passthru tests
+, apache-beam
+, datasets
 }:
 
 buildPythonPackage rec {
   pname = "dill";
-  version = "0.3.5.1";
+  version = "0.3.7";
+  format = "pyproject";
+
+  disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "uqfoundation";
     repo = pname;
     rev = "refs/tags/dill-${version}";
-    sha256 = "sha256-gWE7aQodblgHjUqGAzOJGgxJ4qx9wHo/DU4KRE6JMWo=";
+    hash = "sha256-1cRGA5RuNjlpc3jq9SAsUYgmPauIV8zRF9SxOmveljI=";
   };
 
-  checkInputs = [
-    pytestCheckHook
+  nativeBuildInputs = [
+    setuptools
   ];
 
-  # Tests seem to fail because of import pathing and referencing items/classes in modules.
-  # Seems to be a Nix/pathing related issue, not the codebase, so disabling failing tests.
-  disabledTestPaths = [
-    "tests/test_diff.py"
-    "tests/test_module.py"
-    "tests/test_objects.py"
-    "tests/test_session.py"
-  ];
+  checkPhase = ''
+    runHook preCheck
+    ${python.interpreter} dill/tests/__main__.py
+    runHook postCheck
+  '';
 
-  disabledTests = [
-    "test_class_objects"
-    "test_importable"
-    "test_method_decorator"
-    "test_the_rest"
-    # test exception catching needs updating, can probably be removed with next update
-    "test_recursive_function"
-  ];
+  passthru.tests = {
+    inherit apache-beam datasets;
+  };
 
   pythonImportsCheck = [ "dill" ];
 
   meta = with lib; {
     description = "Serialize all of python (almost)";
     homepage = "https://github.com/uqfoundation/dill/";
+    changelog = "https://github.com/uqfoundation/dill/releases/tag/dill-${version}";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [ tjni ];
   };
 }

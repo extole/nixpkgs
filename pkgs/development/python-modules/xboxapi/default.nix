@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "xboxapi";
   version = "2.0.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "mKeRix";
@@ -18,7 +19,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ requests ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "xboxapi" ];
 

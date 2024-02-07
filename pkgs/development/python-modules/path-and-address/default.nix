@@ -6,6 +6,7 @@
 
 buildPythonPackage rec {
   version = "2.0.1";
+  format = "setuptools";
   pname = "path-and-address";
 
   src = fetchFromGitHub {
@@ -15,7 +16,7 @@ buildPythonPackage rec {
     sha256 = "0b0afpsaim06mv3lhbpm8fmawcraggc11jhzr6h72kdj1cqjk5h6";
   };
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   checkPhase = ''
     py.test

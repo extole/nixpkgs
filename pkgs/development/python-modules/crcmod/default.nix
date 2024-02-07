@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "crcmod";
   version = "1.7";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -11,7 +12,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "Python module for generating objects that compute the Cyclic Redundancy Check (CRC)";
-    homepage = "http://crcmod.sourceforge.net/";
+    homepage = "https://crcmod.sourceforge.net/";
     license = licenses.mit;
   };
 }

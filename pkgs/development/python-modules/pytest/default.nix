@@ -3,29 +3,38 @@
 , callPackage
 , pythonOlder
 , fetchPypi
-, isPyPy
 , writeText
 
-# build
+# build-system
+, setuptools
 , setuptools-scm
 
-# propagates
+# dependencies
 , attrs
+, exceptiongroup
 , iniconfig
 , packaging
 , pluggy
-, py
 , tomli
+
+# optional-dependencies
+, argcomplete
+, hypothesis
+, mock
+, nose
+, pygments
+, requests
+, xmlschema
 }:
 
 buildPythonPackage rec {
   pname = "pytest";
-  version = "7.1.3";
-  format = "pyproject";
+  version = "7.4.3";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-TzZf7C3/nBFi+DTZ8YrxuhMGLbDHCL97lG+KXHYYDDk=";
+    hash = "sha256-2YnRNpgt5OOynavMg4rVgcZOjtUsEfvobd69naCBjNU=";
   };
 
   outputs = [
@@ -34,17 +43,32 @@ buildPythonPackage rec {
   ];
 
   nativeBuildInputs = [
+    setuptools
     setuptools-scm
   ];
 
   propagatedBuildInputs = [
-    attrs
     iniconfig
     packaging
     pluggy
-    py
+  ] ++ lib.optionals (pythonOlder "3.11") [
+    exceptiongroup
     tomli
   ];
+
+  passthru.optional-dependencies = {
+    testing = [
+      argcomplete
+      attrs
+      hypothesis
+      mock
+      nose
+      pygments
+      requests
+      setuptools
+      xmlschema
+    ];
+  };
 
   postInstall = ''
     mkdir $testout
@@ -69,7 +93,7 @@ buildPythonPackage rec {
     # - files are not needed after tests are finished
     pytestRemoveBytecodePhase () {
         # suffix is defined at:
-        #    https://github.com/pytest-dev/pytest/blob/7.1.3/src/_pytest/assertion/rewrite.py#L51-L53
+        #    https://github.com/pytest-dev/pytest/blob/7.2.1/src/_pytest/assertion/rewrite.py#L51-L53
         find $out -name "*-pytest-*.py[co]" -delete
     }
     preDistPhases+=" pytestRemoveBytecodePhase"

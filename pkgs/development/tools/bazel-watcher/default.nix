@@ -29,13 +29,13 @@ let
 in
 buildBazelPackage rec {
   pname = "bazel-watcher";
-  version = "0.17.0";
+  version = "0.23.1";
 
   src = fetchFromGitHub {
     owner = "bazelbuild";
     repo = "bazel-watcher";
     rev = "v${version}";
-    sha256 = "sha256-aK18Q2nYxYajk9f/EEmtV7YJ8cYqbamR7vh3BTgu53Q=";
+    sha256 = "sha256-fnhbxrgwffFQDIRLGisi1Wk3EjfkN8Mi8wtWT/Gy+78=";
   };
 
   nativeBuildInputs = [ go git python3 ];
@@ -44,7 +44,7 @@ buildBazelPackage rec {
   bazel = bazel_5;
   bazelFlags = [ "--override_repository=rules_proto=${rulesProto}" ];
   bazelBuildFlags = lib.optionals stdenv.cc.isClang [ "--cxxopt=-x" "--cxxopt=c++" "--host_cxxopt=-x" "--host_cxxopt=c++" ];
-  bazelTarget = "//ibazel";
+  bazelTargets = [ "//cmd/ibazel" ];
 
   fetchConfigured = false; # we want to fetch all dependencies, regardless of the current system
   fetchAttrs = {
@@ -81,7 +81,7 @@ buildBazelPackage rec {
       rm -rf $bazelOut/external/com_google_protobuf
     '';
 
-    sha256 = "sha256-R+Hc9ldYcKgAXETKr2+Hk7IrjJ93WkrjyJ1SQRoM9V4=";
+    sha256 = "sha256-7/sLGgUCG4SU2nbK0596467dlrKylewiewhIvNFTMvY=";
   };
 
   buildAttrs = {
@@ -90,12 +90,12 @@ buildBazelPackage rec {
     preBuild = ''
       patchShebangs .
 
-      substituteInPlace ibazel/BUILD --replace '{STABLE_GIT_VERSION}' ${version}
+      substituteInPlace cmd/ibazel/BUILD.bazel --replace '{STABLE_GIT_VERSION}' ${version}
       echo ${bazel_5.version} > .bazelversion
     '';
 
     installPhase = ''
-      install -Dm755 bazel-bin/ibazel/ibazel_/ibazel $out/bin/ibazel
+      install -Dm755 bazel-bin/cmd/ibazel/ibazel_/ibazel $out/bin/ibazel
     '';
   };
 

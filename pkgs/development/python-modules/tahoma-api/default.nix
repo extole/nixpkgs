@@ -7,12 +7,13 @@
 buildPythonPackage rec {
   pname = "tahoma-api";
   version = "0.0.17";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "philklei";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-YwOKSBlN4lNyS+hfdbQDUq1gc14FBof463ofxtUVLC4=";
+    hash = "sha256-YwOKSBlN4lNyS+hfdbQDUq1gc14FBof463ofxtUVLC4=";
   };
 
   propagatedBuildInputs = [ requests ];

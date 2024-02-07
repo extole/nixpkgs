@@ -2,6 +2,7 @@
 , aiohttp
 , attrs
 , backoff
+, backports-strenum
 , boto3
 , buildPythonPackage
 , fetchFromGitHub
@@ -15,7 +16,7 @@
 
 buildPythonPackage rec {
   pname = "pyoverkiz";
-  version = "1.5.6";
+  version = "1.13.4";
   format = "pyproject";
 
   disabled = pythonOlder "3.7";
@@ -24,7 +25,7 @@ buildPythonPackage rec {
     owner = "iMicknl";
     repo = "python-overkiz-api";
     rev = "refs/tags/v${version}";
-    hash = "sha256-8Xzrnt5W3kQf+kHHiAWimyw4uHc3UL9BsZePcAYKHNk=";
+    hash = "sha256-VMf6WBWf33KEWJG8UtCDZCa20a8kmVd5UpLIcJgzDis=";
   };
 
   postPatch = ''
@@ -37,15 +38,16 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [
-    attrs
     aiohttp
+    attrs
     backoff
-    pyhumps
+    backports-strenum
     boto3
+    pyhumps
     warrant-lite
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest-asyncio
     pytestCheckHook
   ];
@@ -57,6 +59,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Module to interact with the Somfy TaHoma API or other OverKiz APIs";
     homepage = "https://github.com/iMicknl/python-overkiz-api";
+    changelog = "https://github.com/iMicknl/python-overkiz-api/releases/tag/v${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

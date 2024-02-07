@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "foobot-async";
   version = "1.0.0";
+  format = "setuptools";
 
   disabled = pythonOlder "3.5";
 
@@ -25,7 +26,7 @@ buildPythonPackage rec {
     async-timeout
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aioresponses
     pytestCheckHook
   ];

@@ -6,20 +6,21 @@
 , installShellFiles
 , util-linux
 , nixosTests
+, kubernetes
 }:
 
 buildGoModule rec {
   pname = "containerd";
-  version = "1.6.9";
+  version = "1.7.12";
 
   src = fetchFromGitHub {
     owner = "containerd";
     repo = "containerd";
     rev = "v${version}";
-    sha256 = "sha256-KvQdYQLzgt/MKPsA/mO5un6nE3/xcvVYwIveNn/uDnU=";
+    hash = "sha256-o3ZqSE7ahUAihY/tqXdNgKzs64h0DBxrZaxjSF9smcs=";
   };
 
-  vendorSha256 = null;
+  vendorHash = null;
 
   nativeBuildInputs = [ go-md2man installShellFiles util-linux ];
 
@@ -42,13 +43,14 @@ buildGoModule rec {
     runHook postInstall
   '';
 
-  passthru.tests = { inherit (nixosTests) docker; };
+  passthru.tests = { inherit (nixosTests) docker; } // kubernetes.tests;
 
   meta = with lib; {
+    changelog = "https://github.com/containerd/containerd/releases/tag/${src.rev}";
     homepage = "https://containerd.io/";
     description = "A daemon to control runC";
     license = licenses.asl20;
-    maintainers = with maintainers; [ offline vdemeester endocrimes zowoq ];
+    maintainers = with maintainers; [ offline vdemeester endocrimes ];
     platforms = platforms.linux;
   };
 }

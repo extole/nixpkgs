@@ -18,23 +18,23 @@
 
 mkDerivation rec {
   pname = "lxqt-powermanagement";
-  version = "1.1.0";
+  version = "1.4.0";
 
   src = fetchFromGitHub {
     owner = "lxqt";
     repo = pname;
     rev = version;
-    sha256 = "+FpJD5PEH2/HOSWDQEwMX2sV2JJH0kjcoohBolhSP1A=";
+    hash = "sha256-1koP+ElW5e85TJqToaErnGkTn3uRHk45bDDrXG6Oy68=";
   };
 
   nativeBuildInputs = [
     cmake
     lxqt-build-tools
+    qttools
   ];
 
   buildInputs = [
     qtbase
-    qttools
     qtx11extras
     qtsvg
     kwindowsystem

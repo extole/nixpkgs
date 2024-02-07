@@ -1,61 +1,69 @@
 { lib
 , python3
+, fetchPypi
 , fetchFromGitHub
 , withE2BE ? true
-, withHQthumbnails ? false
 }:
 
 let
   python = python3.override {
     packageOverrides = self: super: {
       tulir-telethon = self.telethon.overridePythonAttrs (oldAttrs: rec {
-        version = "1.26.0a5";
+        version = "1.34.0a2";
         pname = "tulir-telethon";
-        src = super.fetchPypi {
+        src = fetchPypi {
           inherit pname version;
-          sha256 = "sha256-s6pj9kHqcl6XU1KQ/aOw1XWQ3CyDotaDl0m7aj9SbW4=";
+          hash = "sha256-+3mk+H0sQD3ssEPihE/PvWpYVZzkGQMXhFS64m7joJ8=";
         };
         doCheck = false;
       });
     };
   };
-in python.pkgs.buildPythonPackage rec {
+in
+python.pkgs.buildPythonPackage rec {
   pname = "mautrix-telegram";
-  version = "0.12.1";
+  version = "0.15.1";
   disabled = python.pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "mautrix";
     repo = "telegram";
-    rev = "v${version}";
-    sha256 = "sha256-ecNcoNz++HtuDZnDLsXfPL0MRF+XMQ1BU/NFkKPbD5U=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-9ZXyjfbDRwO0wRPMGstlLIKvztp2xAjoqpTwBYJji/4=";
   };
+
+  format = "setuptools";
 
   patches = [ ./0001-Re-add-entrypoint.patch ];
 
   propagatedBuildInputs = with python.pkgs; ([
     ruamel-yaml
     python-magic
-    CommonMark
+    commonmark
     aiohttp
     yarl
     mautrix
     tulir-telethon
     asyncpg
-    Mako
-    # optional
+    mako
+    setuptools
+    # speedups
     cryptg
-    cchardet
     aiodns
     brotli
+    # qr_login
     pillow
     qrcode
+    # formattednumbers
     phonenumbers
+    # metrics
     prometheus-client
+    # sqlite
     aiosqlite
-  ] ++ lib.optionals withHQthumbnails [
-    moviepy
+    # proxy support
+    pysocks
   ] ++ lib.optionals withE2BE [
+    # e2be
     python-olm
     pycryptodome
     unpaddedbase64
@@ -70,5 +78,6 @@ in python.pkgs.buildPythonPackage rec {
     license = licenses.agpl3Plus;
     platforms = platforms.linux;
     maintainers = with maintainers; [ nyanloutre ma27 nickcao ];
+    mainProgram = "mautrix-telegram";
   };
 }

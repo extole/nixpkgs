@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "picos";
   version = "2.0";
+  format = "setuptools";
 
   src = fetchFromGitLab {
     owner = "picos-api";
@@ -19,7 +20,7 @@ buildPythonPackage rec {
   };
 
   # Needed only for the tests
-  checkInputs = [
+  nativeCheckInputs = [
     networkx
   ];
 

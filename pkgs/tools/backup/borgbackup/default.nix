@@ -6,20 +6,37 @@
 , lz4
 , openssh
 , openssl
-, python3
+, python3Packages
+, xxHash
 , zstd
 , installShellFiles
 , nixosTests
+, fetchPypi
 }:
 
-python3.pkgs.buildPythonApplication rec {
+let
+  python = python3Packages.python.override {
+    packageOverrides = self: super: {
+      msgpack = super.msgpack.overrideAttrs (oldAttrs: rec {
+        version ="1.0.4";
+
+        src = fetchPypi {
+          pname = "msgpack";
+          inherit version;
+          hash = "sha256-9dhpwY8DAgLrQS8Iso0q/upVPWYTruieIA16yn7wH18=";
+        };
+      });
+    };
+  };
+in
+python.pkgs.buildPythonApplication rec {
   pname = "borgbackup";
-  version = "1.2.2";
+  version = "1.2.7";
   format = "pyproject";
 
-  src = python3.pkgs.fetchPypi {
+  src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-1zBodEPxvrYCsdcrrjYxj2+WVIGPzcUEWFQOxXnlcmA=";
+    hash = "sha256-9j8oozg8BBlxzsh7BhyjmoFbX9RF2ySqgXLKxBfZQRo=";
   };
 
   postPatch = ''
@@ -28,13 +45,14 @@ python3.pkgs.buildPythonApplication rec {
       --replace "0o4755" "0o0755"
   '';
 
-  nativeBuildInputs = with python3.pkgs; [
+  nativeBuildInputs = with python.pkgs; [
     cython
     setuptools-scm
+    pkgconfig
 
     # docs
     sphinxHook
-    guzzle_sphinx_theme
+    guzzle-sphinx-theme
 
     # shell completions
     installShellFiles
@@ -45,24 +63,18 @@ python3.pkgs.buildPythonApplication rec {
   buildInputs = [
     libb2
     lz4
+    xxHash
     zstd
     openssl
   ] ++ lib.optionals stdenv.isLinux [
     acl
   ];
 
-  propagatedBuildInputs = with python3.pkgs; [
+  propagatedBuildInputs = with python.pkgs; [
     msgpack
     packaging
     (if stdenv.isLinux then pyfuse3 else llfuse)
   ];
-
-  preConfigure = ''
-    export BORG_OPENSSL_PREFIX="${openssl.dev}"
-    export BORG_LZ4_PREFIX="${lz4.dev}"
-    export BORG_LIBB2_PREFIX="${libb2}"
-    export BORG_LIBZSTD_PREFIX="${zstd.dev}"
-  '';
 
   makeWrapperArgs = [
     ''--prefix PATH ':' "${openssh}/bin"''
@@ -75,8 +87,9 @@ python3.pkgs.buildPythonApplication rec {
       --zsh scripts/shell_completions/zsh/_borg
   '';
 
-  checkInputs = with python3.pkgs; [
+  nativeCheckInputs = with python.pkgs; [
     e2fsprogs
+    py
     python-dateutil
     pytest-benchmark
     pytest-xdist
@@ -117,6 +130,7 @@ python3.pkgs.buildPythonApplication rec {
   outputs = [ "out" "doc" "man" ];
 
   meta = with lib; {
+    changelog = "https://github.com/borgbackup/borg/blob/${version}/docs/changes.rst";
     description = "Deduplicating archiver with compression and encryption";
     homepage = "https://www.borgbackup.org";
     license = licenses.bsd3;

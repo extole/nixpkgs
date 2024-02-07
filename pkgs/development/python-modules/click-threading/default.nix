@@ -10,13 +10,14 @@
 buildPythonPackage rec {
   pname = "click-threading";
   version = "0.5.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-rc/mI8AqWVwQfDFAcvZ6Inj+TrQLcsDRoskDzHivNDk=";
+    hash = "sha256-rc/mI8AqWVwQfDFAcvZ6Inj+TrQLcsDRoskDzHivNDk=";
   };
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
   propagatedBuildInputs = [ click ] ++ lib.optional (!isPy3k) futures;
 
   checkPhase = ''

@@ -8,12 +8,13 @@
 buildPythonPackage rec {
   pname = "fabulous";
   version = "0.4.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "jart";
     repo = pname;
     rev = version;
-    sha256 = "sha256-hchlxuB5QP+VxCx+QZ2739/mR5SQmYyE+9kXLKJ2ij4=";
+    hash = "sha256-hchlxuB5QP+VxCx+QZ2739/mR5SQmYyE+9kXLKJ2ij4=";
   };
 
   patches = [

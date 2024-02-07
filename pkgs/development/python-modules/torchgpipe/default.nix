@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "torchgpipe";
   version = "0.0.7";
+  format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
@@ -26,7 +27,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ torch ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
   disabledTests = [
     "test_inplace_on_requires_grad"
     "test_input_requiring_grad"

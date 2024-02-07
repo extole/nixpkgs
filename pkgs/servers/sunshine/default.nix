@@ -1,6 +1,9 @@
 { lib
 , stdenv
 , fetchFromGitHub
+, autoPatchelfHook
+, makeWrapper
+, buildNpmPackage
 , cmake
 , avahi
 , libevdev
@@ -9,7 +12,6 @@
 , libxcb
 , openssl
 , libopus
-, ffmpeg-full
 , boost
 , pkg-config
 , libdrm
@@ -17,32 +19,72 @@
 , libffi
 , libcap
 , mesa
-, cudaSupport ? false
+, curl
+, pcre
+, pcre2
+, libuuid
+, libselinux
+, libsepol
+, libthai
+, libdatrie
+, libxkbcommon
+, libepoxy
+, libva
+, libvdpau
+, libglvnd
+, numactl
+, amf-headers
+, intel-media-sdk
+, svt-av1
+, vulkan-loader
+, libappindicator
+, libnotify
+, config
+, cudaSupport ? config.cudaSupport
 , cudaPackages ? {}
 }:
-
 stdenv.mkDerivation rec {
   pname = "sunshine";
-  version = "0.14.1";
+  version = "0.21.0";
 
   src = fetchFromGitHub {
     owner = "LizardByte";
     repo = "Sunshine";
     rev = "v${version}";
-    sha256 = "sha256-SB2DAOYf2izIwwRWEw2wt5L5oCDbb6YOqXw/z/PD1pQ=";
+    sha256 = "sha256-uvQAJkoKazFLz5iTpYSAGYJQZ2EprQ+p9+tryqorFHM=";
     fetchSubmodules = true;
+  };
+
+  # fetch node_modules needed for webui
+  ui = buildNpmPackage {
+    inherit src version;
+    pname = "sunshine-ui";
+    npmDepsHash = "sha256-+T1XAf4SThoJLOFpnVxDa2qiKFLIKQPGewjA83GQovM=";
+
+    dontNpmBuild = true;
+
+    # use generated package-lock.json as upstream does not provide one
+    postPatch = ''
+      cp ${./package-lock.json} ./package-lock.json
+    '';
+
+    installPhase = ''
+      mkdir -p $out
+      cp -r node_modules $out/
+    '';
   };
 
   nativeBuildInputs = [
     cmake
     pkg-config
+    autoPatchelfHook
+    makeWrapper
   ] ++ lib.optionals cudaSupport [
     cudaPackages.autoAddOpenGLRunpathHook
   ];
 
   buildInputs = [
     avahi
-    ffmpeg-full
     libevdev
     libpulseaudio
     xorg.libX11
@@ -50,6 +92,7 @@ stdenv.mkDerivation rec {
     xorg.libXfixes
     xorg.libXrandr
     xorg.libXtst
+    xorg.libXi
     openssl
     libopus
     boost
@@ -59,53 +102,76 @@ stdenv.mkDerivation rec {
     libevdev
     libcap
     libdrm
+    curl
+    pcre
+    pcre2
+    libuuid
+    libselinux
+    libsepol
+    libthai
+    libdatrie
+    xorg.libXdmcp
+    libxkbcommon
+    libepoxy
+    libva
+    libvdpau
+    numactl
     mesa
+    amf-headers
+    svt-av1
+    libappindicator
+    libnotify
   ] ++ lib.optionals cudaSupport [
     cudaPackages.cudatoolkit
+  ] ++ lib.optionals stdenv.isx86_64 [
+    intel-media-sdk
   ];
 
-  CXXFLAGS = [
-    "-Wno-format-security"
-  ];
-  CFLAGS = [
-    "-Wno-format-security"
+  runtimeDependencies = [
+    avahi
+    mesa
+    xorg.libXrandr
+    libxcb
+    libglvnd
   ];
 
   cmakeFlags = [
-    "-D" "FFMPEG_LIBRARIES=${ffmpeg-full}/lib"
-    "-D" "FFMPEG_INCLUDE_DIRS=${ffmpeg-full}/include"
-    "-D" "LIBAVCODEC_INCLUDE_DIR=${ffmpeg-full}/include"
-    "-D" "LIBAVCODEC_LIBRARIES=${ffmpeg-full}/lib/libavcodec.so"
-    "-D" "LIBAVDEVICE_INCLUDE_DIR=${ffmpeg-full}/include"
-    "-D" "LIBAVDEVICE_LIBRARIES=${ffmpeg-full}/lib/libavdevice.so"
-    "-D" "LIBAVFORMAT_INCLUDE_DIR=${ffmpeg-full}/include"
-    "-D" "LIBAVFORMAT_LIBRARIES=${ffmpeg-full}/lib/libavformat.so"
-    "-D" "LIBAVUTIL_INCLUDE_DIR=${ffmpeg-full}/include"
-    "-D" "LIBAVUTIL_LIBRARIES=${ffmpeg-full}/lib/libavutil.so"
-    "-D" "LIBSWSCALE_LIBRARIES=${ffmpeg-full}/lib/libswscale.so"
-    "-D" "LIBSWSCALE_INCLUDE_DIR=${ffmpeg-full}/include"
+    "-Wno-dev"
   ];
 
   postPatch = ''
-    # Don't force the need for a static boost, fix hardcoded libevdev path
-    substituteInPlace CMakeLists.txt \
-      --replace 'set(Boost_USE_STATIC_LIBS ON)' '# set(Boost_USE_STATIC_LIBS ON)' \
+    # fix hardcoded libevdev path
+    substituteInPlace cmake/compile_definitions/linux.cmake \
       --replace '/usr/include/libevdev-1.0' '${libevdev}/include/libevdev-1.0'
 
-    # fix libgbm path
-    substituteInPlace src/platform/linux/graphics.cpp \
-      --replace 'handle = dyn::handle({ "libgbm.so.1", "libgbm.so" });' 'handle = dyn::handle({ "${mesa}/lib/libgbm.so.1", "${mesa}/lib/libgbm.so" });'
-
-    # fix avahi path
-    substituteInPlace src/platform/linux/publish.cpp \
-      --replace 'handle = dyn::handle({ "libavahi-client.so.3", "libavahi-client.so" });' 'handle = dyn::handle({ "${avahi}/lib/libavahi-client.so.3", "${avahi}/lib/libavahi-client.so" });' \
-      --replace 'handle = dyn::handle({ "libavahi-common.so.3", "libavahi-common.so" });' 'handle = dyn::handle({ "${avahi}/lib/libavahi-common.so.3", "${avahi}/lib/libavahi-common.so" });'
+    substituteInPlace packaging/linux/sunshine.desktop \
+      --replace '@PROJECT_NAME@' 'Sunshine' \
+      --replace '@PROJECT_DESCRIPTION@' 'Self-hosted game stream host for Moonlight'
   '';
 
+  preBuild = ''
+    # copy node_modules where they can be picked up by build
+    mkdir -p ../node_modules
+    cp -r ${ui}/node_modules/* ../node_modules
+  '';
+
+  # allow Sunshine to find libvulkan
+  postFixup = lib.optionalString cudaSupport ''
+    wrapProgram $out/bin/sunshine \
+      --set LD_LIBRARY_PATH ${lib.makeLibraryPath [ vulkan-loader ]}
+  '';
+
+  postInstall = ''
+    install -Dm644 ../packaging/linux/${pname}.desktop $out/share/applications/${pname}.desktop
+  '';
+
+  passthru.updateScript = ./updater.sh;
+
   meta = with lib; {
-    description = "Sunshine is a Game stream host for Moonlight.";
-    homepage = "https://docs.lizardbyte.dev/projects/sunshine/";
+    description = "Sunshine is a Game stream host for Moonlight";
+    homepage = "https://github.com/LizardByte/Sunshine";
     license = licenses.gpl3Only;
+    mainProgram = "sunshine";
     maintainers = with maintainers; [ devusb ];
     platforms = platforms.linux;
   };

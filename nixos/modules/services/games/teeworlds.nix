@@ -70,7 +70,7 @@ in
       };
 
       port = mkOption {
-        type = types.int;
+        type = types.port;
         default = 8303;
         description = lib.mdDoc ''
           Port the server will listen on.
@@ -100,7 +100,7 @@ in
 
       serviceConfig = {
         DynamicUser = true;
-        ExecStart = "${pkgs.teeworlds}/bin/teeworlds_srv -f ${teeworldsConf}";
+        ExecStart = "${pkgs.teeworlds-server}/bin/teeworlds_srv -f ${teeworldsConf}";
 
         # Hardening
         CapabilityBoundingSet = false;

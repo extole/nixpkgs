@@ -9,15 +9,19 @@
 
 buildPythonPackage rec {
   pname = "cftime";
-  version = "1.6.2";
+  version = "1.6.3";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-hhTAD7ilBG3jBP3Ybb0iT5lAgYXXskWsZijQJ2WW5tI=";
+    hash = "sha256-0Kayn3KhPwjgCLm+z/JHzHXISsshMzLt4Yh5xbaqTf0=";
   };
+
+  postPatch = ''
+    sed -i "/--cov/d" setup.cfg
+  '';
 
   nativeBuildInputs = [
     cython
@@ -28,13 +32,9 @@ buildPythonPackage rec {
     numpy
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
-
-  postPatch = ''
-    sed -i "/--cov/d" setup.cfg
-  '';
 
   pythonImportsCheck = [
     "cftime"

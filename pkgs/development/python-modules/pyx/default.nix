@@ -7,12 +7,13 @@
 buildPythonPackage rec {
   pname = "pyx";
   version = "0.16";
+  format = "setuptools";
   disabled = !isPy3k;
 
   src = fetchPypi {
     pname = "PyX";
     inherit version;
-    sha256 = "sha256-TY4+RxzT6am9E9UIbN98CvGww/PhledPX2MxjcQKZtg=";
+    hash = "sha256-TY4+RxzT6am9E9UIbN98CvGww/PhledPX2MxjcQKZtg=";
   };
 
   # No tests in archive
@@ -20,7 +21,7 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "Python package for the generation of PostScript, PDF, and SVG files";
-    homepage = "http://pyx.sourceforge.net/";
+    homepage = "https://pyx.sourceforge.net/";
     license = with licenses; [ gpl2 ];
   };
 }

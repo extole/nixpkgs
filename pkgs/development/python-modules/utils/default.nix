@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "utils";
   version = "1.0.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "haaksmash";
@@ -16,7 +17,7 @@ buildPythonPackage rec {
     sha256 = "07pr39cfw5ayzkp6h53y7lfpd0w19pphsdzsf100fsyy3npavgbr";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytestCheckHook
   ];

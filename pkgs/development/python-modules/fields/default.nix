@@ -3,10 +3,11 @@
 buildPythonPackage rec {
   pname = "fields";
   version = "5.0.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-MdSqA9jUTjXfE8Qx3jUTaZfwR6kkpZfYT3vCCeG+Vyc=";
+    hash = "sha256-MdSqA9jUTjXfE8Qx3jUTaZfwR6kkpZfYT3vCCeG+Vyc=";
   };
 
   pythonImportsCheck = [ "fields" ];

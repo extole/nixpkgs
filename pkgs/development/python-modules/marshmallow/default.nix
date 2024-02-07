@@ -6,27 +6,32 @@
 , pytz
 , simplejson
 , packaging
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "marshmallow";
-  version = "3.16.0";
-  format = "setuptools";
+  version = "3.20.2";
+  pyproject = true;
 
-  disabled = pythonOlder "3.6";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "marshmallow-code";
-    repo = pname;
-    rev = version;
-    hash = "sha256-bR10hYViK7OrAaBpKaeM7S5XyHQZhlGUQTwH/EJ0kME=";
+    repo = "marshmallow";
+    rev = "refs/tags/${version}";
+    hash = "sha256-z6Quf6uTelGwB/uYayVXtVmculwaoI5LL8I0kKiM/e8=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     packaging
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytz
     simplejson
@@ -39,6 +44,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Library for converting complex objects to and from simple Python datatypes";
     homepage = "https://github.com/marshmallow-code/marshmallow";
+    changelog = "https://github.com/marshmallow-code/marshmallow/blob/${version}/CHANGELOG.rst";
     license = licenses.mit;
     maintainers = with maintainers; [ cript0nauta ];
   };

@@ -21,7 +21,7 @@
 
 stdenv.mkDerivation rec {
   pname = "grpc";
-  version = "1.50.0"; # N.B: if you change this, please update:
+  version = "1.60.0"; # N.B: if you change this, please update:
     # pythonPackages.grpcio-tools
     # pythonPackages.grpcio-status
 
@@ -29,22 +29,16 @@ stdenv.mkDerivation rec {
     owner = "grpc";
     repo = "grpc";
     rev = "v${version}";
-    hash = "sha256-h79Ptx17tIMFpaaid4UGzbGDztee9JctfsEcetfude0=";
+    hash = "sha256-0mn+nQAgaurd1WomzcLUAYwp88l26qGkP+cP1SSYxsE=";
     fetchSubmodules = true;
   };
 
   patches = [
-    # Fix build on armv6l (https://github.com/grpc/grpc/pull/21341)
     (fetchpatch {
-      url = "https://github.com/grpc/grpc/commit/2f4cf1d9265c8e10fb834f0794d0e4f3ec5ae10e.patch";
-      sha256 = "0ams3jmgh9yzwmxcg4ifb34znamr7pb4qm0609kvil9xqvkqz963";
-    })
-
-    # Revert gRPC C++ Mutex to be an alias of Abseil, because it breaks dependent packages
-    (fetchpatch {
-      url = "https://github.com/grpc/grpc/commit/931f91b745cd5b2864a0d1787815871d0bd844ae.patch";
-      sha256 = "0vc93g2i4982ys4gzyaxdv9ni25yk10sxq3n7fkz8dypy8sylck7";
-      revert = true;
+      # armv6l support, https://github.com/grpc/grpc/pull/21341
+      name = "grpc-link-libatomic.patch";
+      url = "https://github.com/lopsided98/grpc/commit/a9b917666234f5665c347123d699055d8c2537b2.patch";
+      hash = "sha256-Lm0GQsz/UjBbXXEE14lT0dcRzVmCKycrlrdBJj+KLu8=";
     })
   ];
 
@@ -64,12 +58,21 @@ stdenv.mkDerivation rec {
     "-DBUILD_SHARED_LIBS=ON"
   ] ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform) [
     "-D_gRPC_PROTOBUF_PROTOC_EXECUTABLE=${buildPackages.protobuf}/bin/protoc"
-  ] ++ lib.optionals ((stdenv.hostPlatform.useLLVM or false) && lib.versionOlder stdenv.cc.cc.version "11.0") [
-    # Needs to be compiled with -std=c++11 for clang < 11. Interestingly this is
-    # only an issue with the useLLVM stdenv, not the darwin stdenv…
-    # https://github.com/grpc/grpc/issues/26473#issuecomment-860885484
-    "-DCMAKE_CXX_STANDARD=11"
-  ];
+    "-D_gRPC_CPP_PLUGIN=${buildPackages.grpc}/bin/grpc_cpp_plugin"
+  ]
+  # The build scaffold defaults to c++14 on darwin, even when the compiler uses
+  # a more recent c++ version by default [1]. However, downgrades are
+  # problematic, because the compatibility types in abseil will have different
+  # interface definitions than the ones used for building abseil itself.
+  # [1] https://github.com/grpc/grpc/blob/v1.57.0/CMakeLists.txt#L239-L243
+  ++ (let
+    defaultCxxIsOlderThan17 =
+      (stdenv.cc.isClang && lib.versionAtLeast stdenv.cc.cc.version "16.0")
+       || (stdenv.cc.isGNU && lib.versionAtLeast stdenv.cc.cc.version "11.0");
+    in lib.optionals (stdenv.hostPlatform.isDarwin && defaultCxxIsOlderThan17)
+  [
+    "-DCMAKE_CXX_STANDARD=17"
+  ]);
 
   # CMake creates a build directory by default, this conflicts with the
   # basel BUILD file on case-insensitive filesystems.
@@ -86,13 +89,17 @@ stdenv.mkDerivation rec {
     export LD_LIBRARY_PATH=$(pwd)''${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH
   '';
 
-  NIX_CFLAGS_COMPILE = lib.optionalString stdenv.cc.isClang "-Wno-error=unknown-warning-option"
-    + lib.optionalString stdenv.isAarch64 "-Wno-error=format-security";
+  env.NIX_CFLAGS_COMPILE = toString ([
+    "-Wno-error"
+  ] ++ lib.optionals stdenv.isDarwin [
+    # Workaround for https://github.com/llvm/llvm-project/issues/48757
+    "-Wno-elaborated-enum-base"
+  ]);
 
   enableParallelBuilds = true;
 
   passthru.tests = {
-    inherit (python3.pkgs) grpcio-status grpcio-tools;
+    inherit (python3.pkgs) grpcio-status grpcio-tools jaxlib;
     inherit arrow-cpp;
   };
 

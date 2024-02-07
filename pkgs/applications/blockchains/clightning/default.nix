@@ -18,15 +18,15 @@
 , zlib
 }:
 let
-  py3 = python3.withPackages (p: [ p.Mako ]);
+  py3 = python3.withPackages (p: [ p.mako ]);
 in
 stdenv.mkDerivation rec {
   pname = "clightning";
-  version = "0.12.1";
+  version = "23.11.2";
 
   src = fetchurl {
     url = "https://github.com/ElementsProject/lightning/releases/download/v${version}/clightning-v${version}.zip";
-    sha256 = "sha256-SlDDOJ6H2UVT/dof23CYSzCliAc+5CAYQc87AzOtYjg=";
+    sha256 = "sha256-n1+9Q493N/N5sr7sVpzhObtbKpEejsNUUhhbYPukveg=";
   };
 
   # when building on darwin we need dawin.cctools to provide the correct libtool
@@ -44,17 +44,23 @@ stdenv.mkDerivation rec {
       tools/generate-wire.py \
       tools/update-mocks.sh \
       tools/mockup.sh \
-      devtools/sql-rewrite.py
+      devtools/sql-rewrite.py \
+      plugins/clnrest/clnrest.py
   '' else ''
     substituteInPlace external/libwally-core/tools/autogen.sh --replace gsed sed && \
     substituteInPlace external/libwally-core/configure.ac --replace gsed sed
   '';
 
-  configureFlags = [ "--disable-developer" "--disable-valgrind" ];
+  configureFlags = [ "--disable-valgrind" ];
 
   makeFlags = [ "VERSION=v${version}" ];
 
   enableParallelBuilding = true;
+
+  # workaround for build issue, happens only x86_64-darwin, not aarch64-darwin
+  # ccan/ccan/fdpass/fdpass.c:16:8: error: variable length array folded to constant array as an extension [-Werror,-Wgnu-folding-constant]
+  #                 char buf[CMSG_SPACE(sizeof(fd))];
+  env.NIX_CFLAGS_COMPILE = lib.optionalString (stdenv.isDarwin && stdenv.isx86_64) "-Wno-error=gnu-folding-constant";
 
   meta = with lib; {
     description = "A Bitcoin Lightning Network implementation in C";

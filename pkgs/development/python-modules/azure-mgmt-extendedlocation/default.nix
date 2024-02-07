@@ -7,11 +7,12 @@
 buildPythonPackage rec {
   pname = "azure-mgmt-extendedlocation";
   version = "1.1.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
     extension = "zip";
-    sha256 = "sha256-jRo6EFP8Dg3i9U8HLfjED9QFfWbdg+X3o9PSf4eus9o=";
+    hash = "sha256-jRo6EFP8Dg3i9U8HLfjED9QFfWbdg+X3o9PSf4eus9o=";
   };
 
   propagatedBuildInputs = [

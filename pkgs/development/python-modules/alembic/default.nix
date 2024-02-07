@@ -2,34 +2,45 @@
 , buildPythonPackage
 , fetchPypi
 , pythonOlder
-, Mako
-, python-dateutil
-, sqlalchemy
+
+# build-system
+, setuptools
+
+# dependencies
 , importlib-metadata
 , importlib-resources
-, pytest-xdist
+, mako
+, sqlalchemy
+, typing-extensions
+
+# tests
 , pytestCheckHook
+, pytest-xdist
+, python-dateutil
 }:
 
 buildPythonPackage rec {
   pname = "alembic";
-  version = "1.8.1";
+  version = "1.13.0";
   format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-zQteRbFLcGQmuDPwY2m5ptXuA/gm7DI4cjzoyq9uX/o=";
+    hash = "sha256-q0s7lNLh5fgeNL6Km3t1dfyd1TmPzLC+81HsmxSHJiM=";
   };
 
+  nativeBuildInputs = [
+    setuptools
+  ];
+
   propagatedBuildInputs = [
-    Mako
-    python-dateutil
+    mako
     sqlalchemy
+    typing-extensions
   ] ++ lib.optionals (pythonOlder "3.9") [
     importlib-resources
-  ] ++ lib.optionals (pythonOlder "3.8") [
     importlib-metadata
   ];
 
@@ -37,9 +48,10 @@ buildPythonPackage rec {
     "alembic"
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-xdist
+    python-dateutil
   ];
 
   meta = with lib; {
@@ -47,5 +59,6 @@ buildPythonPackage rec {
     description = "A database migration tool for SQLAlchemy";
     license = licenses.mit;
     maintainers = with maintainers; [ ];
+    mainProgram = "alembic";
   };
 }

@@ -5,12 +5,13 @@
 , poetry-core
 , pytestCheckHook
 , pythonOlder
+, pythonRelaxDepsHook
 , urllib3
 }:
 
 buildPythonPackage rec {
   pname = "freebox-api";
-  version = "1.0.0";
+  version = "1.1.0";
   format = "pyproject";
 
   disabled = pythonOlder "3.8";
@@ -18,12 +19,17 @@ buildPythonPackage rec {
   src = fetchFromGitHub {
     owner = "hacf-fr";
     repo = pname;
-    rev = "v${version}";
-    hash = "sha256-y78PzSivB+IJ9hrN3ZRhDBo7kI7M6uleTPkF6slO6So=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-3i9I2RRRxLgyfzegnqjO4g+ad1v4phx6xa8HpWP1cck=";
   };
 
   nativeBuildInputs = [
     poetry-core
+    pythonRelaxDepsHook
+  ];
+
+  pythonRelaxDeps = [
+    "urllib3"
   ];
 
   propagatedBuildInputs = [
@@ -31,7 +37,7 @@ buildPythonPackage rec {
     urllib3
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -42,6 +48,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python module to interact with the Freebox OS API";
     homepage = "https://github.com/hacf-fr/freebox-api";
+    changelog = "https://github.com/hacf-fr/freebox-api/releases/tag/v${version}";
     license = with licenses; [ gpl3Only ];
     maintainers = with maintainers; [ fab ];
   };

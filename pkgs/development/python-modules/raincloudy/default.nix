@@ -1,12 +1,18 @@
 { lib
+, aiohttp
+, aioresponses
 , beautifulsoup4
 , buildPythonPackage
 , fetchFromGitHub
 , html5lib
+, pytest-asyncio
+, pytest-aiohttp
 , pytestCheckHook
 , pythonOlder
 , requests
 , requests-mock
+, setuptools
+, setuptools-scm
 , urllib3
 }:
 
@@ -24,27 +30,40 @@ buildPythonPackage rec {
     hash = "sha256-qCkBVirM09iA1sXiOB9FJns8bHjQq7rRk8XbRWrtBDI=";
   };
 
-  propagatedBuildInputs = [
-    requests
-    beautifulsoup4
-    urllib3
-    html5lib
-  ];
-
-  checkInputs = [
-    pytestCheckHook
-    requests-mock
+  nativeBuildInputs = [
+    setuptools
+    setuptools-scm
   ];
 
   postPatch = ''
     # https://github.com/vanstinator/raincloudy/pull/60
     substituteInPlace setup.py \
       --replace "bs4" "beautifulsoup4" \
-      --replace "html5lib==1.0.1" "html5lib"
+
+    # fix raincloudy.aio package discovery, by relying on
+    # autodiscovery instead.
+    sed -i '/packages=/d' setup.py
   '';
+
+  propagatedBuildInputs = [
+    aiohttp
+    requests
+    beautifulsoup4
+    urllib3
+    html5lib
+  ];
+
+  nativeCheckInputs = [
+    aioresponses
+    pytest-asyncio
+    pytest-aiohttp
+    pytestCheckHook
+    requests-mock
+  ];
 
   pythonImportsCheck = [
     "raincloudy"
+    "raincloudy.aio"
   ];
 
   disabledTests = [

@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "brotlipy";
   version = "0.7.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -21,7 +22,7 @@ buildPythonPackage rec {
 
   propagatedNativeBuildInputs = [ cffi ];
 
-  checkInputs = [ pytest hypothesis ];
+  nativeCheckInputs = [ pytest hypothesis ];
 
   checkPhase = ''
     py.test

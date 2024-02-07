@@ -7,12 +7,12 @@
 
 buildPythonPackage rec {
   pname = "PyAudio";
-  version = "0.2.12";
+  version = "0.2.14";
   disabled = isPyPy;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-Vd3123K8U3u6X128o6ufAiLuW4Qr2oOXjqsLe49g+54=";
+    hash = "sha256-eN//OHm0mU0fT8ZIVkald1XG7jwZZHpJH3kKCJW9L4c=";
   };
 
   buildInputs = [ pkgs.portaudio ];

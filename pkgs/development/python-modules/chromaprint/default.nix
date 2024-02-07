@@ -8,12 +8,13 @@
 buildPythonPackage rec {
   pname = "chromaprint";
   version = "0.5";
+  format = "setuptools";
 
   disabled = isPy27;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-d4M+ieNQpIXcnEH1WyIWnTYZe3P+Y58W0uz1uYPwLQE=";
+    hash = "sha256-d4M+ieNQpIXcnEH1WyIWnTYZe3P+Y58W0uz1uYPwLQE=";
   };
 
   buildInputs = [ m2r ];

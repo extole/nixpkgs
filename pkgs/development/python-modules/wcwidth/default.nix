@@ -1,22 +1,23 @@
 { lib, fetchPypi, buildPythonPackage, pytestCheckHook
-, isPy3k
-, backports_functools_lru_cache
 , setuptools
 }:
 
 buildPythonPackage rec {
   pname = "wcwidth";
-  version = "0.2.5";
+  version = "0.2.12";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "c4d647b99872929fdb7bdcaa4fbe7f01413ed3d98077df798530e5b04f116c83";
+    hash = "sha256-8BwQTv31eXG8t1bwVN1Y3exSBN0V+jHWUD6leUfZfAI=";
   };
 
-  checkInputs = [ pytestCheckHook ];
+  nativeBuildInputs = [
+    setuptools
+  ];
 
-  propagatedBuildInputs = [ setuptools ] ++ lib.optionals (!isPy3k) [
-    backports_functools_lru_cache
+  nativeCheckInputs = [
+    pytestCheckHook
   ];
 
   # To prevent infinite recursion with pytest

@@ -1,61 +1,55 @@
 { lib
 , buildPythonPackage
+, pythonOlder
 , fetchFromGitHub
+
+# build-system
 , poetry-core
-, setuptools
 
 # propagates
 , importlib-resources
 , jsonschema
-, jsonschema-spec
+, jsonschema-path
 , lazy-object-proxy
 , openapi-schema-validator
-, pyyaml
-
-# optional
-, requests
 
 # tests
-, mock
 , pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "openapi-spec-validator";
-  version = "0.5.1";
-  format = "pyproject";
+  version = "0.7.1";
+  pyproject = true;
+
+  disabled = pythonOlder "3.8";
 
   # no tests via pypi sdist
   src = fetchFromGitHub {
-    owner = "p1c2u";
-    repo = pname;
-    rev = version;
-    hash = "sha256-8VhD57dNG0XrPUdcq39GEfHUAgdDwJ8nv+Lp57OpTLg=";
+    owner = "python-openapi";
+    repo = "openapi-spec-validator";
+    rev = "refs/tags/${version}";
+    hash = "sha256-X0ePdHQeBSWjsCFQgCoNloQZRhKbvPBE43aavBppvmg=";
   };
 
-  nativeBuildInputs = [
-    poetry-core
-    setuptools
-  ];
-
-  propagatedBuildInputs = [
-    importlib-resources
-    jsonschema
-    jsonschema-spec
-    lazy-object-proxy
-    openapi-schema-validator
-    pyyaml
-  ];
-
-  passthru.optional-dependencies.requests = [
-    requests
-  ];
-
-  preCheck = ''
+  postPatch = ''
     sed -i '/--cov/d' pyproject.toml
   '';
 
-  checkInputs = [
+  nativeBuildInputs = [
+    poetry-core
+  ];
+
+  propagatedBuildInputs = [
+    jsonschema
+    jsonschema-path
+    lazy-object-proxy
+    openapi-schema-validator
+  ] ++ lib.optionals (pythonOlder "3.9") [
+    importlib-resources
+  ];
+
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -76,6 +70,5 @@ buildPythonPackage rec {
     description = "Validates OpenAPI Specs against the OpenAPI 2.0 (aka Swagger) and OpenAPI 3.0.0 specification";
     homepage = "https://github.com/p1c2u/openapi-spec-validator";
     license = licenses.asl20;
-    maintainers = with maintainers; [ rvl ];
   };
 }

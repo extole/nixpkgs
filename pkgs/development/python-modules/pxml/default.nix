@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "pxml";
   version = "0.2.13";
+  format = "setuptools";
   disabled = pythonAtLeast "3.8";
 
   src = fetchPypi {
@@ -19,7 +20,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ blessings six ];
-  checkInputs = [ nose coverage ];
+  nativeCheckInputs = [ nose coverage ];
 
   # test_prefixedWhitespace fails due to a python3 StringIO issue requiring
   # bytes rather than str

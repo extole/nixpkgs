@@ -1,6 +1,7 @@
 { stdenv
 , lib
 , fetchurl
+, fetchpatch
 , alsa-lib
 , dbus
 , ell
@@ -22,12 +23,32 @@
   ];
 in stdenv.mkDerivation rec {
   pname = "bluez";
-  version = "5.65";
+  version = "5.70";
 
   src = fetchurl {
     url = "mirror://kernel/linux/bluetooth/${pname}-${version}.tar.xz";
-    sha256 = "sha256-JWWk1INUtXbmrZLiW1TtZoCCllgciruAWHBR+Zk9ltQ=";
+    sha256 = "sha256-N+Ny6RaVXhRMuIL4iOS+QImPEK47fCE93N1V7pwAkng=";
   };
+
+  patches = [
+    # replace use of a non-standard symbol to fix build with musl libc (pkgsMusl.bluez)
+    (fetchpatch {
+      url = "https://git.alpinelinux.org/aports/plain/main/bluez/max-input.patch?id=32b31b484cb13009bd8081c4106e4cf064ec2f1f";
+      sha256 = "sha256-SczbXtsxBkCO+izH8XOBcrJEO2f7MdtYVT3+2fCV8wU=";
+    })
+    # Fix device pairing regression
+    # FIXME: remove in next release
+    (fetchpatch {
+      url = "https://github.com/bluez/bluez/commit/3a9c637010f8dc1ba3e8382abe01065761d4f5bb.patch";
+      hash = "sha256-UUmYMHnxYrw663nEEC2mv3zj5e0omkLNejmmPUtgS3c=";
+    })
+    # CVE-2023-45866 / https://github.com/skysafe/reblog/tree/main/cve-2023-45866
+    (fetchpatch {
+      name = "CVE-2023-45866.patch";
+      url = "https://git.kernel.org/pub/scm/bluetooth/bluez.git/patch/profiles/input?id=25a471a83e02e1effb15d5a488b3f0085eaeb675";
+      sha256 = "sha256-IuPQ18yN0EO/PkqdT/JETyOxdZCKewBiDjGN4CG2GLo=";
+    })
+  ];
 
   buildInputs = [
     alsa-lib
@@ -76,7 +97,6 @@ in stdenv.mkDerivation rec {
     "--enable-mesh"
     "--enable-midi"
     "--enable-nfc"
-    "--enable-sap"
     "--enable-sixaxis"
     "--enable-btpclient"
     "--enable-hid2hci"
@@ -120,6 +140,10 @@ in stdenv.mkDerivation rec {
     # Add extra configuration
     mkdir $out/etc/bluetooth
     ln -s /etc/bluetooth/main.conf $out/etc/bluetooth/main.conf
+
+    # https://github.com/NixOS/nixpkgs/issues/204418
+    ln -s /etc/bluetooth/input.conf $out/etc/bluetooth/input.conf
+    ln -s /etc/bluetooth/network.conf $out/etc/bluetooth/network.conf
 
     # Add missing tools, ref https://git.archlinux.org/svntogit/packages.git/tree/trunk/PKGBUILD?h=packages/bluez
     for files in `find tools/ -type f -perm -755`; do

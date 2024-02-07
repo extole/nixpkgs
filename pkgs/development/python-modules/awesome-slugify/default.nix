@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "awesome-slugify";
   version = "1.6.5";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -20,7 +21,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ unidecode regex ];
 
-  checkInputs = [ unittestCheckHook ];
+  nativeCheckInputs = [ unittestCheckHook ];
 
   meta = with lib; {
     homepage = "https://github.com/dimka665/awesome-slugify";

@@ -11,6 +11,7 @@ let
     mkChangedOptionModule
     mkRenamedOptionModule
     mkRemovedOptionModule
+    mkPackageOption
     concatStringsSep
     mapAttrsToList
     escapeShellArg
@@ -24,7 +25,6 @@ let
     maintainers
     catAttrs
     collect
-    splitString
     hasPrefix
     ;
 
@@ -246,14 +246,7 @@ in
         };
       };
 
-      package = mkOption {
-        type = package;
-        default = pkgs.keycloak;
-        defaultText = literalExpression "pkgs.keycloak";
-        description = lib.mdDoc ''
-          Keycloak package to use.
-        '';
-      };
+      package = mkPackageOption pkgs "keycloak" { };
 
       initialAdminPassword = mkOption {
         type = str;
@@ -335,7 +328,8 @@ in
             };
 
             hostname = mkOption {
-              type = str;
+              type = nullOr str;
+              default = null;
               example = "keycloak.example.com";
               description = lib.mdDoc ''
                 The hostname part of the public URL used as base for
@@ -457,7 +451,7 @@ in
 
       keycloakConfig = lib.generators.toKeyValue {
         mkKeyValue = lib.flip lib.generators.mkKeyValueDefault "=" {
-          mkValueString = v: with builtins;
+          mkValueString = v:
             if isInt v then toString v
             else if isString v then v
             else if true == v then "true"
@@ -481,6 +475,18 @@ in
           {
             assertion = (cfg.database.useSSL && cfg.database.type == "postgresql") -> (cfg.database.caCert != null);
             message = "A CA certificate must be specified (in 'services.keycloak.database.caCert') when PostgreSQL is used with SSL";
+          }
+          {
+            assertion = createLocalPostgreSQL -> config.services.postgresql.settings.standard_conforming_strings or true;
+            message = "Setting up a local PostgreSQL db for Keycloak requires `standard_conforming_strings` turned on to work reliably";
+          }
+          {
+            assertion = cfg.settings.hostname != null || cfg.settings.hostname-url or null != null;
+            message = "Setting the Keycloak hostname is required, see `services.keycloak.settings.hostname`";
+          }
+          {
+            assertion = !(cfg.settings.hostname != null && cfg.settings.hostname-url or null != null);
+            message = "`services.keycloak.settings.hostname` and `services.keycloak.settings.hostname-url` are mutually exclusive";
           }
         ];
 
@@ -544,7 +550,13 @@ in
             create_role="$(mktemp)"
             trap 'rm -f "$create_role"' EXIT
 
+            # Read the password from the credentials directory and
+            # escape any single quotes by adding additional single
+            # quotes after them, following the rules laid out here:
+            # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS
             db_password="$(<"$CREDENTIALS_DIRECTORY/db_password")"
+            db_password="''${db_password//\'/\'\'}"
+
             echo "CREATE ROLE keycloak WITH LOGIN PASSWORD '$db_password' CREATEDB" > "$create_role"
             psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='keycloak'" | grep -q 1 || psql -tA --file="$create_role"
             psql -tAc "SELECT 1 FROM pg_database WHERE datname = 'keycloak'" | grep -q 1 || psql -tAc 'CREATE DATABASE "keycloak" OWNER "keycloak"'
@@ -566,8 +578,16 @@ in
           script = ''
             set -o errexit -o pipefail -o nounset -o errtrace
             shopt -s inherit_errexit
+
+            # Read the password from the credentials directory and
+            # escape any single quotes by adding additional single
+            # quotes after them, following the rules laid out here:
+            # https://dev.mysql.com/doc/refman/8.0/en/string-literals.html
             db_password="$(<"$CREDENTIALS_DIRECTORY/db_password")"
-            ( echo "CREATE USER IF NOT EXISTS 'keycloak'@'localhost' IDENTIFIED BY '$db_password';"
+            db_password="''${db_password//\'/\'\'}"
+
+            ( echo "SET sql_mode = 'NO_BACKSLASH_ESCAPES';"
+              echo "CREATE USER IF NOT EXISTS 'keycloak'@'localhost' IDENTIFIED BY '$db_password';"
               echo "CREATE DATABASE IF NOT EXISTS keycloak CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
               echo "GRANT ALL PRIVILEGES ON keycloak.* TO 'keycloak'@'localhost';"
             ) | mysql -N
@@ -632,12 +652,17 @@ in
 
               ${secretReplacements}
 
+              # Escape any backslashes in the db parameters, since
+              # they're otherwise unexpectedly read as escape
+              # sequences.
+              sed -i '/db-/ s|\\|\\\\|g' /run/keycloak/conf/keycloak.conf
+
             '' + optionalString (cfg.sslCertificate != null && cfg.sslCertificateKey != null) ''
               mkdir -p /run/keycloak/ssl
               cp $CREDENTIALS_DIRECTORY/ssl_{cert,key} /run/keycloak/ssl/
             '' + ''
               export KEYCLOAK_ADMIN=admin
-              export KEYCLOAK_ADMIN_PASSWORD=${cfg.initialAdminPassword}
+              export KEYCLOAK_ADMIN_PASSWORD=${escapeShellArg cfg.initialAdminPassword}
               kc.sh start --optimized
             '';
           };
@@ -651,6 +676,6 @@ in
           mkIf createLocalMySQL (mkDefault dbPkg);
       };
 
-  meta.doc = ./keycloak.xml;
+  meta.doc = ./keycloak.md;
   meta.maintainers = [ maintainers.talyz ];
 }

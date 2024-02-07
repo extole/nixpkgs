@@ -36,11 +36,11 @@ python3.pkgs.buildPythonApplication rec {
       prompt-toolkit
       pygments
       # pyside6
-      z3
+      z3-solver
     ];
   };
 
-  checkInputs = with python3.pkgs; [
+  nativeCheckInputs = with python3.pkgs; [
     pytestCheckHook
   ];
 

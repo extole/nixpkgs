@@ -10,11 +10,12 @@
 
 buildPythonPackage rec {
   pname = "pgspecial";
-  version = "2.0.1";
+  version = "2.1.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-ZEQ7vJrQm1fQ9Ny7OO/0TVKFO3QYyepS9YV6vhu1NOw=";
+    hash = "sha256-o4I5zZYfrDPObaNcRm11istvlCkBWY19905bgv5vVjY=";
   };
 
   propagatedBuildInputs = [
@@ -23,7 +24,7 @@ buildPythonPackage rec {
     psycopg
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     configobj
     pytestCheckHook
   ];

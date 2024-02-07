@@ -9,23 +9,23 @@
 
 buildPythonPackage rec {
   pname = "pyomo";
-  version = "6.4.2";
+  version = "6.7.0";
   format = "setuptools";
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     repo = "pyomo";
     owner = "pyomo";
     rev = "refs/tags/${version}";
-    hash = "sha256-YTcK5UCE6AuGk3iyhLOeqdl0rb8ccOhBRJEew40Rris=";
+    hash = "sha256-HoTtvda97ghQ0SQBZFGkDAwD2WNtZpIum2m1khivEK4=";
   };
 
   propagatedBuildInputs = [
     ply
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     parameterized
     pytestCheckHook
   ];
@@ -54,7 +54,8 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python Optimization Modeling Objects";
     homepage = "http://pyomo.org";
+    changelog = "https://github.com/Pyomo/pyomo/releases/tag/${version}";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ costrouc ];
+    maintainers = with maintainers; [ ];
   };
 }

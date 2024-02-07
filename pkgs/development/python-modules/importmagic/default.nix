@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "importmagic";
   version = "0.1.7";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -16,7 +17,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ six ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "importmagic" ];
 

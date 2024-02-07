@@ -5,7 +5,6 @@
 , mock
 , blessings
 , nose
-, nose_progressive
 , pillow
 , args
 , pkgs
@@ -14,6 +13,7 @@
 buildPythonPackage rec {
   pname = "clint";
   version = "0.5.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -28,7 +28,7 @@ buildPythonPackage rec {
   # no longer compatible as behavior demand 2to3, which was removed
   # in setuptools>=58
   doCheck  = false;
-  checkInputs = [ mock nose nose_progressive pkgs.glibcLocales ];
+  nativeCheckInputs = [ mock nose pkgs.glibcLocales ];
   checkPhase = ''
     ${python.interpreter} test_clint.py
   '';

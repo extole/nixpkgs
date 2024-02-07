@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "aiolip";
   version = "1.1.6";
+  format = "setuptools";
   disabled = pythonOlder "3.5";
 
   src = fetchFromGitHub {
@@ -17,7 +18,7 @@ buildPythonPackage rec {
     sha256 = "1bgmcl8q1p6f2xm3w2qylvla6vf6bd1p2hfwj4l8w6w0w04vr02g";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

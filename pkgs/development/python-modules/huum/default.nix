@@ -1,22 +1,27 @@
 { lib
 , aiohttp
 , buildPythonPackage
-, fetchPypi
+, fetchFromGitHub
+, mashumaro
 , poetry-core
 , pydantic
+, pytest-asyncio
+, pytestCheckHook
 , pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "huum";
-  version = "0.6.0";
-  format = "pyproject";
+  version = "0.7.9";
+  pyproject = true;
 
-  disabled = pythonOlder "3.9";
+  disabled = pythonOlder "3.11";
 
-  src = fetchPypi {
-    inherit pname version;
-    sha256 = "sha256-PYOjfLPa/vZZP0IZuUZnQ74IrTRvizgYhKOmhd83aMQ=";
+  src = fetchFromGitHub {
+    owner = "frwickst";
+    repo = "pyhuum";
+    rev = "refs/tags/${version}";
+    hash = "sha256-wIroT1eMO9VXsPWQkpSBEVN/nR4pg2/Eo4ms81qMaew=";
   };
 
   nativeBuildInputs = [
@@ -25,21 +30,24 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [
     aiohttp
-    pydantic
+    mashumaro
   ];
 
-  # Tests are not shipped and source not tagged
-  # https://github.com/frwickst/pyhuum/issues/2
-  doCheck = false;
+  nativeCheckInputs = [
+    pytest-asyncio
+    pytestCheckHook
+  ];
 
   pythonImportsCheck = [
     "huum"
   ];
 
   meta = with lib; {
-    description = "Library for for Huum saunas";
+    description = "Library for Huum saunas";
     homepage = "https://github.com/frwickst/pyhuum";
+    changelog = "https://github.com/frwickst/pyhuum/releases/tag/${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
+    broken = versionAtLeast pydantic.version "2";
   };
 }

@@ -1,65 +1,55 @@
-{ stdenv, lib, rustPlatform, fetchgit
-, minijail-tools, pkg-config, protobuf, wayland-scanner
+{ lib, rustPlatform, fetchgit, fetchpatch
+, pkg-config, protobuf, python3, wayland-scanner
 , libcap, libdrm, libepoxy, minijail, virglrenderer, wayland, wayland-protocols
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "crosvm";
-  version = "104.0";
+  version = "120.0";
 
   src = fetchgit {
-    url = "https://chromium.googlesource.com/crosvm/crosvm";
-    rev = "265aab613b1eb31598ea0826f04810d9f010a2c6";
-    sha256 = "OzbtPHs6BWK83RZ/6eCQHA61X6SY8FoBkaN70a37pvc=";
+    url = "https://chromium.googlesource.com/chromiumos/platform/crosvm";
+    rev = "0a9d1cb8be29e49c355ea8b18cd58506dbbaf6e5";
+    sha256 = "BbCcsxJU25VgWVday4rGPXaJSuAWebNGo3MiYPIBBto=";
     fetchSubmodules = true;
   };
 
-  separateDebugInfo = true;
-
   patches = [
-    ./default-seccomp-policy-dir.diff
+    (fetchpatch {
+      name = "test-page-size-fix.patch";
+      url = "https://chromium.googlesource.com/crosvm/crosvm/+/d9bc6e99ff5ac31d7d88b684c938af01a0872fc1%5E%21/?format=TEXT";
+      decode = "base64 -d";
+      includes = [ "src/crosvm/config.rs" ];
+      hash = "sha256-3gfNzp0WhtNr+8CWSISCJau208EMIo3RJhM+4SyeV3o=";
+    })
   ];
 
-  cargoLock.lockFile = ./Cargo.lock;
+  separateDebugInfo = true;
 
-  nativeBuildInputs = [ minijail-tools pkg-config protobuf wayland-scanner ];
+  cargoHash = "sha256-YXfKZeRL3gfWztf36lVNbCCwUqW+0w3q7X7v0arCrvk=";
+
+  nativeBuildInputs = [
+    pkg-config protobuf python3 rustPlatform.bindgenHook wayland-scanner
+  ];
 
   buildInputs = [
     libcap libdrm libepoxy minijail virglrenderer wayland wayland-protocols
   ];
 
-  arch = stdenv.hostPlatform.parsed.cpu.name;
-
-  postPatch = ''
-    cp ${cargoLock.lockFile} Cargo.lock
-    sed -i "s|/usr/share/policy/crosvm/|$PWD/seccomp/$arch/|g" \
-        seccomp/$arch/*.policy
+  preConfigure = ''
+    patchShebangs third_party/minijail/tools/*.py
   '';
 
-  preBuild = ''
-    export DEFAULT_SECCOMP_POLICY_DIR=$out/share/policy
-
-    for policy in seccomp/$arch/*.policy; do
-        compile_seccomp_policy \
-            --default-action trap $policy ''${policy%.policy}.bpf
-    done
-
-    substituteInPlace seccomp/$arch/*.policy \
-      --replace "@include $(pwd)/seccomp/$arch/" "@include $out/share/policy/"
-  '';
+  CROSVM_USE_SYSTEM_VIRGLRENDERER = true;
 
   buildFeatures = [ "default" "virgl_renderer" "virgl_renderer_next" ];
-
-  postInstall = ''
-    mkdir -p $out/share/policy/
-    cp -v seccomp/$arch/*.{policy,bpf} $out/share/policy/
-  '';
 
   passthru.updateScript = ./update.py;
 
   meta = with lib; {
     description = "A secure virtual machine monitor for KVM";
-    homepage = "https://chromium.googlesource.com/crosvm/crosvm/";
+    homepage = "https://crosvm.dev/";
+    mainProgram = "crosvm";
     maintainers = with maintainers; [ qyliss ];
     license = licenses.bsd3;
     platforms = [ "aarch64-linux" "x86_64-linux" ];

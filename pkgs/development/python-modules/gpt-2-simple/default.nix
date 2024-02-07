@@ -4,12 +4,13 @@
 buildPythonPackage rec {
   pname = "gpt-2-simple";
   version = "0.8.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "minimaxir";
     repo = "gpt-2-simple";
     rev = "v${version}";
-    sha256 = "sha256-WwD4sDcc28zXEOISJsq8e+rgaNrrgIy79Wa4J3E7Ovc=";
+    hash = "sha256-WwD4sDcc28zXEOISJsq8e+rgaNrrgIy79Wa4J3E7Ovc=";
   };
 
   propagatedBuildInputs = [ regex requests tqdm numpy toposort tensorflow ];

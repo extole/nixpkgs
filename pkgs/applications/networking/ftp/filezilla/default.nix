@@ -11,18 +11,22 @@
 , pugixml
 , sqlite
 , tinyxml
+, boost
 , wrapGAppsHook
-, wxGTK30-gtk3
+, wxGTK32
+, gtk3
 , xdg-utils
+, CoreServices
+, Security
 }:
 
 stdenv.mkDerivation rec {
   pname = "filezilla";
-  version = "3.61.0";
+  version = "3.66.4";
 
   src = fetchurl {
-    url = "https://download.filezilla-project.org/client/FileZilla_${version}_src.tar.bz2";
-    hash = "sha256-Cv7w5NolICaHsy7Wsf/NhELVs1vc0W308Cuy6pLimfc=";
+    url = "https://download.filezilla-project.org/client/FileZilla_${version}_src.tar.xz";
+    hash = "sha256-pA8E4C76rntQ0VFe4cNsSw5EWBhWbEUORAv9bHDpsgM=";
   };
 
   configureFlags = [
@@ -33,6 +37,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ autoreconfHook pkg-config wrapGAppsHook ];
 
   buildInputs = [
+    boost
     dbus
     gettext
     gnutls
@@ -42,10 +47,14 @@ stdenv.mkDerivation rec {
     pugixml
     sqlite
     tinyxml
-    wxGTK30-gtk3
-    wxGTK30-gtk3.gtk
+    wxGTK32
+    gtk3
     xdg-utils
-  ];
+  ] ++ lib.optionals stdenv.isDarwin [ CoreServices Security ];
+
+  preBuild = lib.optionalString (stdenv.isDarwin) ''
+    export MACOSX_DEPLOYMENT_TARGET=11.0
+  '';
 
   enableParallelBuilding = true;
 

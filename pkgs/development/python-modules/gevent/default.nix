@@ -4,27 +4,41 @@
 , isPyPy
 , python
 , libev
+, cffi
+, cython_3
 , greenlet
+, importlib-metadata
 , setuptools
-, zope_event
-, zope_interface
+, wheel
+, zope-event
+, zope-interface
 , pythonOlder
+
+# for passthru.tests
+, dulwich
+, gunicorn
+, opentracing
+, pika
 }:
 
 buildPythonPackage rec {
   pname = "gevent";
-  version = "21.12.0";
+  version = "23.9.1";
   format = "pyproject";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-9ItkV4w2e5H6eTv46qr0mVy5PIvEWGDkc7+GgHCtCU4=";
+    hash = "sha256-csACI1OQ1G+Uk4qWkg2IVtT/2d32KjA6DXwRiJQJfjQ=";
   };
 
   nativeBuildInputs = [
+    cython_3
     setuptools
+    wheel
+  ] ++ lib.optionals (!isPyPy) [
+    cffi
   ];
 
   buildInputs = [
@@ -32,8 +46,9 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [
-    zope_event
-    zope_interface
+    importlib-metadata
+    zope-event
+    zope-interface
   ] ++ lib.optionals (!isPyPy) [
     greenlet
   ];
@@ -43,7 +58,16 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [
     "gevent"
+    "gevent.events"
   ];
+
+  passthru.tests = {
+    inherit
+      dulwich
+      gunicorn
+      opentracing
+      pika;
+  } // lib.filterAttrs (k: v: lib.hasInfix "gevent" k) python.pkgs;
 
   meta = with lib; {
     description = "Coroutine-based networking library";

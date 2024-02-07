@@ -7,13 +7,14 @@
 buildPythonPackage rec {
   pname = "backcall";
   version = "0.2.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
     sha256 = "5cbdbf27be5e7cfadb448baf0aa95508f91f2bbc6c6437cd9cd06e2a4c215e1e";
   };
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   checkPhase = ''
     py.test

@@ -17,11 +17,12 @@
 
 buildPythonPackage rec {
   pname = "cliff";
-  version = "4.0.0";
+  version = "4.4.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-Ow0w56z1DjwhSjnuPmaqLytZV+Kh3jc+F7uo6Yx1AaU=";
+    hash = "sha256-qo1ASqLWtNhjnGG9bcR6yzZW68P8Alsbe7B68rrveF8=";
   };
 
   postPatch = ''

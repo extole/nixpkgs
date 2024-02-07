@@ -9,10 +9,11 @@
 buildPythonPackage rec {
   pname = "azure-mgmt-servicelinker";
   version = "1.1.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-QVw6Y9HachwBRwCbF0cSGLCAkSJtNnXBvsj5YX1TmJU=";
+    hash = "sha256-QVw6Y9HachwBRwCbF0cSGLCAkSJtNnXBvsj5YX1TmJU=";
     extension = "zip";
   };
 

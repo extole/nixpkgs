@@ -1,27 +1,48 @@
-{ lib, buildGoModule, fetchFromGitHub, installShellFiles }:
+{ lib
+, buildGoModule
+, fetchFromGitHub
+, installShellFiles
+}:
 
 buildGoModule rec {
   pname = "oh-my-posh";
-  version = "12.10.0";
+  version = "19.6.0";
 
   src = fetchFromGitHub {
     owner = "jandedobbeleer";
     repo = pname;
-    rev = "v${version}";
-    sha256 = "sha256-iPSaJL1mvPjzZjXtgqeFS1p1jlOqc6B/R1/Zwym0j3g=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-/VkI/ACUTGRcFpJhUV068m8HdM44NiandS+2a+Ms6vs=";
   };
 
-  vendorSha256 = "sha256-OrtKFkWXqVoXKmN6BT8YbCNjR1gRTT4gPNwmirn7fjU=";
+  vendorHash = "sha256-8ZupQe4b3uCX79Q0oYqggMWZE9CfX5OSFdLIrxT8CHY=";
 
-  sourceRoot = "source/src";
+  sourceRoot = "${src.name}/src";
 
-  nativeBuildInputs = [ installShellFiles ];
+  nativeBuildInputs = [
+    installShellFiles
+  ];
 
-  ldflags = [ "-s" "-w" "-X" "main.Version=${version}" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/jandedobbeleer/oh-my-posh/src/build.Version=${version}"
+    "-X github.com/jandedobbeleer/oh-my-posh/src/build.Date=1970-01-01T00:00:00Z"
+  ];
 
-  tags = [ "netgo" "osusergo" "static_build" ];
+  tags = [
+    "netgo"
+    "osusergo"
+    "static_build"
+  ];
+
+  postPatch = ''
+    # these tests requires internet access
+    rm engine/image_test.go engine/migrate_glyphs_test.go
+  '';
 
   postInstall = ''
+    mv $out/bin/{src,oh-my-posh}
     mkdir -p $out/share/oh-my-posh
     cp -r ${src}/themes $out/share/oh-my-posh/
     installShellCompletion --cmd oh-my-posh \
@@ -33,7 +54,8 @@ buildGoModule rec {
   meta = with lib; {
     description = "A prompt theme engine for any shell";
     homepage = "https://ohmyposh.dev";
+    changelog = "https://github.com/JanDeDobbeleer/oh-my-posh/releases/tag/v${version}";
     license = licenses.mit;
-    maintainers = with maintainers; [ lucperkins ];
+    maintainers = with maintainers; [ lucperkins urandom ];
   };
 }

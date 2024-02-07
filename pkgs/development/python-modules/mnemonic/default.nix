@@ -7,15 +7,16 @@
 buildPythonPackage rec {
   pname = "mnemonic";
   version = "0.20";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "trezor";
     repo = "python-${pname}";
     rev = "v${version}";
-    sha256 = "sha256-YYgWlYfVd1iALOziaUI8uVYjJDCIVk/dXcUmJd2jcvQ=";
+    hash = "sha256-YYgWlYfVd1iALOziaUI8uVYjJDCIVk/dXcUmJd2jcvQ=";
   };
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "mnemonic" ];
 

@@ -25,12 +25,13 @@
 buildPythonPackage rec {
   pname = "dragonfly";
   version = "0.35.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "dictation-toolbox";
     repo = pname;
     rev = version;
-    sha256 = "sha256-sqEEEr5/KG3cn4rmOGJt9zMNAjeLO6h3NJgg0EyewrM=";
+    hash = "sha256-sqEEEr5/KG3cn4rmOGJt9zMNAjeLO6h3NJgg0EyewrM=";
   };
 
   postPatch = ''

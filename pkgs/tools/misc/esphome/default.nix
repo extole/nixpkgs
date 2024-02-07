@@ -1,29 +1,37 @@
 { lib
-, python3
+, callPackage
+, python3Packages
 , fetchFromGitHub
+, installShellFiles
 , platformio
 , esptool
 , git
 }:
 
 let
-  python = python3.override {
+  python = python3Packages.python.override {
     packageOverrides = self: super: {
-      esphome-dashboard = self.callPackage ./dashboard.nix {};
+      esphome-dashboard = self.callPackage ./dashboard.nix { };
     };
   };
 in
-with python.pkgs; buildPythonApplication rec {
+python.pkgs.buildPythonApplication rec {
   pname = "esphome";
-  version = "2022.10.2";
-  format = "setuptools";
+  version = "2023.12.5";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = pname;
     repo = pname;
     rev = "refs/tags/${version}";
-    hash = "sha256-f6t5Q9jK6ovcIFVw1hYyhtiy/iDaq7cmfn5ywAeEaT8=";
+    hash = "sha256-ajpYwquVyznIngZKcWxI9Pyiqf4VYcWtGFRZSpi6+3I=";
   };
+
+  nativeBuildInputs = with python.pkgs; [
+    setuptools
+    argcomplete
+    installShellFiles
+  ];
 
   postPatch = ''
     # remove all version pinning (E.g tornado==5.1.1 -> tornado)
@@ -42,18 +50,21 @@ with python.pkgs; buildPythonApplication rec {
   # They have validation functions like:
   # - validate_cryptography_installed
   # - validate_pillow_installed
-  propagatedBuildInputs = [
+  propagatedBuildInputs = with python.pkgs; [
     aioesphomeapi
+    argcomplete
     click
     colorama
     cryptography
     esphome-dashboard
-    ifaddr
     kconfiglib
     paho-mqtt
     pillow
+    platformio
     protobuf
+    pyparsing
     pyserial
+    python-magic
     pyyaml
     requests
     tornado
@@ -67,15 +78,15 @@ with python.pkgs; buildPythonApplication rec {
     # esptool is used in esphomeyaml/__main__.py
     # git is used in esphomeyaml/writer.py
     "--prefix PATH : ${lib.makeBinPath [ platformio esptool git ]}"
+    "--prefix PYTHONPATH : $PYTHONPATH" # will show better error messages
     "--set ESPHOME_USE_SUBPROCESS ''"
   ];
 
-  checkInputs = [
+  nativeCheckInputs = with python3Packages; [
     hypothesis
     mock
     pytest-asyncio
     pytest-mock
-    pytest-sugar
     pytestCheckHook
   ];
 
@@ -90,12 +101,24 @@ with python.pkgs; buildPythonApplication rec {
     $out/bin/esphome --help > /dev/null
   '';
 
+  postInstall =
+    let
+      argcomplete = lib.getExe' python3Packages.argcomplete "register-python-argcomplete";
+    in
+    ''
+      installShellCompletion --cmd esphome \
+        --bash <(${argcomplete} --shell bash esphome) \
+        --zsh <(${argcomplete} --shell zsh esphome) \
+        --fish <(${argcomplete} --shell fish esphome)
+    '';
+
   passthru = {
-    dashboard = esphome-dashboard;
-    updateScript = callPackage ./update.nix {};
+    dashboard = python.pkgs.esphome-dashboard;
+    updateScript = callPackage ./update.nix { };
   };
 
   meta = with lib; {
+    changelog = "https://github.com/esphome/esphome/releases/tag/${version}";
     description = "Make creating custom firmwares for ESP32/ESP8266 super easy";
     homepage = "https://esphome.io/";
     license = with licenses; [
@@ -103,5 +126,6 @@ with python.pkgs; buildPythonApplication rec {
       gpl3Only # The python codebase and all other parts of this codebase
     ];
     maintainers = with maintainers; [ globin hexa ];
+    mainProgram = "esphome";
   };
 }

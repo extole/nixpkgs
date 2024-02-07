@@ -18,6 +18,7 @@
 buildPythonPackage {
   pname = "baselines";
   version = "0.1.6"; # remember to manually adjust the rev
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "openai";
@@ -51,7 +52,7 @@ buildPythonPackage {
   # fails to create a daemon, probably because of sandboxing
   doCheck = false;
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest
   ];
 

@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "aadict";
   version = "0.2.3";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -16,7 +17,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ six ];
-  checkInputs = [ nose coverage ];
+  nativeCheckInputs = [ nose coverage ];
 
   meta = with lib; {
     homepage = "https://github.com/metagriffin/aadict";

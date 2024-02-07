@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "parquet";
   version = "1.3.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "jcrobak";
@@ -22,7 +23,7 @@ buildPythonPackage rec {
     thriftpy2
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

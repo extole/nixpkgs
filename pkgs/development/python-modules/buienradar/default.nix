@@ -14,6 +14,7 @@
 buildPythonPackage rec {
   pname = "buienradar";
   version = "1.0.5";
+  format = "setuptools";
 
   disabled = pythonOlder "3.4";
 
@@ -34,7 +35,7 @@ buildPythonPackage rec {
     xmltodict
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

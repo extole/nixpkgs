@@ -6,10 +6,11 @@
 buildPythonPackage rec {
   pname = "imagesize";
   version = "1.4.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-aRUERK/7nLDVzFqSs2dvCy+3zZrjnpR6XhGja0SXzUo=";
+    hash = "sha256-aRUERK/7nLDVzFqSs2dvCy+3zZrjnpR6XhGja0SXzUo=";
   };
 
   meta = with lib; {

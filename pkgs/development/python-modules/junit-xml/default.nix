@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "junit-xml";
   version = "1.9";
+  format = "setuptools";
 
   # Only a wheel on PyPI
   src = fetchFromGitHub {
@@ -20,7 +21,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ six ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   meta = with lib; {
     description = "Creates JUnit XML test result documents that can be read by tools such as Jenkins";

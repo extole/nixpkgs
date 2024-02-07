@@ -2,16 +2,17 @@
 
 buildPythonPackage rec {
   version = "0.3.0";
+  format = "setuptools";
   pname = "ci-info";
 
   disabled = isPy27;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-H9UMvUAfKa3/7rGLBIniMtFqwadFisa8MW3qtq5TX7A=";
+    hash = "sha256-H9UMvUAfKa3/7rGLBIniMtFqwadFisa8MW3qtq5TX7A=";
   };
 
-  checkInputs = [ pytest pytestCheckHook ];
+  nativeCheckInputs = [ pytest pytestCheckHook ];
 
   doCheck = false;  # both tests access network
 

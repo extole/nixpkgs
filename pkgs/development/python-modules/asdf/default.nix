@@ -33,14 +33,12 @@ buildPythonPackage rec {
     hash = "sha256-u8e7ot5NDRqQFH0eLVnGinBQmQD73BlR5K9HVjA7SIg=";
   };
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
-
   patches = [
     # Fix default validation, https://github.com/asdf-format/asdf/pull/1203
     (fetchpatch {
       name = "default-validation.patch";
       url = "https://github.com/asdf-format/asdf/commit/6f79f620b4632e20178d9bd53528702605d3e976.patch";
-      sha256 = "sha256-h/dYhXRCf5oIIC+u6+8C91mJnmEzuNmlEzqc0UEhLy0=";
+      hash = "sha256-h/dYhXRCf5oIIC+u6+8C91mJnmEzuNmlEzqc0UEhLy0=";
       excludes = [
           "CHANGES.rst"
       ];
@@ -70,7 +68,7 @@ buildPythonPackage rec {
     importlib-resources
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     astropy
     lz4
     pytest-astropy
@@ -93,6 +91,8 @@ buildPythonPackage rec {
     description = "Python tools to handle ASDF files";
     homepage = "https://github.com/asdf-format/asdf";
     license = licenses.bsd3;
-    maintainers = with maintainers; [ costrouc ];
+    maintainers = with maintainers; [ ];
+    # Many tests fail, according to Hydra
+    broken = true;
   };
 }

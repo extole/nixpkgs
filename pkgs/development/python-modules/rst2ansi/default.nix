@@ -3,10 +3,11 @@
 buildPythonPackage rec {
   pname = "rst2ansi";
   version = "0.1.5";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-Gxf7mmKNQPV5M60aOqlSNGREvgaUaVCOc+lQYNoz/m8=";
+    hash = "sha256-Gxf7mmKNQPV5M60aOqlSNGREvgaUaVCOc+lQYNoz/m8=";
   };
 
   propagatedBuildInputs = [ docutils ];

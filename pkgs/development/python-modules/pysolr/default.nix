@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "pysolr";
   version = "3.9.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -13,7 +14,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ requests ];
 
-  checkInputs = [ mock ];
+  nativeCheckInputs = [ mock ];
 
   doCheck = false; # requires network access
 

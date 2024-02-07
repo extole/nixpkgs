@@ -4,6 +4,7 @@
 , poetry-core
 , pytestCheckHook
 , pythonOlder
+, pythonRelaxDepsHook
 , pytz
 , requests
 , requests-mock
@@ -13,20 +14,25 @@
 
 buildPythonPackage rec {
   pname = "meteofrance-api";
-  version = "1.1.0";
-  format = "pyproject";
+  version = "1.3.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "hacf-fr";
-    repo = pname;
-    rev = "v${version}";
-    hash = "sha256-1ZN/9ur6uhK7M5TurmmWgUjzkc79MPqKnT637hbAAWA=";
+    repo = "meteofrance-api";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-uSrVK6LwCDyvsjzGl4xQd8585Hl6sp2Ua9ly0wqnC1Y=";
   };
 
   nativeBuildInputs = [
     poetry-core
+    pythonRelaxDepsHook
+  ];
+
+  pythonRelaxDeps = [
+    "urllib3"
   ];
 
   propagatedBuildInputs = [
@@ -36,7 +42,7 @@ buildPythonPackage rec {
     urllib3
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     requests-mock
   ];
@@ -48,20 +54,23 @@ buildPythonPackage rec {
   disabledTests = [
     # Tests require network access
     "test_currentphenomenons"
+    "test_dictionary"
     "test_forecast"
-    "test_full_with_coastal_bulletint"
+    "test_full_with_coastal_bulletin"
     "test_fulls"
     "test_no_rain_expected"
     "test_picture_of_the_day"
     "test_places"
     "test_rain"
     "test_session"
+    "test_observation"
     "test_workflow"
   ];
 
   meta = with lib; {
     description = "Module to access information from the Meteo-France API";
     homepage = "https://github.com/hacf-fr/meteofrance-api";
+    changelog = "https://github.com/hacf-fr/meteofrance-api/releases/tag/v${version}";
     license = licenses.mit;
     maintainers = with maintainers; [ fab ];
   };

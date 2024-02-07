@@ -1,5 +1,4 @@
 { lib
-, appdirs
 , buildPythonPackage
 , defusedxml
 , fetchFromGitHub
@@ -15,13 +14,14 @@
 , responses
 , restfly
 , semver
+, setuptools
 , typing-extensions
 }:
 
 buildPythonPackage rec {
   pname = "pytenable";
-  version = "1.4.8";
-  format = "setuptools";
+  version = "1.4.18";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
@@ -29,30 +29,35 @@ buildPythonPackage rec {
     owner = "tenable";
     repo = "pyTenable";
     rev = "refs/tags/${version}";
-    hash = "sha256-alBEKCYwLIbQanKTzkd3NnfOudhGhKhg4sFqddWdzQA=";
+    hash = "sha256-JAS+C1MeO/B8ZQ2BYsRwpVW08E9hGoJcvv9zOJZD3Gg=";
   };
 
-  propagatedBuildInputs = [
-    semver
+  nativeBuildInputs = [
+    setuptools
   ];
 
-  buildInputs = [
-    appdirs
+  propagatedBuildInputs = [
     defusedxml
     marshmallow
     python-box
     python-dateutil
     requests
-    requests-pkcs12
     restfly
+    semver
     typing-extensions
   ];
 
-  checkInputs = [
-    responses
+  nativeCheckInputs = [
     pytest-datafiles
     pytest-vcr
     pytestCheckHook
+    requests-pkcs12
+    responses
+  ];
+
+  disabledTestPaths = [
+    # Disable tests that requires network access
+    "tests/io/"
   ];
 
   disabledTests = [
@@ -61,6 +66,9 @@ buildPythonPackage rec {
     "test_uploads_docker_push_tag_typeerror"
     "test_uploads_docker_push_cs_name_typeerror"
     "test_uploads_docker_push_cs_tag_typeerror"
+    # Test requires network access
+    "test_assets_list_vcr"
+    "test_events_list_vcr"
   ];
 
   pythonImportsCheck = [
@@ -70,6 +78,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python library for the Tenable.io and TenableSC API";
     homepage = "https://github.com/tenable/pyTenable";
+    changelog = "https://github.com/tenable/pyTenable/releases/tag/${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

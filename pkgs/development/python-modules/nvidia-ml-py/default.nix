@@ -5,13 +5,13 @@
 
 buildPythonPackage rec {
   pname = "nvidia-ml-py";
-  version = "11.515.48";
+  version = "12.535.133";
   format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
     extension = "tar.gz";
-    hash = "sha256-iNLQu9c8Q3B+FXMObRTtxqE3B/siJIlIlCH6T0rX+sY=";
+    hash = "sha256-sVWa8NV90glVv1jQWv/3sWbd1ElH6zBRyZBWOHmesdw=";
   };
 
   patches = [

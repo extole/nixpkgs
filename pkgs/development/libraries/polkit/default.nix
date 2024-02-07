@@ -9,7 +9,6 @@
 , mesonEmulatorHook
 , ninja
 , perl
-, rsync
 , python3
 , fetchpatch
 , gettext
@@ -21,9 +20,11 @@
 , docbook_xml_dtd_412
 , gtk-doc
 , coreutils
-, useSystemd ? stdenv.isLinux
+, useSystemd ? lib.meta.availableOn stdenv.hostPlatform systemdMinimal
 , systemdMinimal
 , elogind
+, buildPackages
+, withIntrospection ? lib.meta.availableOn stdenv.hostPlatform gobject-introspection && stdenv.hostPlatform.emulatorAvailable buildPackages
 # A few tests currently fail on musl (polkitunixusertest, polkitunixgrouptest, polkitidentitytest segfault).
 # Not yet investigated; it may be due to the "Make netgroup support optional"
 # patch not updating the tests correctly yet, or doing something wrong,
@@ -37,7 +38,7 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "polkit";
-  version = "121";
+  version = "123";
 
   outputs = [ "bin" "dev" "out" ]; # small man pages in $bin
 
@@ -47,7 +48,7 @@ stdenv.mkDerivation rec {
     owner = "polkit";
     repo = "polkit";
     rev = version;
-    sha256 = "Lj7KSGILc6CBsNqPO0G0PNt6ClikbRG45E8FZbb46yY=";
+    hash = "sha256-/kjWkh6w2FYgtYWzw3g3GlWJKKpkJ3cqwfE0iDqJctw=";
   };
 
   patches = [
@@ -57,14 +58,6 @@ stdenv.mkDerivation rec {
       url = "https://gitlab.freedesktop.org/polkit/polkit/-/commit/7ba07551dfcd4ef9a87b8f0d9eb8b91fabcb41b3.patch";
       sha256 = "ebbLILncq1hAZTBMsLm+vDGw6j0iQ0crGyhzyLZQgKA=";
     })
-    # Make netgroup support optional (musl does not have it)
-    # Upstream MR: https://gitlab.freedesktop.org/polkit/polkit/merge_requests/10
-    # NOTE: Remove after the next release
-    (fetchpatch {
-      name = "make-innetgr-optional.patch";
-      url = "https://gitlab.freedesktop.org/polkit/polkit/-/commit/b57deee8178190a7ecc75290fa13cf7daabc2c66.patch";
-      sha256 = "8te6gatT9Fp+fIT05fQBym5mEwHeHfaUNUNEMfSbtLc=";
-    })
   ];
 
   depsBuildBuild = [
@@ -73,32 +66,24 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     glib
-    gtk-doc
     pkg-config
     gettext
     meson
     ninja
     perl
-    rsync
-    gobject-introspection
-    (python3.pythonForBuild.withPackages (pp: with pp; [
-      dbus-python
-      (python-dbusmock.overridePythonAttrs (attrs: {
-        # Avoid dependency cycle.
-        doCheck = false;
-      }))
-    ]))
 
     # man pages
     libxslt
     docbook-xsl-nons
     docbook_xml_dtd_412
-  ] ++ lib.optionals (!stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
+  ] ++ lib.optionals withIntrospection [
+    gobject-introspection
+    gtk-doc
+  ] ++ lib.optionals (withIntrospection && !stdenv.buildPlatform.canExecute stdenv.hostPlatform) [
     mesonEmulatorHook
   ];
 
   buildInputs = [
-    gobject-introspection
     expat
     pam
     dbus
@@ -112,17 +97,26 @@ stdenv.mkDerivation rec {
     glib # in .pc Requires
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     dbus
+    (python3.pythonOnBuildForHost.withPackages (pp: with pp; [
+      dbus-python
+      (python-dbusmock.overridePythonAttrs (attrs: {
+        # Avoid dependency cycle.
+        doCheck = false;
+      }))
+    ]))
   ];
 
   mesonFlags = [
     "--datadir=${system}/share"
     "--sysconfdir=/etc"
-    "-Dsystemdsystemunitdir=${placeholder "out"}/etc/systemd/system"
+    "-Dsystemdsystemunitdir=${placeholder "out"}/lib/systemd/system"
     "-Dpolkitd_user=polkituser" #TODO? <nixos> config.ids.uids.polkituser
     "-Dos_type=redhat" # only affects PAM includes
+    "-Dintrospection=${lib.boolToString withIntrospection}"
     "-Dtests=${lib.boolToString doCheck}"
+    "-Dgtk_doc=${lib.boolToString withIntrospection}"
     "-Dman=true"
   ] ++ lib.optionals stdenv.isLinux [
     "-Dsession_tracking=${if useSystemd then "libsystemd-login" else "libelogind"}"
@@ -135,7 +129,7 @@ stdenv.mkDerivation rec {
   # at install time but Meson does not support this
   # so we need to convince it to install all files to a temporary
   # location using DESTDIR and then move it to proper one in postInstall.
-  DESTDIR = "${placeholder "out"}/dest";
+  env.DESTDIR = "dest";
 
   inherit doCheck;
 
@@ -152,7 +146,7 @@ stdenv.mkDerivation rec {
       --replace   /bin/false ${coreutils}/bin/false
   '';
 
-  postConfigure = lib.optionalString (!stdenv.hostPlatform.isMusl) ''
+  postConfigure = lib.optionalString doCheck ''
     # Unpacked by meson
     chmod +x subprojects/mocklibc-1.0/bin/mocklibc
     patchShebangs subprojects/mocklibc-1.0/bin/mocklibc
@@ -169,23 +163,19 @@ stdenv.mkDerivation rec {
 
   postInstall = ''
     # Move stuff from DESTDIR to proper location.
-    # We use rsync to merge the directories.
-    rsync --archive "${DESTDIR}/etc" "$out"
-    rm --recursive "${DESTDIR}/etc"
-    rsync --archive "${DESTDIR}${system}"/* "$out"
-    rm --recursive "${DESTDIR}${system}"/*
-    rmdir --parents --ignore-fail-on-non-empty "${DESTDIR}${system}"
-    for o in $outputs; do
-        rsync --archive "${DESTDIR}/''${!o}" "$(dirname "''${!o}")"
-        rm --recursive "${DESTDIR}/''${!o}"
+    # We need to be careful with the ordering to merge without conflicts.
+    for o in $(getAllOutputNames); do
+        mv "$DESTDIR/''${!o}" "''${!o}"
     done
-    # Ensure the DESTDIR is removed.
-    destdirContainer="$(dirname "${DESTDIR}")"
-    pushd "$destdirContainer"; rmdir --parents "''${DESTDIR##$destdirContainer/}${builtins.storeDir}"; popd
+    mv "$DESTDIR/etc" "$out"
+    mv "$DESTDIR${system}/share"/* "$out/share"
+    # Ensure we did not forget to install anything.
+    rmdir --parents --ignore-fail-on-non-empty "$DESTDIR${builtins.storeDir}" "$DESTDIR${system}/share"
+    ! test -e "$DESTDIR"
   '';
 
   meta = with lib; {
-    homepage = "http://www.freedesktop.org/wiki/Software/polkit";
+    homepage = "https://gitlab.freedesktop.org/polkit/polkit/";
     description = "A toolkit for defining and handling the policy that allows unprivileged processes to speak to privileged processes";
     license = licenses.lgpl2Plus;
     platforms = platforms.linux;

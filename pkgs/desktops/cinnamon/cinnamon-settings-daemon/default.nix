@@ -32,18 +32,17 @@
 
 stdenv.mkDerivation rec {
   pname = "cinnamon-settings-daemon";
-  version = "5.4.5";
+  version = "6.0.0";
 
   src = fetchFromGitHub {
     owner = "linuxmint";
     repo = pname;
     rev = version;
-    hash = "sha256-qjI1z1MuaI5JFqjHap/+aYDQ0YuP9VNnnY6vy/AaKqs=";
+    hash = "sha256-bT6NetCBo3J9IiiJ9Hs4iC1N3n/AP9Q+6wZciuKA4i4=";
   };
 
   patches = [
     ./csd-backlight-helper-fix.patch
-    ./use-sane-install-dir.patch
   ];
 
   buildInputs = [

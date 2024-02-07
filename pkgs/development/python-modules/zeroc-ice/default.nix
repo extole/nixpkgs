@@ -1,15 +1,30 @@
-{ stdenv, lib, buildPythonPackage, fetchPypi, openssl, bzip2 }:
+{ stdenv
+, lib
+, buildPythonPackage
+, fetchPypi
+, setuptools
+, bzip2
+, openssl
+}:
 
 buildPythonPackage rec {
   pname = "zeroc-ice";
-  version = "3.7.8";
+  version = "3.7.10";
+  pyproject = true;
 
   src = fetchPypi {
     inherit version pname;
-    sha256 = "sha256-kodRHIkMXdFUBGNVRtSyjbVqGQRxPaHqgp6ddFT5ZIY=";
+    hash = "sha256-Bwn2Y/Bbu6O89iaSNWvMpXBhyJRmj6eL8j6HiPpbQbM=";
   };
 
-  buildInputs = [ openssl bzip2 ];
+  nativeBuildInputs = [
+    setuptools
+  ];
+
+  buildInputs = [
+    bzip2
+    openssl
+  ];
 
   pythonImportsCheck = [ "Ice" ];
 

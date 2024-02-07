@@ -1,61 +1,67 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
-, flatten-dict
 , fsspec
 , funcy
-, pygtrie
+, pytest-asyncio
 , pytest-mock
 , pytestCheckHook
 , pythonOlder
+, reflink
 , setuptools-scm
 , shortuuid
-, tqdm
-, typing-extensions
 }:
 
 buildPythonPackage rec {
   pname = "dvc-objects";
-  version = "0.1.7";
-  format = "pyproject";
+  version = "3.0.3";
+  pyproject = true;
 
   disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "iterative";
-    repo = pname;
+    repo = "dvc-objects";
     rev = "refs/tags/${version}";
-    hash = "sha256-Edp2MRhe/eTUosL4XQfVbtwFWBg3D5RDWRb6r1C4MgE=";
+    hash = "sha256-JQ3UDUOpuxPavXkoJqbS0T7y3kpwuJ8NvqAl3DahoLU=";
   };
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace " --benchmark-skip" ""
+  '';
 
   nativeBuildInputs = [
     setuptools-scm
   ];
 
   propagatedBuildInputs = [
-    flatten-dict
     fsspec
+  ]  ++ lib.optionals (pythonOlder "3.12") [
     funcy
-    pygtrie
-    shortuuid
-    tqdm
-    typing-extensions
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
+    pytest-asyncio
     pytest-mock
     pytestCheckHook
+    reflink
+    shortuuid
   ];
 
   pythonImportsCheck = [
     "dvc_objects"
   ];
 
+  disabledTestPaths = [
+    # Disable benchmarking
+    "tests/benchmarks/"
+  ];
+
   meta = with lib; {
     description = "Library for DVC objects";
     homepage = "https://github.com/iterative/dvc-objects";
+    changelog = "https://github.com/iterative/dvc-objects/releases/tag/${version}";
     license = licenses.asl20;
     maintainers = with maintainers; [ fab ];
   };

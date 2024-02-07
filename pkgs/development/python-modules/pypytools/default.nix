@@ -2,17 +2,20 @@
 , buildPythonPackage
 , fetchpatch
 , fetchPypi
+, attrs
 , freezegun
 , numpy
 , py
 , pytestCheckHook
+, pythonAtLeast
 , pythonOlder
+, setuptools
 }:
 
 buildPythonPackage rec {
   pname = "pypytools";
   version = "0.6.2";
-  format = "setuptools";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
@@ -21,13 +24,20 @@ buildPythonPackage rec {
     hash = "sha256-oUDAU+TRwLroNfQGYusAQKdRkHcazysqiDLfp77v5Sk=";
   };
 
+  nativeBuildInputs = [
+    setuptools
+  ];
+
   propagatedBuildInputs = [
+    # attrs is an implicit dependency
+    attrs
     py
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     freezegun
     numpy
+    py
     pytestCheckHook
   ];
 
@@ -36,12 +46,17 @@ buildPythonPackage rec {
     (fetchpatch {
       name = "support-later-python.patch";
       url = "https://github.com/antocuni/pypytools/commit/c6aed496ec35a6ef7ce9e95084849eebc16bafef.patch";
-      sha256 = "sha256-YoYRZmgueQmxRtGaeP4zEVxuA0U7TB0PmoYHHVI7ICQ=";
+      hash = "sha256-YoYRZmgueQmxRtGaeP4zEVxuA0U7TB0PmoYHHVI7ICQ=";
     })
   ];
 
   pythonImportsCheck = [
     "pypytools"
+  ];
+
+  disabledTests = lib.optionals (pythonAtLeast "3.11") [
+    # https://github.com/antocuni/pypytools/issues/4
+    "test_clonefunc"
   ];
 
   meta = with lib; {

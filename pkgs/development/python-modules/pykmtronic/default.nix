@@ -8,10 +8,11 @@
 buildPythonPackage rec {
   pname = "pykmtronic";
   version = "0.3.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-8qLyBJp7C93x0PWbgDAtNEDJ5VLNfwZ3DRZfudRCBgo=";
+    hash = "sha256-8qLyBJp7C93x0PWbgDAtNEDJ5VLNfwZ3DRZfudRCBgo=";
   };
 
   propagatedBuildInputs = [ aiohttp lxml ];

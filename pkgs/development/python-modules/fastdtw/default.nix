@@ -12,6 +12,7 @@
 buildPythonPackage rec {
   pname = "fastdtw";
   version = "0.3.4";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "slaypni";
@@ -38,7 +39,7 @@ buildPythonPackage rec {
   ];
 
   pythonImportsCheck = [ "fastdtw.fastdtw" ];
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
   dontUseSetuptoolsCheck = true;  # looks for pytest-runner
   preCheck = ''
     echo "Temporarily moving tests to $OUT to find cython modules"

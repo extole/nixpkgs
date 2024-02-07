@@ -14,26 +14,24 @@
 
 buildPythonPackage rec {
   pname = "pipdeptree";
-  version = "2.3.3";
+  version = "2.13.2";
   format = "pyproject";
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "tox-dev";
     repo = "pipdeptree";
     rev = "refs/tags/${version}";
-    hash = "sha256-ivqu9b+4FhGa5y+WnKRk4nF6MR4Vj62pSs2d7ycIZMc=";
+    hash = "sha256-eDgulAKq78HRW/7GhO40hxr+F1hOfgXqAzaCw5pFjD8=";
   };
-
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   nativeBuildInputs = [
     hatchling
     hatch-vcs
   ];
 
-  propagatedBuildInput = [
+  propagatedBuildInputs = [
     pip
   ];
 
@@ -43,7 +41,7 @@ buildPythonPackage rec {
     ];
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     diff-cover
     pytest-mock
     pytestCheckHook
@@ -52,6 +50,11 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [
     "pipdeptree"
+  ];
+
+  disabledTests = [
+    # Don't run console tests
+    "test_console"
   ];
 
   meta = with lib; {

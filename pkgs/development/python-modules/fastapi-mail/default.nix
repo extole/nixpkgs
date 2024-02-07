@@ -11,6 +11,7 @@
 , jinja2
 , poetry-core
 , pydantic
+, pydantic-settings
 , pytest-asyncio
 , pytestCheckHook
 , python-multipart
@@ -19,22 +20,23 @@
 
 buildPythonPackage rec {
   pname = "fastapi-mail";
-  version = "1.2.0";
-  format = "pyproject";
+  version = "1.4.1";
+  pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "sabuhish";
-    repo = pname;
+    repo = "fastapi-mail";
     rev = "refs/tags/${version}";
-    hash = "sha256-RAUxc7spJL1QECAO0uZcCVAR/LaFIxFu61LD4RV9nEI=";
+    hash = "sha256-2iTZqZIxlt1GKhElasTcnys18UbNNDwHoZziHBOIGBo=";
   };
 
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace 'fastapi = "^0.75.0"' 'fastapi = "*"' \
-      --replace 'httpx = "^0.22.0"' 'httpx = "*"'
+      --replace 'version = "1.2.5"' 'version = "${version}"' \
+      --replace 'aiosmtplib = "^2.0"' 'aiosmtplib = "*"' \
+      --replace 'pydantic = "^2.0"' 'pydantic = "*"' \
   '';
 
   nativeBuildInputs = [
@@ -51,10 +53,11 @@ buildPythonPackage rec {
     httpx
     jinja2
     pydantic
+    pydantic-settings
     python-multipart
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest-asyncio
     pytestCheckHook
   ];
@@ -72,6 +75,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Module for sending emails and attachments";
     homepage = "https://github.com/sabuhish/fastapi-mail";
+    changelog = "https://github.com/sabuhish/fastapi-mail/releases/tag/${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

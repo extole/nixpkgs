@@ -6,7 +6,7 @@
 , eth-hash
 , eth-typing
 , eth-utils
-, factory_boy
+, factory-boy
 , hypothesis
 , isPyPy
 , pyasn1
@@ -17,13 +17,14 @@
 buildPythonPackage rec {
   pname = "eth-keys";
   version = "0.4.0";
+  format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "ethereum";
     repo = "eth-keys";
     rev = "v${version}";
-    sha256 = "sha256-jG/jJPM4t3z6UQIdc8L6y0DxZiGx5pVuGL8XwbIt60o=";
+    hash = "sha256-jG/jJPM4t3z6UQIdc8L6y0DxZiGx5pVuGL8XwbIt60o=";
   };
 
   propagatedBuildInputs = [
@@ -31,9 +32,9 @@ buildPythonPackage rec {
     eth-utils
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     asn1tools
-    factory_boy
+    factory-boy
     hypothesis
     pyasn1
     pytestCheckHook
@@ -50,6 +51,8 @@ buildPythonPackage rec {
     "test_public_key_compression_is_equal"
     "test_public_key_decompression_is_equal"
     "test_signatures_with_high_s"
+    # timing sensitive
+    "test_encode_decode_pairings"
   ];
 
   pythonImportsCheck = [ "eth_keys" ];
@@ -62,6 +65,6 @@ buildPythonPackage rec {
     description = "Common API for Ethereum key operations";
     homepage = "https://github.com/ethereum/eth-keys";
     license = licenses.mit;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }

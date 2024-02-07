@@ -2,7 +2,7 @@
 
 let
   pname = "lbry-desktop";
-  version = "0.52.5";
+  version = "0.53.9";
 in appimageTools.wrapAppImage rec {
   name = "${pname}-${version}";
 
@@ -12,7 +12,7 @@ in appimageTools.wrapAppImage rec {
     src = fetchurl {
       url = "https://github.com/lbryio/lbry-desktop/releases/download/v${version}/LBRY_${version}.AppImage";
       # Gotten from latest-linux.yml
-      sha512 = "i0t1Ygf3el7Brh6TA804V6n5r5UczvOPxAdhyJ7Gvvg9VqN1+QXB6hsqF4jYTW3jcKxvorVALwrFDVezBTPv5g==";
+      hash = "sha256-FkqIazE4eIEobYRBstXfPWh6MTCaNcCLk14yDGC4rRk=";
     };
   };
 
@@ -45,5 +45,6 @@ in appimageTools.wrapAppImage rec {
     changelog = "https://github.com/lbryio/lbry-desktop/blob/master/CHANGELOG.md";
     maintainers = with maintainers; [ enderger ];
     platforms = [ "x86_64-linux" ];
+    mainProgram = "lbry";
   };
 }

@@ -9,11 +9,12 @@
 buildPythonPackage rec {
   pname = "txzmq";
   version = "1.0.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit version;
     pname = "txZMQ";
-    sha256 = "sha256-jWB9C/CcqUYAuOQvByHb5D7lOgRwGCNErHrOfljcYXc=";
+    hash = "sha256-jWB9C/CcqUYAuOQvByHb5D7lOgRwGCNErHrOfljcYXc=";
   };
 
   propagatedBuildInputs = [
@@ -21,7 +22,7 @@ buildPythonPackage rec {
     twisted
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

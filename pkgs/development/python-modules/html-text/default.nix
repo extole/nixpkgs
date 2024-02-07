@@ -9,19 +9,20 @@
 buildPythonPackage rec {
   pname = "html-text";
   version = "0.5.2";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "TeamHG-Memex";
     repo = "html-text";
     rev = version;
-    sha256 = "sha256-jw/hpz0QfcgP5OEJcmre0h1OzOfpPtaROxHm+YUqces=";
+    hash = "sha256-jw/hpz0QfcgP5OEJcmre0h1OzOfpPtaROxHm+YUqces=";
   };
 
   propagatedBuildInputs = [
     lxml
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     six
   ];

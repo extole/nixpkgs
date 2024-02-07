@@ -169,7 +169,7 @@ in
           gracefully be applied to this option.
 
           If you intend to update the configuration through this option, be sure
-          to enable {option}`services.znc.mutable`, otherwise none of the
+          to disable {option}`services.znc.mutable`, otherwise none of the
           changes here will be applied after the initial deploy.
         '';
       };
@@ -243,6 +243,7 @@ in
     systemd.services.znc = {
       description = "ZNC Server";
       wantedBy = [ "multi-user.target" ];
+      wants = [ "network-online.target" ];
       after = [ "network-online.target" ];
       serviceConfig = {
         User = cfg.user;

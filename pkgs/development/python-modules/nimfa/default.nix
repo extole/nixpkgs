@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "nimfa";
   version = "1.4.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -18,7 +19,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ numpy scipy ];
-  checkInputs = [ matplotlib pytest ];
+  nativeCheckInputs = [ matplotlib pytest ];
   doCheck = !isPy3k;  # https://github.com/marinkaz/nimfa/issues/42
 
   meta = with lib; {

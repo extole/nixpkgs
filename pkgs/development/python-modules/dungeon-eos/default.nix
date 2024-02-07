@@ -3,12 +3,13 @@
 buildPythonPackage rec {
   pname = "dungeon-eos";
   version = "0.0.5";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "SkyTemple";
     repo = pname;
     rev = version;
-    sha256 = "sha256-Z1fGtslXP8zcZmVeWjRrbcM2ZJsfbrWjpLWZ49uSCRY=";
+    hash = "sha256-Z1fGtslXP8zcZmVeWjRrbcM2ZJsfbrWjpLWZ49uSCRY=";
   };
 
   doCheck = false; # there are no tests

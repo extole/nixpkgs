@@ -3,13 +3,14 @@
 buildPythonPackage rec {
   pname = "jsonfield";
   version = "3.1.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
     sha256 = "0yl828cd0m8jsyr4di6hcjdqmi31ijh5vk57mbpfl7p2gmcq8kky";
   };
 
-  checkInputs = [ pytestCheckHook pytest-django ];
+  nativeCheckInputs = [ pytestCheckHook pytest-django ];
 
   preCheck = "export DJANGO_SETTINGS_MODULE=tests.settings";
 

@@ -102,7 +102,7 @@ in
         };
 
         port = mkOption {
-          type = types.int;
+          type = types.port;
           default = if cfg.database.type == "mysql" then mysql.port else pgsql.port;
           defaultText = literalExpression ''
             if config.${opt.database.type} == "mysql"
@@ -203,7 +203,7 @@ in
       { assertion = !config.services.zabbixServer.enable;
         message = "Please choose one of services.zabbixServer or services.zabbixProxy.";
       }
-      { assertion = cfg.database.createLocally -> cfg.database.user == user;
+      { assertion = cfg.database.createLocally -> cfg.database.user == user && cfg.database.name == cfg.database.user;
         message = "services.zabbixProxy.database.user must be set to ${user} if services.zabbixProxy.database.createLocally is set true";
       }
       { assertion = cfg.database.createLocally -> cfg.database.passwordFile == null;
@@ -252,7 +252,7 @@ in
       ensureDatabases = [ cfg.database.name ];
       ensureUsers = [
         { name = cfg.database.user;
-          ensurePermissions = { "DATABASE ${cfg.database.name}" = "ALL PRIVILEGES"; };
+          ensureDBOwnership = true;
         }
       ];
     };

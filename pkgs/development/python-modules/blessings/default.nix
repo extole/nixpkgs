@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "blessings";
   version = "1.7";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -18,7 +19,7 @@ buildPythonPackage rec {
   doCheck = false;
 
   propagatedBuildInputs = [ six ];
-  checkInputs = [ nose ];
+  nativeCheckInputs = [ nose ];
 
   checkPhase = ''
     nosetests

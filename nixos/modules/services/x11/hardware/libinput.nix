@@ -130,9 +130,9 @@ let cfg = config.services.xserver.libinput;
         default = true;
         description =
           lib.mdDoc ''
-            Disables horizontal scrolling. When disabled, this driver will discard any horizontal scroll
-            events from libinput. Note that this does not disable horizontal scrolling, it merely
-            discards the horizontal axis from any scroll events.
+            Enables or disables horizontal scrolling. When disabled, this driver will discard any
+            horizontal scroll events from libinput. This does not disable horizontal scroll events
+            from libinput; it merely discards the horizontal axis from any scroll events.
           '';
       };
 
@@ -171,7 +171,7 @@ let cfg = config.services.xserver.libinput;
           lib.mdDoc ''
             Enables or disables drag lock during tapping behavior. When enabled, a finger up during tap-
             and-drag will not immediately release the button. If the finger is set down again within the
-            timeout, the draging process continues.
+            timeout, the dragging process continues.
           '';
       };
 
@@ -260,7 +260,10 @@ in {
   options = {
 
     services.xserver.libinput = {
-      enable = mkEnableOption (lib.mdDoc "libinput");
+      enable = mkEnableOption (lib.mdDoc "libinput") // {
+        default = config.services.xserver.enable;
+        defaultText = lib.literalExpression "config.services.xserver.enable";
+      };
       mouse = mkConfigForDevice "mouse";
       touchpad = mkConfigForDevice "touchpad";
     };

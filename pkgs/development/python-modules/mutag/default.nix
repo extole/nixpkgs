@@ -8,13 +8,14 @@
 buildPythonPackage {
   pname = "mutag";
   version = "0.0.2-2ffa0258ca";
+  format = "setuptools";
   disabled = ! isPy3k;
 
   src = fetchFromGitHub {
     owner = "aroig";
     repo = "mutag";
     rev = "2ffa0258cadaf79313241f43bf2c1caaf197d9c2";
-    sha256 = "sha256-YT3DGvYPyTuB70gg6p/3oXcTahEPcNuSIqe56xu3rSs=";
+    hash = "sha256-YT3DGvYPyTuB70gg6p/3oXcTahEPcNuSIqe56xu3rSs=";
   };
 
   propagatedBuildInputs = [ pyparsing ];

@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "lockfile";
   version = "0.12.2";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -15,7 +16,7 @@ buildPythonPackage rec {
   };
 
   buildInputs = [ pbr ];
-  checkInputs = [ nose ];
+  nativeCheckInputs = [ nose ];
 
   checkPhase = ''
     nosetests

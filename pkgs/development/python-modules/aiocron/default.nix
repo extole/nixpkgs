@@ -1,6 +1,7 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, setuptools
 , python
 , croniter
 , tzlocal
@@ -10,18 +11,23 @@
 buildPythonPackage rec {
   pname = "aiocron";
   version = "1.8";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-SFRlE/ry63kB5lpk66e2U8gBBu0A7ZyjQZw9ELZVWgE=";
+    hash = "sha256-SFRlE/ry63kB5lpk66e2U8gBBu0A7ZyjQZw9ELZVWgE=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     croniter
     tzlocal
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     tzlocal
   ];

@@ -17,6 +17,7 @@
 buildPythonPackage rec {
   pname = "lomond";
   version = "0.3.3";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "wildfoundry";
@@ -34,7 +35,7 @@ buildPythonPackage rec {
     six
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     freezegun
     pytest-mock
     pytestCheckHook

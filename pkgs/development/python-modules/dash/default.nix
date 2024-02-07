@@ -1,45 +1,97 @@
 { lib
 , buildPythonPackage
-, celery
-, dash-core-components
-, dash-html-components
-, dash-table
-, diskcache
-, fetchFromGitHub
-, flask
-, flask-compress
-, mock
-, multiprocess
-, plotly
-, psutil
-, pytest-mock
-, pytestCheckHook
 , pythonOlder
-, pyyaml
+, fetchFromGitHub
+
+, setuptools
+, nodejs
+, yarn
+, prefetch-yarn-deps
+, fetchYarnDeps
+
+, flask
+, werkzeug
+, plotly
+, dash-html-components
+, dash-core-components
+, dash-table
+, importlib-metadata
+, typing-extensions
+, requests
+, retrying
+, ansi2html
+, nest-asyncio
+
+, celery
 , redis
+, diskcache
+, multiprocess
+, psutil
+, flask-compress
+
+, pytestCheckHook
+, pytest-mock
+, mock
+, pyyaml
 }:
 
 buildPythonPackage rec {
   pname = "dash";
-  version = "2.6.2";
-  format = "setuptools";
+  version = "2.14.2";
+  pyproject = true;
 
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
     owner = "plotly";
-    repo = pname;
-    rev = "refs/tags/v${version}";
-    hash = "sha256-d2p3ahOqBA4n8XhMR6juluEGNM5EyT+GQFlDcuHZMqs=";
+    repo = "dash";
+    rev = "v${version}";
+    hash = "sha256-EFEsFgd3VbzlIUiz1fBIsKHywgWrL74taDFx0yIM/Ks=";
   };
 
+  nativeBuildInputs = [
+    setuptools
+    nodejs
+    yarn
+    prefetch-yarn-deps
+  ];
+
+  yarnOfflineCache = fetchYarnDeps {
+    yarnLock = "${src}/@plotly/dash-jupyterlab/yarn.lock";
+    hash = "sha256-mkiyrA0jGiP0zbabSjgHFLEUX3f+LZdJ8eARI5QA8CU=";
+  };
+
+  preBuild = ''
+    pushd @plotly/dash-jupyterlab
+
+    export HOME=$(mktemp -d)
+
+    yarn config --offline set yarn-offline-mirror ${yarnOfflineCache}
+    fixup-yarn-lock yarn.lock
+
+    substituteInPlace package.json --replace jlpm yarn
+    yarn install --offline --frozen-lockfile --ignore-engines --ignore-scripts
+    patchShebangs node_modules
+
+    # Generates the jupyterlab extension files
+    yarn run build:pack
+
+    popd
+  '';
+
   propagatedBuildInputs = [
-    plotly
     flask
-    flask-compress
-    dash-core-components
+    werkzeug
+    plotly
     dash-html-components
+    dash-core-components
     dash-table
+    importlib-metadata
+    typing-extensions
+    requests
+    retrying
+    ansi2html
+    nest-asyncio
   ];
 
   passthru.optional-dependencies = {
@@ -52,9 +104,12 @@ buildPythonPackage rec {
       multiprocess
       psutil
     ];
+    compress = [
+      flask-compress
+    ];
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     pytest-mock
     mock
@@ -63,18 +118,17 @@ buildPythonPackage rec {
 
   disabledTestPaths = [
     "tests/unit/test_browser.py"
-    "tests/unit/test_app_runners.py" # Use selenium
+    "tests/unit/test_app_runners.py" # Uses selenium
     "tests/integration"
   ];
 
-  pythonImportsCheck = [
-    "dash"
-  ];
+  pythonImportsCheck = [ "dash" ];
 
-  meta = with lib; {
+  meta = {
+    changelog = "https://github.com/plotly/dash/blob/${src.rev}/CHANGELOG.md";
     description = "Python framework for building analytical web applications";
     homepage = "https://dash.plot.ly/";
-    license = licenses.mit;
-    maintainers = with maintainers; [ antoinerg ];
+    license = lib.licenses.mit;
+    maintainers = with lib.maintainers; [ antoinerg tomasajt ];
   };
 }

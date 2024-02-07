@@ -3,9 +3,10 @@
 buildPythonPackage rec {
   pname = "preggy";
   version = "1.4.4";
+  format = "setuptools";
 
   propagatedBuildInputs = [ six unidecode ];
-  checkInputs = [ nose yanc ];
+  nativeCheckInputs = [ nose yanc ];
 
   src = fetchPypi {
     inherit pname version;

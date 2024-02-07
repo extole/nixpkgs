@@ -7,6 +7,7 @@
 buildPythonPackage rec {
   pname = "shellescape";
   version = "3.8.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "chrissimpkins";
@@ -15,7 +16,7 @@ buildPythonPackage rec {
     hash = "sha256-HAe3Qf3lLeVWw/tVkW0J+CfoxSoOnCcWDR2nEWZn7HM=";
   };
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
   pythonImportsCheck = [ "shellescape" ];
 
   meta = with lib; {

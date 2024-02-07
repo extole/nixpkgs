@@ -15,10 +15,11 @@
 buildPythonPackage rec {
   pname = "pywebpush";
   version = "1.14.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-bDbhZ5JoIZ5pO6lA2yvyVMJAygJmTeECtyaa/DxUVzE=";
+    hash = "sha256-bDbhZ5JoIZ5pO6lA2yvyVMJAygJmTeECtyaa/DxUVzE=";
   };
 
   propagatedBuildInputs = [
@@ -29,7 +30,7 @@ buildPythonPackage rec {
     six
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     coverage
     flake8
     mock

@@ -13,6 +13,7 @@
 buildPythonPackage rec {
   pname = "segments";
   version = "2.2.0";
+  format = "setuptools";
   disabled = isPy27;
 
   src = fetchFromGitHub {
@@ -32,7 +33,7 @@ buildPythonPackage rec {
     clldutils
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytestCheckHook
     pytest-mock

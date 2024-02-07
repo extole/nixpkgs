@@ -15,18 +15,22 @@
 
 mkDerivation rec {
   pname = "qimgv";
-  version = "1.0.2";
+  version = "1.0.3-alpha";
 
   src = fetchFromGitHub {
     owner = "easymodo";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-YlV/ysm7bdPverpKpanrL+jPVvMtP1paoAm0PREMaww=";
+    sha256 = "sha256-fHMSo8zlOl9Lt8nYwClUzON4TPB9Ogwven+TidsesxY=";
   };
 
   nativeBuildInputs = [
     cmake
     pkg-config
+  ];
+
+  cmakeFlags = [
+    "-DVIDEO_SUPPORT=ON"
   ];
 
   buildInputs = [

@@ -1,28 +1,39 @@
 { lib
 , fetchFromGitHub
 , buildGoModule
+, testers
+, gh-dash
 }:
 
 buildGoModule rec {
   pname = "gh-dash";
-  version = "3.4.2";
+  version = "3.11.1";
 
   src = fetchFromGitHub {
     owner = "dlvhdr";
     repo = "gh-dash";
     rev = "v${version}";
-    sha256 = "sha256-MiVscWYq2Y9EaupSYbTA9bsToLoIVhHCNE2Kj0GpkPw=";
+    hash = "sha256-07tp8kfmK/YXfV0Yi4Z27BBAefbdJ0gj2ySq2xDB1nw=";
   };
 
-  vendorSha256 = "sha256-BbrHvphTQLvUKanmO4GrNpkT0MSlY7+WMJiyXV7dFB8=";
+  vendorHash = "sha256-33W2xd/T1g65eujTTr0q3gYn9np2iELWBEDAjcefwQc=";
 
-  ldflags = [ "-s" "-w" ];
+  ldflags = [
+    "-s"
+    "-w"
+    "-X github.com/dlvhdr/gh-dash/cmd.Version=${version}"
+  ];
+
+  passthru.tests = {
+    version = testers.testVersion { package = gh-dash; };
+  };
 
   meta = {
-    description = "gh extension to display a dashboard with pull requests and issues";
-    homepage = "https://github.com/dlvhdr/gh-dash";
     changelog = "https://github.com/dlvhdr/gh-dash/releases/tag/${src.rev}";
+    description = "Github Cli extension to display a dashboard with pull requests and issues";
+    homepage = "https://github.com/dlvhdr/gh-dash";
     license = lib.licenses.mit;
     maintainers = with lib.maintainers; [ amesgen ];
+    mainProgram = "gh-dash";
   };
 }

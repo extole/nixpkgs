@@ -2,7 +2,7 @@
 , buildPythonPackage
 , callPackage
 , fetchPypi
-, appdirs
+, platformdirs
 , cryptography
 , dogpile-cache
 , jmespath
@@ -19,18 +19,18 @@
 
 buildPythonPackage rec {
   pname = "openstacksdk";
-  version = "0.102.0";
+  version = "2.0.0";
   format = "setuptools";
 
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-sqGP66eerCrDRpyNr+AdQAjIrDC+OkxrUydbTxxroq0=";
+    hash = "sha256-aXy2JRXFSNO3/Fyz+GXiebkw05433OsR2HH4H5+lkeg=";
   };
 
   propagatedBuildInputs = [
-    appdirs
+    platformdirs
     cryptography
     dogpile-cache
     jmespath

@@ -16,7 +16,7 @@ let
       # systemd/systemd#19604
       description = ''
         LDAP value - either a string, or an attrset containing
-        <literal>path</literal> or <literal>base64</literal> for included
+        `path` or `base64` for included
         values or base-64 encoded values respectively.
       '';
       check = x: lib.isString x || (lib.isAttrs x && (x ? path || x ? base64));
@@ -91,13 +91,8 @@ in {
         description = lib.mdDoc "Whether to enable the ldap server.";
       };
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.openldap;
-        defaultText = literalExpression "pkgs.openldap";
-        description = lib.mdDoc ''
-          OpenLDAP package to use.
-
+      package = mkPackageOption pkgs "openldap" {
+        extraDescription = ''
           This can be used to, for example, set an OpenLDAP package
           with custom overrides to enable modules or other
           functionality.
@@ -299,6 +294,7 @@ in {
         "man:slapd-mdb"
       ];
       wantedBy = [ "multi-user.target" ];
+      wants = [ "network-online.target" ];
       after = [ "network-online.target" ];
       serviceConfig = {
         User = cfg.user;

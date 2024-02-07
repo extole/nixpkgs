@@ -6,23 +6,28 @@
 , meson
 , ninja
 , libmpdclient
+, yaml-cpp
+, darwin
 }:
 
 stdenv.mkDerivation rec {
   pname = "ashuffle";
-  version = "3.12.5";
+  version = "3.14.3";
 
   src = fetchFromGitHub {
     owner = "joshkunz";
     repo = "ashuffle";
     rev = "v${version}";
-    sha256 = "sha256-dPgv6EzRxRdHkGvys601Bkg9Srd8oEjoE9jbAin74Vk=";
+    hash = "sha256-C7LClzVganE2DvucHw6euNRw2r36vhhCQlhWlkwWPwk=";
     fetchSubmodules = true;
   };
 
   dontUseCmakeConfigure = true;
   nativeBuildInputs = [ cmake pkg-config meson ninja ];
-  buildInputs = [ libmpdclient ];
+  buildInputs = [ libmpdclient yaml-cpp ]
+    ++ lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.CoreFoundation ];
+
+  mesonFlags = [ "-Dunsupported_use_system_yamlcpp=true" ];
 
   meta = with lib; {
     homepage = "https://github.com/joshkunz/ashuffle";

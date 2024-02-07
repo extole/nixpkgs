@@ -1,24 +1,27 @@
 { lib
 , buildPythonPackage
-, isPy3k
-, fetchPypi
+, pythonOlder
+, fetchFromGitHub
 , substituteAll
 , graphviz
 , coreutils
 , pkg-config
+, setuptools
 , pytest
 }:
 
 buildPythonPackage rec {
   pname = "pygraphviz";
-  version = "1.10";
+  version = "1.12";
+  pyproject = true;
 
-  disabled = !isPy3k;
+  disabled = pythonOlder "3.10";
 
-  src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-RX4JOoiBKJAyUaJmqMwWtLqT8/YzSz6/7ZLHRxp02Gc=";
-    extension = "zip";
+  src = fetchFromGitHub {
+    owner = "pygraphviz";
+    repo = "pygraphviz";
+    rev = "pygraphviz-${version}";
+    hash = "sha256-XDP77H724eiMa/V18OtLxpUpxlIVDmcFLMYOAbazquo=";
   };
 
   patches = [
@@ -29,11 +32,14 @@ buildPythonPackage rec {
     })
   ];
 
-  nativeBuildInputs = [ pkg-config ];
+  nativeBuildInputs = [
+    pkg-config
+    setuptools
+  ];
 
   buildInputs = [ graphviz ];
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   checkPhase = ''
     runHook preCheck

@@ -1,37 +1,43 @@
 { lib
-, fetchPypi
-, buildPythonPackage
 , blessed
 , browser-cookie3
+, buildPythonPackage
+, cloudscraper
+, fetchPypi
 , keyring
 , keyrings-alt
 , lxml
 , measurement
+, mock
+, pytestCheckHook
 , python-dateutil
+, pythonOlder
 , requests
 , rich
+, setuptools
 , typing-extensions
-, pytestCheckHook
-, mock
-, nose
-, pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "myfitnesspal";
-  version = "2.0.0";
-  format = "setuptools";
+  version = "2.1.0";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-xkO4rzjQTf1H4ZtJlzx6dT6BnfSg3VZU8pXdJFraTAI=";
+    hash = "sha256-H9oKSio+2x4TDCB4YN5mmERUEeETLKahPlW3TDDFE/E=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     blessed
     browser-cookie3
+    cloudscraper
     keyring
     keyrings-alt
     lxml
@@ -42,9 +48,8 @@ buildPythonPackage rec {
     typing-extensions
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
-    nose
     pytestCheckHook
   ];
 

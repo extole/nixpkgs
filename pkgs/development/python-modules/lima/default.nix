@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "lima";
   version = "0.5";
+  format = "setuptools";
   disabled = !isPy3k;
 
   src = fetchPypi {
@@ -10,7 +11,7 @@ buildPythonPackage rec {
     sha256 = "0qqj0053r77ppkcyyk2fhpaxjzsl1h98nf9clpny6cs66sdl241v";
   };
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   meta = with lib; {
     description = "Lightweight Marshalling of Python 3 Objects.";

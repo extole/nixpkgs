@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "pure-cdb";
   version = "4.0.0";
+  format = "setuptools";
   disabled = pythonOlder "3.4";
 
   # Archive on pypi has no tests.
@@ -13,7 +14,7 @@ buildPythonPackage rec {
     hash = "sha256-7zxQO+oTZJhXfM2yijGXchLixiQRuFTOSESVlEc+T0s=";
   };
 
-  checkInputs = [ flake8 ];
+  nativeCheckInputs = [ flake8 ];
 
   pythonImportsCheck = [ "cdblib" ];
 

@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "sentinels";
   version = "1.0.0";
+  format = "setuptools";
 
   disabled = pythonOlder "3.5";
 
@@ -21,7 +22,7 @@ buildPythonPackage rec {
     setuptools
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

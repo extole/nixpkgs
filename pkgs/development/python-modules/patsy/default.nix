@@ -1,6 +1,7 @@
 { lib
 , fetchPypi
 , buildPythonPackage
+, setuptools
 , six
 , numpy
 , scipy # optional, allows spline-related features (see patsy's docs)
@@ -9,12 +10,17 @@
 
 buildPythonPackage rec {
   pname = "patsy";
-  version = "0.5.3";
+  version = "0.5.4";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-vcGAAYdeMZvJHIEsHrahC+S7E8uB63Y/RmF53KO2cnc=";
+    hash = "sha256-favFJ1lzCN4OjxiPqiCvfgaom9qjBnVt/HeDaT6havQ=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     six
@@ -22,7 +28,7 @@ buildPythonPackage rec {
     scipy
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

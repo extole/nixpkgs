@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "pysrt";
   version = "1.1.2";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "byroot";
@@ -16,7 +17,7 @@ buildPythonPackage rec {
     sha256 = "1f5hxyzlh5mdvvi52qapys9qcinffr6ghgivb6k4jxa92cbs3mfg";
   };
 
-  checkInputs = [ nose ];
+  nativeCheckInputs = [ nose ];
   checkPhase = ''
     nosetests -v
   '';

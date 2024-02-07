@@ -20,16 +20,15 @@ let
   '';
 in buildPythonPackage rec {
   pname = "python-dbusmock";
-  version = "0.28.4";
+  version = "0.29.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "martinpitt";
     repo = pname;
     rev = "refs/tags/${version}";
-    sha256 = "sha256-gsGg9zHVyDTCVZmFUI8qqXDt0ui+o3hPwjRlsYUmShg=";
+    hash = "sha256-sfvVLPTSTXjwyB0a2NyDIONv01FXZ40nHZwwo3oqI90=";
   };
-
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   nativeBuildInputs = [
     setuptools-scm
@@ -39,7 +38,7 @@ in buildPythonPackage rec {
     dbus-python
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     dbus
     pygobject3
     bluez

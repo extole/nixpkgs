@@ -23,8 +23,6 @@ buildPythonPackage rec {
     hash = "sha256-ewPP2Xq+ecZGc5kokvLEsRokGqTWlymrzkwk480tapk=";
   };
 
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
-
   nativeBuildInputs = [
     hatch-vcs
     hatchling
@@ -34,7 +32,7 @@ buildPythonPackage rec {
     httpx
   ] ++ httpx.optional-dependencies.http2;
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     respx
   ];

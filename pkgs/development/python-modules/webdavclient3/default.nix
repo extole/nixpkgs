@@ -4,6 +4,7 @@
 buildPythonPackage rec {
   pname = "webdavclient3";
   version = "3.14.6";
+  format = "setuptools";
 
   disabled = isPy27;
 
@@ -14,7 +15,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ python-dateutil lxml requests ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   # disable tests completely, as most of them fail due to urllib3 not being able to establish a http connection
   doCheck = false;

@@ -1,19 +1,28 @@
-{ lib, buildPythonPackage, fetchPypi, pythonOlder
+{ lib
+, buildPythonPackage
+, fetchPypi
+, pythonOlder
+, setuptools
 , attrs
 , pytest
 }:
 
 buildPythonPackage rec {
   pname = "outcome";
-  version = "1.2.0";
+  version = "1.3.0.post0";
+
   disabled = pythonOlder "3.4";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-b4K9PeRdowPPH3ceyvoWM3UKNYQ2qLtg4Goc63RdJnI=";
+    hash = "sha256-nc8C5l8pcbgAR7N3Ro5yomjhXArzzxI45v8U9/kRQ7g=";
   };
 
-  checkInputs = [ pytest ];
+  nativeBuildInputs = [
+    setuptools
+  ];
+
+  nativeCheckInputs = [ pytest ];
   propagatedBuildInputs = [ attrs ];
   # Has a test dependency on trio, which depends on outcome.
   doCheck = false;

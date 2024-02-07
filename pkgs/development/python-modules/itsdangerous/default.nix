@@ -9,16 +9,21 @@
 buildPythonPackage rec {
   pname = "itsdangerous";
   version = "2.1.2";
+  format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-XbvGizF+XkLzJ/kCF2NUXcP8O/4i5t65aq8fw4h0FWo=";
+    hash = "sha256-XbvGizF+XkLzJ/kCF2NUXcP8O/4i5t65aq8fw4h0FWo=";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     freezegun
     pytestCheckHook
+  ];
+
+  pytestFlagsArray = [
+    "-W" "ignore::DeprecationWarning"
   ];
 
   meta = with lib; {

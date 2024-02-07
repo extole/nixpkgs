@@ -6,6 +6,7 @@
 buildPythonPackage rec {
   pname = "strategies";
   version = "0.2.3";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -13,7 +14,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ multipledispatch toolz ];
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   meta = {
     description = "A Python library for control flow programming";

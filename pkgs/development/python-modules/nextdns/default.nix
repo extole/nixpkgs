@@ -12,16 +12,16 @@
 
 buildPythonPackage rec {
   pname = "nextdns";
-  version = "1.1.1";
+  version = "2.1.0";
   format = "setuptools";
 
-  disabled = pythonOlder "3.8";
+  disabled = pythonOlder "3.10";
 
   src = fetchFromGitHub {
     owner = "bieniu";
-    repo = pname;
+    repo = "nextdns";
     rev = "refs/tags/${version}";
-    hash = "sha256-hMTafmG3mk6jyrqxI7L/rQxKGpgNgEZ+b6d6/yISCng=";
+    hash = "sha256-haw6t7pepMN77LFVgDFBbV4StRqcRMvnCaup8K38kEg=";
   };
 
   propagatedBuildInputs = [
@@ -29,7 +29,7 @@ buildPythonPackage rec {
     orjson
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aioresponses
     pytest-asyncio
     pytest-error-for-skips
@@ -43,6 +43,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Module for the NextDNS API";
     homepage = "https://github.com/bieniu/nextdns";
+    changelog = "https://github.com/bieniu/nextdns/releases/tag/${version}";
     license = licenses.asl20;
     maintainers = with maintainers; [ fab ];
   };

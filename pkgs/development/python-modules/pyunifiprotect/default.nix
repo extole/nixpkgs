@@ -2,14 +2,19 @@
 , aiofiles
 , aiohttp
 , aioshutil
+, async-timeout
 , buildPythonPackage
 , dateparser
 , fetchFromGitHub
+, ffmpeg
+, hatch-vcs
+, hatchling
 , ipython
 , orjson
 , packaging
 , pillow
 , poetry-core
+, py
 , pydantic
 , pyjwt
 , pytest-aiohttp
@@ -21,34 +26,34 @@
 , python-dotenv
 , pythonOlder
 , pytz
-, setuptools
 , termcolor
 , typer
-, ffmpeg
 }:
 
 buildPythonPackage rec {
   pname = "pyunifiprotect";
-  version = "4.3.4";
-  format = "pyproject";
+  version = "4.23.2";
+  pyproject = true;
 
   disabled = pythonOlder "3.9";
 
   src = fetchFromGitHub {
     owner = "briis";
-    repo = pname;
+    repo = "pyunifiprotect";
     rev = "refs/tags/v${version}";
-    hash = "sha256-EMKbSNlMTHvwiTPb9jnA2NIG6OhyNJshrRPYpYdHsM8=";
+    hash = "sha256-X4LRi2hNpKgnmk3GeoI+ziboBKIosSZye5lPWaBPL1s=";
   };
+
+  env.SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   postPatch = ''
     substituteInPlace pyproject.toml \
-      --replace "--cov=pyunifiprotect --cov-append" "" \
-      --replace "pydantic!=1.9.1" "pydantic"
+      --replace "--strict-markers -ra -Wd --ignore=.* --no-cov-on-fail --cov=pyunifiprotect --cov-append --maxfail=10 -n=auto" ""
   '';
 
   nativeBuildInputs = [
-    setuptools
+    hatch-vcs
+    hatchling
   ];
 
   propagatedBuildInputs = [
@@ -63,7 +68,10 @@ buildPythonPackage rec {
     pyjwt
     pytz
     typer
-  ] ++ typer.optional-dependencies.all;
+  ] ++ typer.optional-dependencies.all
+  ++ lib.optionals (pythonOlder "3.11") [
+    async-timeout
+  ];
 
   passthru.optional-dependencies = {
     shell = [
@@ -73,8 +81,9 @@ buildPythonPackage rec {
     ];
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     ffmpeg # Required for command ffprobe
+    py
     pytest-aiohttp
     pytest-asyncio
     pytest-benchmark
@@ -94,6 +103,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Library for interacting with the Unifi Protect API";
     homepage = "https://github.com/briis/pyunifiprotect";
+    changelog = "https://github.com/AngellusMortis/pyunifiprotect/releases/tag/v${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
   };

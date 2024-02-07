@@ -5,6 +5,7 @@
 buildPythonPackage rec {
   pname = "python-jsonrpc-server";
   version = "0.4.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "palantir";
@@ -17,7 +18,7 @@ buildPythonPackage rec {
     sed -i "s/version=versioneer.get_version(),/version=\"$version\",/g" setup.py
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook mock pytest-cov coverage
   ];
 

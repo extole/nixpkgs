@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "pytest-resource-path";
   version = "1.3.0";
+  format = "setuptools";
   disabled = pythonOlder "3.5";
 
   src = fetchFromGitHub {
@@ -32,7 +33,7 @@ buildPythonPackage rec {
     colorama
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

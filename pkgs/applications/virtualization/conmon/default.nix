@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , fetchFromGitHub
+, fetchpatch2
 , pkg-config
 , glib
 , glibc
@@ -11,18 +12,18 @@
 
 stdenv.mkDerivation rec {
   pname = "conmon";
-  version = "2.1.4";
+  version = "2.1.10";
 
   src = fetchFromGitHub {
     owner = "containers";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-d7fXbzbrqhP6zLVZo3gO+FyvZg7Z3AGlNSNLy0PD6EE=";
+    hash = "sha256-WUXyx5OWIJDamzHUahN+0/rcn2pxQgCgYAE/d0mxk2A=";
   };
 
   nativeBuildInputs = [ pkg-config ];
   buildInputs = [ glib libseccomp systemd ]
-  ++ lib.optionals (!stdenv.hostPlatform.isMusl) [ glibc glibc.static ];
+    ++ lib.optionals (!stdenv.hostPlatform.isMusl) [ glibc glibc.static ];
 
   # manpage requires building the vendored go-md2man
   makeFlags = [ "bin/conmon" ];
@@ -39,10 +40,12 @@ stdenv.mkDerivation rec {
   passthru.tests = { inherit (nixosTests) cri-o podman; };
 
   meta = with lib; {
+    changelog = "https://github.com/containers/conmon/releases/tag/${src.rev}";
     homepage = "https://github.com/containers/conmon";
     description = "An OCI container runtime monitor";
     license = licenses.asl20;
     maintainers = with maintainers; [ ] ++ teams.podman.members;
     platforms = platforms.linux;
+    mainProgram = "conmon";
   };
 }

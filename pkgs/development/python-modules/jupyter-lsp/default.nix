@@ -1,21 +1,26 @@
-{ stdenv
-, lib
+{ lib
 , buildPythonPackage
 , fetchPypi
-, jupyter_server
+, setuptools
+, jupyter-server
 }:
 
 buildPythonPackage rec {
   pname = "jupyter-lsp";
-  version = "1.5.1";
+  version = "2.2.1";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-dRq9NUE76ZpDMfNZewk0Gtx1VYntMgkawvaG2z1hJn4=";
+    hash = "sha256-sX+rbXD+g8iJawz/WSN2QAOCR8GWBWtDaEoJArap4Ps=";
   };
 
+  nativeBuildInputs = [
+    setuptools
+  ];
+
   propagatedBuildInputs = [
-    jupyter_server
+    jupyter-server
   ];
   # tests require network
   doCheck = false;
@@ -23,10 +28,10 @@ buildPythonPackage rec {
 
   meta = with lib; {
     description = "Multi-Language Server WebSocket proxy for your Jupyter notebook or lab server";
-    homepage = "https://pypi.org/project/jupyter-lsp";
+    homepage = "https://jupyterlab-lsp.readthedocs.io/en/latest/";
     license = licenses.bsd3;
     platforms = platforms.all;
-    maintainers = with maintainers; [ doronbehar ];
+    maintainers = with maintainers; [ ];
   };
 }
 

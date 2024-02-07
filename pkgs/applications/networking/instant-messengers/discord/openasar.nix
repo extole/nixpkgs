@@ -1,14 +1,14 @@
-{ lib, stdenv, fetchFromGitHub, nodejs, bash, nodePackages, unzip }:
+{ lib, stdenv, fetchFromGitHub, nodejs, bash, asar, unzip }:
 
 stdenv.mkDerivation rec {
   pname = "openasar";
-  version = "unstable-2022-10-10";
+  version = "unstable-2023-10-24";
 
   src = fetchFromGitHub {
     owner = "GooseMod";
     repo = "OpenAsar";
-    rev = "7a04cb57dff43f328de78addc234e9d21ff079a8";
-    hash = "sha256-6zYXv+iAfDEFHQ4FwNVEA4+zWiDyeLvkm17f4LuaCJg=";
+    rev = "eee9bab822e3dbd97a735d0050ddd41ba27917f2";
+    hash = "sha256-SSWQSqGgTZjowgrzF6qHZDTw/Y9xFHNTZvetxqZubYI=";
   };
 
   postPatch = ''
@@ -25,7 +25,7 @@ stdenv.mkDerivation rec {
     bash scripts/injectPolyfills.sh
     substituteInPlace src/index.js --replace 'nightly' '${version}'
     ${nodejs}/bin/node scripts/strip.js
-    ${nodePackages.asar}/bin/asar pack src app.asar
+    ${asar}/bin/asar pack src app.asar
 
     runHook postBuild
   '';
@@ -44,7 +44,7 @@ stdenv.mkDerivation rec {
     description = "Open-source alternative of Discord desktop's \"app.asar\".";
     homepage = "https://openasar.dev";
     license = licenses.mit;
-    maintainers = with maintainers; [ pedrohlc ];
+    maintainers = with maintainers; [ ];
     platforms = nodejs.meta.platforms;
   };
 }

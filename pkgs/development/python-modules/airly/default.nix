@@ -10,17 +10,18 @@
 buildPythonPackage rec {
   pname = "airly";
   version = "1.1.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "ak-ambi";
     repo = "python-airly";
     rev = "v${version}";
-    sha256 = "sha256-weliT/FYnRX+pzVAyRWFly7lfj2z7P+hpq5SIhyIgmI=";
+    hash = "sha256-weliT/FYnRX+pzVAyRWFly7lfj2z7P+hpq5SIhyIgmI=";
   };
 
   propagatedBuildInputs = [ aiohttp ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aioresponses
     aiounittest
     pytestCheckHook

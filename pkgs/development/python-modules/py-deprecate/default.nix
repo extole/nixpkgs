@@ -8,6 +8,7 @@
 let
   pname = "py-deprecate";
   version = "0.3.2";
+  format = "setuptools";
 in
 buildPythonPackage {
   inherit pname version;
@@ -19,7 +20,7 @@ buildPythonPackage {
     hash = "sha256-84RmQvLxwtLPQk3hX7Q6eeJeejhrO3t+mc95W1E85Fg=";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     scikit-learn
   ];

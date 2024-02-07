@@ -1,23 +1,26 @@
-{ lib, buildGoModule, fetchFromGitHub }:
+{ lib
+, buildGoModule
+, fetchFromGitHub
+}:
 
 buildGoModule rec {
   pname = "statsd_exporter";
-  version = "0.22.8";
+  version = "0.26.0";
 
   src = fetchFromGitHub {
-    rev = "v${version}";
     owner = "prometheus";
     repo = "statsd_exporter";
-    sha256 = "sha256-fzBVG3XPvaJnfsebA4muWDmkgw8kwzpOv/C68/j/tSs=";
+    rev = "v${version}";
+    hash = "sha256-C7+4v40T667KJHEQ3ebLDg2wJNrxD/nossfT6rMlER8=";
   };
 
-  vendorSha256 = "sha256-EQl3ME/l0mEkqjy2DCjUBv6LVbR6OaEUkwNIBPfXiDA=";
+  vendorHash = "sha256-scBpRZeECgAtpu9lnkIk1I2c8UmAkEL8LYNPUeUNYto=";
 
   meta = with lib; {
     description = "Receives StatsD-style metrics and exports them to Prometheus";
     homepage = "https://github.com/prometheus/statsd_exporter";
+    changelog = "https://github.com/prometheus/statsd_exporter/blob/v${version}/CHANGELOG.md";
     license = licenses.asl20;
     maintainers = with maintainers; [ benley ivan ];
-    platforms = platforms.unix;
   };
 }

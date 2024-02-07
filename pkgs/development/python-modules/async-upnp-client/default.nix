@@ -1,30 +1,42 @@
 { lib
 , stdenv
+, buildPythonPackage
+, fetchFromGitHub
+, pythonOlder
+
+# build-system
+, setuptools
+
+# dependencies
 , aiohttp
 , async-timeout
-, buildPythonPackage
 , defusedxml
-, fetchFromGitHub
+, python-didl-lite
+, voluptuous
+
+# tests
+, pytest-aiohttp
 , pytest-asyncio
 , pytestCheckHook
-, python-didl-lite
-, pythonOlder
-, voluptuous
 }:
 
 buildPythonPackage rec {
   pname = "async-upnp-client";
-  version = "0.32.1";
-  format = "setuptools";
+  version = "0.38.0";
+  pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
   src = fetchFromGitHub {
     owner = "StevenLooman";
     repo = "async_upnp_client";
-    rev = version;
-    sha256 = "sha256-T/8AZU95eHl/AIVkG9tYhN19B8PLvTWRTBRJjbvfI+8=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-hCgZsoccrHCXTZPnFX5OFhCGnd2WufxWo84jW3k9KiY=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     aiohttp
@@ -34,8 +46,9 @@ buildPythonPackage rec {
     voluptuous
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
+    pytest-aiohttp
     pytest-asyncio
   ];
 
@@ -73,6 +86,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Asyncio UPnP Client library for Python";
     homepage = "https://github.com/StevenLooman/async_upnp_client";
+    changelog = "https://github.com/StevenLooman/async_upnp_client/blob/${version}/CHANGES.rst";
     license = licenses.asl20;
     maintainers = with maintainers; [ hexa ];
   };

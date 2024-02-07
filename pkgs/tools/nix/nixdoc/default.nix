@@ -2,24 +2,27 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "nixdoc";
-  version = "1.0.1";
+  version = "2.7.0";
 
   src = fetchFromGitHub {
-    owner = "tazjin";
-    repo  = "nixdoc";
+    owner = "nix-community";
+    repo = "nixdoc";
     rev = "v${version}";
-    sha256 = "14d4dq06jdqazxvv7fq5872zy0capxyb0fdkp8qg06gxl1iw201s";
+    sha256 = "sha256-0cyKI8KHFsMXYca3hzbqxmBpxGdhl4/i183kfUQr8pg=";
   };
 
-  buildInputs =  lib.optionals stdenv.isDarwin [ darwin.Security ];
+  cargoHash = "sha256-9dqjNExxLDgVsu14yDQOJP1qxKy2ACiUH+pbX77iT70=";
 
-  cargoSha256 = "1nv6g8rmjjbwqmjkrpqncypqvx5c7xp2zlx5h6rw2j9d1wlys0v5";
+  buildInputs = lib.optionals stdenv.isDarwin [ darwin.Security ];
 
   meta = with lib; {
     description = "Generate documentation for Nix functions";
-    homepage    = "https://github.com/tazjin/nixdoc";
+    homepage    = "https://github.com/nix-community/nixdoc";
     license     = [ licenses.gpl3 ];
-    maintainers = [ maintainers.tazjin ];
+    maintainers = with maintainers; [
+      infinisil
+      asymmetric
+    ];
     platforms   = platforms.unix;
   };
 }

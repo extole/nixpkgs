@@ -1,8 +1,10 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, importlib-metadata
 , nose
 , numpy
+, setuptools
 , setuptools-scm
 , six
 , glibcLocales
@@ -11,23 +13,25 @@
 
 buildPythonPackage rec {
   pname = "pyfaidx";
-  version = "0.7.1";
-  format = "setuptools";
+  version = "0.7.2.2";
+  format = "pyproject";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-OXdjK3/SkEn4sRA11+neoOLF2pwjX5grTD+uBv8foj8=";
+    hash = "sha256-O3aTwFLIJpEAD+SpJHXbgv/DtachoSsQ37yHEZxLTTA=";
   };
 
   nativeBuildInputs = [
+    setuptools
     setuptools-scm
   ];
 
   propagatedBuildInputs = [
+    importlib-metadata
     six
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     glibcLocales
     nose
     numpy

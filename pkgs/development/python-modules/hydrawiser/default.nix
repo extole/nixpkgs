@@ -12,6 +12,7 @@
 buildPythonPackage rec {
   pname = "hydrawiser";
   version = "0.2";
+  format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
@@ -23,7 +24,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ requests ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest-asyncio
     pytest-cov
     pytestCheckHook

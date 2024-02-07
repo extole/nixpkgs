@@ -1,5 +1,12 @@
-{ python, lib, stdenv, pyside2
-, cmake, qt5, llvmPackages }:
+{ python
+, lib
+, stdenv
+, pyside2
+, cmake
+, qt5
+, libxcrypt
+, llvmPackages_15
+}:
 
 stdenv.mkDerivation {
   pname = "shiboken2";
@@ -14,10 +21,21 @@ stdenv.mkDerivation {
     cd sources/shiboken2
   '';
 
-  CLANG_INSTALL_DIR = llvmPackages.libclang.out;
+  CLANG_INSTALL_DIR = llvmPackages_15.libclang.out;
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ llvmPackages.libclang python python.pkgs.setuptools qt5.qtbase qt5.qtxmlpatterns ];
+
+  buildInputs = [
+    llvmPackages_15.libclang
+    python
+    python.pkgs.setuptools
+    qt5.qtbase
+    qt5.qtxmlpatterns
+  ] ++ (lib.optionals (python.pythonOlder "3.9") [
+    # see similar issue: 202262
+    # libxcrypt is required for crypt.h for building older python modules
+    libxcrypt
+  ]);
 
   cmakeFlags = [
     "-DBUILD_TESTS=OFF"
@@ -27,7 +45,7 @@ stdenv.mkDerivation {
 
   postInstall = ''
     cd ../../..
-    ${python.interpreter} setup.py egg_info --build-type=shiboken2
+    ${python.pythonOnBuildForHost.interpreter} setup.py egg_info --build-type=shiboken2
     cp -r shiboken2.egg-info $out/${python.sitePackages}/
     rm $out/bin/shiboken_tool.py
   '';

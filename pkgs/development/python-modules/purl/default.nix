@@ -8,19 +8,20 @@
 buildPythonPackage rec {
   pname = "purl";
   version = "1.6";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "codeinthehole";
     repo = "purl";
     rev = version;
-    sha256 = "sha256-Jb3JRW/PtQ7NlO4eQ9DmTPu/sjvFTg2mztphoIF79gc=";
+    hash = "sha256-Jb3JRW/PtQ7NlO4eQ9DmTPu/sjvFTg2mztphoIF79gc=";
   };
 
   propagatedBuildInputs = [
     six
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

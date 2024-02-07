@@ -8,17 +8,20 @@
 buildPythonPackage rec {
   pname = "pyserial-asyncio";
   version = "0.6";
+  format = "setuptools";
 
   disabled = pythonOlder "3.5";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-tgMpI+BenXXsF6WvmphCnEbSg5rfr4BgTVLg+qzXoy8=";
+    hash = "sha256-tgMpI+BenXXsF6WvmphCnEbSg5rfr4BgTVLg+qzXoy8=";
   };
 
   propagatedBuildInputs = [
     pyserial
   ];
+
+  __darwinAllowLocalNetworking = true;
 
   pythonImportsCheck = [
     "serial_asyncio"
@@ -29,6 +32,5 @@ buildPythonPackage rec {
     homepage = "https://github.com/pyserial/pyserial-asyncio";
     license = licenses.bsd3;
     maintainers = with maintainers; [ ];
-    platforms = platforms.linux;
   };
 }

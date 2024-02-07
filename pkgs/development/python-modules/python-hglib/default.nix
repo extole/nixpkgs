@@ -8,13 +8,14 @@
 buildPythonPackage rec {
   pname = "python-hglib";
   version = "2.6.2";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-sYvR7VPJDuV9VxTWata7crZOkw1K7KmDCJLAi7KNpgg=";
+    hash = "sha256-sYvR7VPJDuV9VxTWata7crZOkw1K7KmDCJLAi7KNpgg=";
   };
 
-  checkInputs = [ mercurial nose ];
+  nativeCheckInputs = [ mercurial nose ];
 
   preCheck = ''
     export HGTMP=$(mktemp -d)

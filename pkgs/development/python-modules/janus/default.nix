@@ -5,6 +5,7 @@
 buildPythonPackage rec {
   pname = "janus";
   version = "1.0.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -17,7 +18,7 @@ buildPythonPackage rec {
     typing-extensions
   ];
 
-  checkInputs = [ pytest-asyncio pytestCheckHook ];
+  nativeCheckInputs = [ pytest-asyncio pytestCheckHook ];
 
   # also fails upstream: https://github.com/aio-libs/janus/pull/258
   disabledTests = [ "test_format" ];

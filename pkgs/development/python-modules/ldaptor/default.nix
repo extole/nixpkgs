@@ -6,7 +6,7 @@
 , pyparsing
 , service-identity
 , six
-, zope_interface
+, zope-interface
 , pythonOlder
 , python
 }:
@@ -14,11 +14,12 @@
 buildPythonPackage rec {
   pname = "ldaptor";
   version = "21.2.0";
+  format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-jEnrGTddSqs+W4NYYGFODLF+VrtaIOGHSAj6W+xno1g=";
+    hash = "sha256-jEnrGTddSqs+W4NYYGFODLF+VrtaIOGHSAj6W+xno1g=";
   };
 
   propagatedBuildInputs = [
@@ -26,10 +27,10 @@ buildPythonPackage rec {
     pyparsing
     six
     twisted
-    zope_interface
+    zope-interface
   ] ++ twisted.optional-dependencies.tls;
 
-  checkInputs = [
+  nativeCheckInputs = [
     twisted
   ];
 
@@ -46,6 +47,6 @@ buildPythonPackage rec {
     description = "A Pure-Python Twisted library for LDAP";
     homepage = "https://github.com/twisted/ldaptor";
     license = licenses.mit;
-    maintainers = with maintainers; [ SuperSandro2000 ];
+    maintainers = with maintainers; [ ];
   };
 }

@@ -7,12 +7,12 @@
 
 buildPythonPackage rec {
   pname = "python-crfsuite";
-  version = "0.9.8";
+  version = "0.9.10";
   format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-DgPPbro2KHF8zwbfoPSiuoYohgrbF0y/0lCnpGkoZaE=";
+    hash = "sha256-84UkYx4rUzNB8Q8sd2iScNxuzVmFSV3M96o3sQRbwuU=";
   };
 
   preCheck = ''
@@ -20,7 +20,7 @@ buildPythonPackage rec {
     rm -r pycrfsuite
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

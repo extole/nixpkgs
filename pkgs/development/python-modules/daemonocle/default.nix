@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "daemonocle";
   version = "1.2.3";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "jnrbsn";
@@ -23,7 +24,7 @@ buildPythonPackage rec {
     psutil
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     lsof
   ];

@@ -1,6 +1,7 @@
 { lib, stdenv, llvm_meta, version
 , monorepoSrc, runCommand
-, cmake, python3, xcbuild, libllvm, libcxxabi, libxcrypt
+, cmake, python3, xcbuild, libllvm, linuxHeaders, libcxxabi, libxcrypt
+, doFakeLibgcc ? stdenv.hostPlatform.isFreeBSD
 }:
 
 let
@@ -28,9 +29,11 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [ cmake python3 libllvm.dev ]
     ++ lib.optional stdenv.isDarwin xcbuild.xcrun;
-  buildInputs = lib.optional stdenv.hostPlatform.isDarwin libcxxabi;
+  buildInputs =
+    lib.optional (stdenv.hostPlatform.isLinux && stdenv.hostPlatform.isRiscV) linuxHeaders
+    ++ lib.optional stdenv.hostPlatform.isDarwin libcxxabi;
 
-  NIX_CFLAGS_COMPILE = [
+  env.NIX_CFLAGS_COMPILE = toString [
     "-DSCUDO_DEFAULT_OPTIONS=DeleteSizeMismatch=0:DeallocationTypeMismatch=0"
   ];
 
@@ -38,7 +41,7 @@ stdenv.mkDerivation {
     "-DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON"
     "-DCMAKE_C_COMPILER_TARGET=${stdenv.hostPlatform.config}"
     "-DCMAKE_ASM_COMPILER_TARGET=${stdenv.hostPlatform.config}"
-  ] ++ lib.optionals (haveLibc && !isMusl) [
+  ] ++ lib.optionals (haveLibc && stdenv.hostPlatform.isGnu) [
     "-DSANITIZER_COMMON_CFLAGS=-I${libxcrypt}/include"
   ] ++ lib.optionals (useLLVM || bareMetal || isMusl) [
     "-DCOMPILER_RT_BUILD_SANITIZERS=OFF"
@@ -53,8 +56,6 @@ stdenv.mkDerivation {
     "-DCMAKE_CXX_COMPILER_WORKS=ON"
     "-DCOMPILER_RT_BAREMETAL_BUILD=ON"
     "-DCMAKE_SIZEOF_VOID_P=${toString (stdenv.hostPlatform.parsed.cpu.bits / 8)}"
-  ] ++ lib.optionals (useLLVM && !haveLibc) [
-    "-DCMAKE_C_FLAGS=-nodefaultlibs"
   ] ++ lib.optionals (useLLVM) [
     "-DCOMPILER_RT_BUILD_BUILTINS=ON"
     #https://stackoverflow.com/questions/53633705/cmake-the-c-compiler-is-not-able-to-compile-a-simple-test-program
@@ -80,6 +81,12 @@ stdenv.mkDerivation {
     ./darwin-targetconditionals.patch
     ../../common/compiler-rt/darwin-plistbuddy-workaround.patch
     ./armv7l.patch
+    # Fix build on armv6l
+    ../../common/compiler-rt/armv6-mcr-dmb.patch
+    ../../common/compiler-rt/armv6-sync-ops-no-thumb.patch
+    ../../common/compiler-rt/armv6-no-ldrexd-strexd.patch
+    ../../common/compiler-rt/armv6-scudo-no-yield.patch
+    ../../common/compiler-rt/armv6-scudo-libatomic.patch
   ];
 
   # TSAN requires XPC on Darwin, which we have no public/free source files for. We can depend on the Apple frameworks
@@ -102,6 +109,10 @@ stdenv.mkDerivation {
       --replace "#include <assert.h>" ""
   '';
 
+  preConfigure = lib.optionalString (useLLVM && !haveLibc) ''
+    cmakeFlagsArray+=(-DCMAKE_C_FLAGS="-nodefaultlibs -ffreestanding")
+  '';
+
   # Hack around weird upsream RPATH bug
   postInstall = lib.optionalString (stdenv.hostPlatform.isDarwin || stdenv.hostPlatform.isWasm) ''
     ln -s "$out/lib"/*/* "$out/lib"
@@ -110,6 +121,8 @@ stdenv.mkDerivation {
     ln -s $out/lib/*/clang_rt.crtend-*.o $out/lib/crtend.o
     ln -s $out/lib/*/clang_rt.crtbegin_shared-*.o $out/lib/crtbeginS.o
     ln -s $out/lib/*/clang_rt.crtend_shared-*.o $out/lib/crtendS.o
+  '' + lib.optionalString doFakeLibgcc ''
+    ln -s $out/lib/freebsd/libclang_rt.builtins-*.a $out/lib/libgcc.a
   '';
 
   meta = llvm_meta // {
@@ -126,5 +139,8 @@ stdenv.mkDerivation {
     # "All of the code in the compiler-rt project is dual licensed under the MIT
     # license and the UIUC License (a BSD-like license)":
     license = with lib.licenses; [ mit ncsa ];
+    # compiler-rt requires a Clang stdenv on 32-bit RISC-V:
+    # https://reviews.llvm.org/D43106#1019077
+    broken = stdenv.hostPlatform.isRiscV32 && !stdenv.cc.isClang;
   };
 }

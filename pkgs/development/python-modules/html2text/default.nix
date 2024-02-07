@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "html2text";
   version = "2020.1.16";
+  format = "setuptools";
   disabled = pythonOlder "3.5";
 
   src = fetchFromGitHub {
@@ -17,7 +18,7 @@ buildPythonPackage rec {
     sha256 = "1y924clp2hiqg3a9437z808p29mqcx537j5fmz71plx8qrcm5jf9";
   };
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "html2text" ];
 

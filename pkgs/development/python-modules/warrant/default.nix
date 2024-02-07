@@ -5,6 +5,7 @@
 buildPythonPackage {
   pname = "warrant";
   version = "0.6.1";
+  format = "setuptools";
 
   # move to fetchPyPi when https://github.com/capless/warrant/issues/97 is fixed
   src = fetchFromGitHub {
@@ -28,7 +29,7 @@ buildPythonPackage {
       --replace "python-jose-cryptodome>=1.3.2" "python-jose>=2.0.0"
   '';
 
-  checkInputs = [ mock ];
+  nativeCheckInputs = [ mock ];
 
   propagatedBuildInputs = [ boto3 envs python-jose requests ];
 

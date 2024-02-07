@@ -68,7 +68,7 @@ stdenv.mkDerivation rec {
     glib
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     mutest
   ];
 
@@ -77,6 +77,10 @@ stdenv.mkDerivation rec {
     "-Dintrospection=enabled"
     "-Dinstalled_test_datadir=${placeholder "installedTests"}/share"
     "-Dinstalled_test_bindir=${placeholder "installedTests"}/libexec"
+  ] ++ lib.optionals stdenv.isAarch32 [
+    # the box test is failing with SIGBUS on armv7l-linux
+    # https://github.com/ebassi/graphene/issues/215
+    "-Darm_neon=false"
   ];
 
   doCheck = true;
@@ -100,9 +104,7 @@ stdenv.mkDerivation rec {
       installedTests = nixosTests.installed-tests.graphene;
     };
 
-    updateScript = nix-update-script {
-      attrPath = pname;
-    };
+    updateScript = nix-update-script { };
   };
 
   meta = with lib; {

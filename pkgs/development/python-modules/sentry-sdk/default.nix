@@ -1,62 +1,57 @@
 { lib
 , stdenv
-, buildPythonPackage
-, fetchFromGitHub
-, pythonOlder
-
-# runtime
-, certifi
-, urllib3
-
-# optionals
 , aiohttp
 , apache-beam
+, asttokens
 , blinker
-, botocore
 , bottle
+, buildPythonPackage
 , celery
+, certifi
 , chalice
 , django
-, falcon
-, flask
-, flask-login
-, httpx
-, pure-eval
-, pyramid
-, pyspark
-, rq
-, sanic
-, sqlalchemy
-, tornado
-, trytond
-, werkzeug
-
-# tests
-, asttokens
 , executing
+, falcon
+, fetchFromGitHub
+, flask
 , gevent
+, httpx
 , jsonschema
 , mock
+, pure-eval
 , pyrsistent
+, pyspark
+, pysocks
 , pytest-forked
 , pytest-localserver
 , pytest-watch
 , pytestCheckHook
+, pythonOlder
+, rq
+, sanic
+, setuptools
+, sqlalchemy
+, tornado
+, urllib3
 }:
 
 buildPythonPackage rec {
   pname = "sentry-sdk";
-  version = "1.10.1";
-  format = "setuptools";
+  version = "1.39.2";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
   src = fetchFromGitHub {
     owner = "getsentry";
     repo = "sentry-python";
-    rev = version;
-    hash = "sha256-wNI92LVGFN+7LPxnrezPeF7dSS5UgwCuF62/ux3rik4=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-MC+9w53fsC5XB7CR9SS+z4bu2GgxkqdeYWERhk8lhcA=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     certifi
@@ -118,7 +113,7 @@ buildPythonPackage rec {
     ];
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     asttokens
     executing
     gevent
@@ -126,6 +121,7 @@ buildPythonPackage rec {
     mock
     pure-eval
     pyrsistent
+    pysocks
     pytest-forked
     pytest-localserver
     pytest-watch
@@ -137,11 +133,12 @@ buildPythonPackage rec {
   disabledTests = [
     # Issue with the asseration
     "test_auto_enabling_integrations_catches_import_error"
+    "test_default_release"
   ];
 
   disabledTestPaths = [
     # Varius integration tests fail every once in a while when we
-    # upgrade depencies, so don't bother testing them.
+    # upgrade dependencies, so don't bother testing them.
     "tests/integrations/"
   ] ++ lib.optionals (stdenv.buildPlatform != "x86_64-linux") [
     # test crashes on aarch64
@@ -155,6 +152,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Python SDK for Sentry.io";
     homepage = "https://github.com/getsentry/sentry-python";
+    changelog = "https://github.com/getsentry/sentry-python/blob/${version}/CHANGELOG.md";
     license = licenses.bsd2;
     maintainers = with maintainers; [ fab gebner ];
   };

@@ -37,8 +37,8 @@ let
 in
 rec {
   shards_0_17 = generic {
-    version = "0.17.0";
-    hash = "sha256-f9MptrKalW7gi0J2h0fokkzdjKBVa2TmoPX8BYffqzY=";
+    version = "0.17.4";
+    hash = "sha256-DAFKmr57fW2CWiexbP4Mvoqfh9ALpYEZv3NFK4Z4Zo4=";
   };
 
   shards = shards_0_17;

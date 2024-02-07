@@ -55,8 +55,9 @@ stdenv.mkDerivation rec {
     ++ lib.optionals withQT [ qttools qtbase ]
     ++ lib.optional withVPX libvpx;
 
+  dontWrapQtApps = true;
+
   buildCommand = let
-    qtVersion = "5.${lib.versions.minor qtbase.version}";
     wrapWith = makeWrapper: filename:
       "${makeWrapper} ${filename} --set ADM_ROOT_DIR $out --prefix LD_LIBRARY_PATH : ${libXext}/lib";
     wrapQtApp = wrapWith "wrapQtApp";
@@ -84,6 +85,11 @@ stdenv.mkDerivation rec {
 
     ln -s "$out/bin/avidemux3_${default}" "$out/bin/avidemux"
 
+    # make the install path match the rpath
+    if [[ -d ''${!outputLib}/lib64 ]]; then
+      mv ''${!outputLib}/lib64 ''${!outputLib}/lib
+      ln -s lib ''${!outputLib}/lib64
+    fi
     fixupPhase
   '';
 

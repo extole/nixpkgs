@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "pyevmasm";
   version = "0.2.3";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "crytic";
@@ -18,7 +19,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ future ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   meta = with lib; {
     description = "Ethereum Virtual Machine (EVM) assembler and disassembler";

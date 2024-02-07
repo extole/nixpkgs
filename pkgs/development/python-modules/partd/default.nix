@@ -2,6 +2,7 @@
 , buildPythonPackage
 , fetchPypi
 , isPy27
+, setuptools
 , pytest
 , locket
 , numpy
@@ -12,15 +13,21 @@
 
 buildPythonPackage rec {
   pname = "partd";
-  version = "1.3.0";
+  version = "1.4.1";
+  pyproject = true;
+
   disabled = isPy27;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-zpGrzcYXjWaLyqQxeRpakX2QI0HLGT9UP+RF1JRmBIU=";
+    hash = "sha256-VsJd1J5v6lcn5zEgPEZsbgkvMI2PACThmdAvaqIWf2c=";
   };
 
-  checkInputs = [ pytest ];
+  nativeBuildInputs = [
+    setuptools
+  ];
+
+  nativeCheckInputs = [ pytest ];
 
   propagatedBuildInputs = [ locket numpy pandas pyzmq toolz ];
 

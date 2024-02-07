@@ -10,21 +10,26 @@
 , shadow
 , systemd
 , coreutils
+, gitUpdater
+, busybox
+, procps
 }:
 
 python3.pkgs.buildPythonApplication rec {
   pname = "cloud-init";
-  version = "22.3.3";
+  version = "23.4.1";
   namePrefix = "";
 
   src = fetchFromGitHub {
     owner = "canonical";
     repo = "cloud-init";
-    rev = version;
-    hash = "sha256-9vdFPSmkkdJDlVfA9DgqczRoOBMmSMezdl3D/0OSbsQ=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-jdL5xDQTmz1ppVr2+fX76tiscGazw5L7Q0/uQF6+ogM=";
   };
 
-  patches = [ ./0001-add-nixos-support.patch ];
+  patches = [
+    ./0001-add-nixos-support.patch
+  ];
 
   prePatch = ''
     substituteInPlace setup.py \
@@ -60,28 +65,34 @@ python3.pkgs.buildPythonApplication rec {
     requests
   ];
 
-  checkInputs = with python3.pkgs; [
+  nativeCheckInputs = with python3.pkgs; [
     pytestCheckHook
     httpretty
     dmidecode
     # needed for tests; at runtime we rather want the setuid wrapper
+    passlib
     shadow
     responses
     pytest-mock
     coreutils
+    procps
   ];
 
   makeWrapperArgs = [
-    "--prefix PATH : ${lib.makeBinPath [ dmidecode cloud-utils.guest ]}/bin"
+    "--prefix PATH : ${lib.makeBinPath [ dmidecode cloud-utils.guest busybox ]}/bin"
   ];
 
   disabledTests = [
     # tries to create /var
     "test_dhclient_run_with_tmpdir"
+    "test_dhcp_client_failover"
     # clears path and fails because mkdir is not found
     "test_path_env_gets_set_from_main"
+    # fails to find cat
+    "test_subp_combined_stderr_stdout"
     # tries to read from /etc/ca-certificates.conf while inside the sandbox
     "test_handler_ca_certs"
+    "TestRemoveDefaultCaCerts"
     # Doesn't work in the sandbox
     "TestEphemeralDhcpNoNetworkSetup"
     "TestHasURLConnectivity"
@@ -112,13 +123,17 @@ python3.pkgs.buildPythonApplication rec {
     "cloudinit"
   ];
 
-  passthru.tests = { inherit (nixosTests) cloud-init cloud-init-hostname; };
+  passthru = {
+    tests = { inherit (nixosTests) cloud-init cloud-init-hostname; };
+    updateScript = gitUpdater { ignoredVersions = ".ubuntu.*"; };
+  };
 
   meta = with lib; {
-    homepage = "https://cloudinit.readthedocs.org";
+    homepage = "https://github.com/canonical/cloud-init";
     description = "Provides configuration and customization of cloud instance";
+    changelog = "https://github.com/canonical/cloud-init/raw/${version}/ChangeLog";
     license = with licenses; [ asl20 gpl3Plus ];
-    maintainers = with maintainers; [ phile314 illustris ];
+    maintainers = with maintainers; [ illustris jfroche ];
     platforms = platforms.all;
   };
 }

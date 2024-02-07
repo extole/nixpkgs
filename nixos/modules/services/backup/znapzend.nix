@@ -9,7 +9,7 @@ let
       The znapzend backup plan to use for the source.
 
       The plan specifies how often to backup and for how long to keep the
-      backups. It consists of a series of retention periodes to interval
+      backups. It consists of a series of retention periods to interval
       associations:
 
       ```
@@ -268,7 +268,7 @@ let
 
   mkSrcAttrs = srcCfg: with srcCfg; {
     enabled = onOff enable;
-    # mbuffer is not referenced by its full path to accomodate non-NixOS systems or differing mbuffer versions between source and target
+    # mbuffer is not referenced by its full path to accommodate non-NixOS systems or differing mbuffer versions between source and target
     mbuffer = with mbuffer; if enable then "mbuffer"
         + optionalString (port != null) ":${toString port}" else "off";
     mbuffer_size = mbuffer.size;
@@ -359,25 +359,25 @@ in
       };
 
       features.oracleMode = mkEnableOption (lib.mdDoc ''
-        Destroy snapshots one by one instead of using one long argument list.
+        destroying snapshots one by one instead of using one long argument list.
         If source and destination are out of sync for a long time, you may have
         so many snapshots to destroy that the argument gets is too long and the
-        command fails.
+        command fails
       '');
       features.recvu = mkEnableOption (lib.mdDoc ''
         recvu feature which uses `-u` on the receiving end to keep the destination
-        filesystem unmounted.
+        filesystem unmounted
       '');
       features.compressed = mkEnableOption (lib.mdDoc ''
         compressed feature which adds the options `-Lce` to
         the {command}`zfs send` command. When this is enabled, make
         sure that both the sending and receiving pool have the same relevant
-        features enabled. Using `-c` will skip unneccessary
+        features enabled. Using `-c` will skip unnecessary
         decompress-compress stages, `-L` is for large block
         support and -e is for embedded data support. see
         {manpage}`znapzend(1)`
         and {manpage}`zfs(8)`
-        for more info.
+        for more info
       '');
       features.sendRaw = mkEnableOption (lib.mdDoc ''
         sendRaw feature which adds the options `-w` to the
@@ -386,25 +386,25 @@ in
         backup that can't be read without the encryption key/passphrase, useful
         when the remote isn't fully trusted or not physically secure. This
         option must be used consistently, raw incrementals cannot be based on
-        non-raw snapshots and vice versa.
+        non-raw snapshots and vice versa
       '');
       features.skipIntermediates = mkEnableOption (lib.mdDoc ''
-        Enable the skipIntermediates feature to send a single increment
+        the skipIntermediates feature to send a single increment
         between latest common snapshot and the newly made one. It may skip
         several source snaps if the destination was offline for some time, and
         it should skip snapshots not managed by znapzend. Normally for online
         destinations, the new snapshot is sent as soon as it is created on the
-        source, so there are no automatic increments to skip.
+        source, so there are no automatic increments to skip
       '');
       features.lowmemRecurse = mkEnableOption (lib.mdDoc ''
         use lowmemRecurse on systems where you have too many datasets, so a
         recursive listing of attributes to find backup plans exhausts the
         memory available to {command}`znapzend`: instead, go the slower
         way to first list all impacted dataset names, and then query their
-        configs one by one.
+        configs one by one
       '');
       features.zfsGetType = mkEnableOption (lib.mdDoc ''
-        use zfsGetType if your {command}`zfs get` supports a
+        using zfsGetType if your {command}`zfs get` supports a
         `-t` argument for filtering by dataset type at all AND
         lists properties for snapshots by default when recursing, so that there
         is too much data to process while searching for backup plans.
@@ -412,7 +412,7 @@ in
         `--recursive` search for backup plans can literally
         differ by hundreds of times (depending on the amount of snapshots in
         that dataset tree... and a decent backup plan will ensure you have a lot
-        of those), so you would benefit from requesting this feature.
+        of those), so you would benefit from requesting this feature
       '');
     };
   };

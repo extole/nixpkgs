@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "munkres";
   version = "1.1.4";
+  format = "setuptools";
 
   disabled = !isPy3k;
 
@@ -26,7 +27,7 @@ buildPythonPackage rec {
     })
   ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   meta = with lib; {
     homepage = "http://bmc.github.com/munkres/";

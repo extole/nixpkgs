@@ -1,98 +1,110 @@
 { lib
+, stdenv
 , python3
 , groff
 , less
 , fetchFromGitHub
+, installShellFiles
 , nix-update-script
+, testers
+, awscli2
 }:
 
 let
-  py = python3.override {
-    packageOverrides = self: super: {
-      awscrt = super.awscrt.overridePythonAttrs (oldAttrs: rec {
-        version = "0.14.0";
-        src = self.fetchPypi {
-          inherit (oldAttrs) pname;
-          inherit version;
-          hash = "sha256-MGLTFcsWVC/gTdgjny6LwyOO6QRc1QcLkVzy677Lqqw=";
+  py = python3 // {
+    pkgs = python3.pkgs.overrideScope (final: prev: {
+      sphinx = prev.sphinx.overridePythonAttrs (prev: {
+        disabledTests = prev.disabledTests ++ [
+          "test_check_link_response_only" # fails on hydra https://hydra.nixos.org/build/242624087/nixlog/1
+        ];
+      });
+      ruamel-yaml = prev.ruamel-yaml.overridePythonAttrs (prev: {
+        src = prev.src.override {
+          version = "0.17.21";
+          hash = "sha256-i3zml6LyEnUqNcGsQURx3BbEJMlXO+SSa1b/P10jt68=";
         };
       });
-
-      prompt-toolkit = super.prompt-toolkit.overridePythonAttrs (oldAttrs: rec {
-        version = "3.0.28";
-        src = self.fetchPypi {
-          pname = "prompt_toolkit";
+      urllib3 = prev.urllib3.overridePythonAttrs (prev: rec {
+        pyproject = true;
+        version = "1.26.18";
+        nativeBuildInputs = with final; [
+          setuptools
+        ];
+        src = prev.src.override {
           inherit version;
-          hash = "sha256-nxzRax6GwpaPJRnX+zHdnWaZFvUVYSwmnRTp7VK1FlA=";
+          hash = "sha256-+OzBu6VmdBNFfFKauVW/jGe0XbeZ0VkGYmFxnjKFgKA=";
         };
       });
-    };
+    });
   };
 
 in
 with py.pkgs; buildPythonApplication rec {
   pname = "awscli2";
-  version = "2.8.8"; # N.B: if you change this, check if overrides are still up-to-date
-  format = "pyproject";
+  version = "2.15.12"; # N.B: if you change this, check if overrides are still up-to-date
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "aws";
     repo = "aws-cli";
-    rev = version;
-    sha256 = "sha256-F8FqsLh+KU6YR1BsE1+UPOsLkr7ie10kXCYJS0DfDCQ=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-1qvtImffj35+J9mPVLCgJE3porpF4DnlsRBW0ihzg10=";
   };
 
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace 'cryptography>=3.3.2,<40.0.2' 'cryptography>=3.3.2' \
+      --replace 'flit_core>=3.7.1,<3.8.1' 'flit_core>=3.7.1' \
+      --replace 'awscrt==0.19.18' 'awscrt>=0.19' \
+      --replace 'docutils>=0.10,<0.20' 'docutils>=0.10' \
+      --replace 'prompt-toolkit>=3.0.24,<3.0.39' 'prompt-toolkit>=3.0.24'
+
+    substituteInPlace requirements-base.txt \
+      --replace "wheel==0.38.4" "wheel>=0.38.4" \
+      --replace "flit_core==3.8.0" "flit_core>=3.8.0"
+
+    # Upstream needs pip to build and install dependencies and validates this
+    # with a configure script, but we don't as we provide all of the packages
+    # through PYTHONPATH
+    sed -i '/pip>=/d' requirements/bootstrap.txt
+  '';
+
   nativeBuildInputs = [
+    installShellFiles
     flit-core
   ];
 
   propagatedBuildInputs = [
     awscrt
     bcdoc
+    botocore
     colorama
     cryptography
     distro
     docutils
     groff
+    jmespath
     less
     prompt-toolkit
-    pyyaml
-    rsa
-    ruamel-yaml
-    wcwidth
     python-dateutil
-    jmespath
+    pyyaml
+    ruamel-yaml
     urllib3
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     jsonschema
     mock
     pytestCheckHook
   ];
 
-  postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace "colorama>=0.2.5,<0.4.4" "colorama" \
-      --replace "distro>=1.5.0,<1.6.0" "distro" \
-      --replace "docutils>=0.10,<0.16" "docutils" \
-      --replace "wcwidth<0.2.0" "wcwidth"
-  '';
-
   postInstall = ''
-    mkdir -p $out/${python3.sitePackages}/awscli/data
-    ${python3.interpreter} scripts/gen-ac-index --index-location $out/${python3.sitePackages}/awscli/data/ac.index
-
-    mkdir -p $out/share/bash-completion/completions
-    echo "complete -C $out/bin/aws_completer aws" > $out/share/bash-completion/completions/aws
-
-    mkdir -p $out/share/zsh/site-functions
-    mv $out/bin/aws_zsh_completer.sh $out/share/zsh/site-functions
-
+    installShellCompletion --cmd aws \
+      --bash <(echo "complete -C $out/bin/aws_completer aws") \
+      --zsh $out/bin/aws_zsh_completer.sh
+  '' + lib.optionalString (!stdenv.hostPlatform.isWindows) ''
     rm $out/bin/aws.cmd
   '';
-
-  doCheck = true;
 
   preCheck = ''
     export PATH=$PATH:$out/bin
@@ -119,15 +131,22 @@ with py.pkgs; buildPythonApplication rec {
   passthru = {
     python = py; # for aws_shell
     updateScript = nix-update-script {
-      attrPath = pname;
+      # Excludes 1.x versions from the Github tags list
+      extraArgs = [ "--version-regex" "^(2\.(.*))" ];
+    };
+    tests.version = testers.testVersion {
+      package = awscli2;
+      command = "aws --version";
+      inherit version;
     };
   };
 
   meta = with lib; {
-    homepage = "https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html";
-    changelog = "https://github.com/aws/aws-cli/blob/${version}/CHANGELOG.rst";
     description = "Unified tool to manage your AWS services";
+    homepage = "https://aws.amazon.com/cli/";
+    changelog = "https://github.com/aws/aws-cli/blob/${version}/CHANGELOG.rst";
     license = licenses.asl20;
     maintainers = with maintainers; [ bhipple davegallant bryanasdev000 devusb anthonyroussel ];
+    mainProgram = "aws";
   };
 }

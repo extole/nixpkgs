@@ -1,55 +1,84 @@
-{ lib, buildPythonPackage, fetchPypi, pythonOlder
+{ lib
+, buildPythonPackage
+, fetchPypi
+, pythonOlder
+, stdenv
+
+# build-system
+, setuptools
+
+# dependencies
 , attrs
-, sortedcontainers
-, async_generator
+, exceptiongroup
 , idna
 , outcome
-, contextvars
-, pytestCheckHook
-, pyopenssl
-, trustme
 , sniffio
-, stdenv
-, jedi
+, sortedcontainers
+
+# tests
 , astor
-, yapf
 , coreutils
+, jedi
+, pyopenssl
+, pytestCheckHook
+, pytest-trio
+, trustme
+, yapf
 }:
 
+let
+  # escape infinite recursion with pytest-trio
+  pytest-trio' = (pytest-trio.override {
+    trio = null;
+  }).overrideAttrs {
+    doCheck = false;
+    pythonImportsCheck = [];
+  };
+in
 buildPythonPackage rec {
   pname = "trio";
-  version = "0.21.0";
-  disabled = pythonOlder "3.6";
+  version = "0.23.1";
+  pyproject = true;
+
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-Uj85t7ae73NQHOv+Gq/UAKmq1bA1Q6Dt7VKVJIj/HBM=";
+    hash = "sha256-FviffcyPe53N7B/Nhj4MA5r20PmiL439Vvdddexz/Ug=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     attrs
-    sortedcontainers
-    async_generator
     idna
     outcome
     sniffio
-  ] ++ lib.optionals (pythonOlder "3.7") [ contextvars ];
+    sortedcontainers
+  ] ++ lib.optionals (pythonOlder "3.11") [
+    exceptiongroup
+  ];
 
   # tests are failing on Darwin
   doCheck = !stdenv.isDarwin;
 
-  checkInputs = [
+  nativeCheckInputs = [
     astor
     jedi
     pyopenssl
     pytestCheckHook
+    pytest-trio'
     trustme
     yapf
   ];
 
   preCheck = ''
-    substituteInPlace trio/tests/test_subprocess.py \
+    substituteInPlace trio/_tests/test_subprocess.py \
       --replace "/bin/sleep" "${coreutils}/bin/sleep"
+
+    export HOME=$TMPDIR
   '';
 
   # It appears that the build sandbox doesn't include /etc/services, and these tests try to use it.
@@ -61,6 +90,13 @@ buildPythonPackage rec {
     "static_tool_sees_all_symbols"
     # tests pytest more than python
     "fallback_when_no_hook_claims_it"
+    # requires mypy
+    "test_static_tool_sees_class_members"
+  ];
+
+  disabledTestPaths = [
+    # linters
+    "trio/_tests/tools/test_gen_exports.py"
   ];
 
   pytestFlagsArray = [

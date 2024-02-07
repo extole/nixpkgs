@@ -1,25 +1,24 @@
 { lib
 , async-timeout
-, asynctest
 , buildPythonPackage
 , coloredlogs
 , fetchFromGitHub
 , jsonschema
-, pyserial
-, pyserial-asyncio
 , pytest-asyncio
 , pytest-mock
+, pytest-rerunfailures
 , pytest-timeout
 , pytestCheckHook
 , pythonOlder
+, setuptools
 , voluptuous
 , zigpy
 }:
 
 buildPythonPackage rec {
   pname = "zigpy-znp";
-  version = "0.9.1";
-  format = "setuptools";
+  version = "0.12.1";
+  pyproject = true;
 
   disabled = pythonOlder "3.7";
 
@@ -27,30 +26,38 @@ buildPythonPackage rec {
     owner = "zigpy";
     repo = pname;
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-32QSFBzYg+E++5euCWKgbF3/uLEn1uObenmR/Wv9XZc=";
+    hash = "sha256-Bs/m9Iyr8x+sMUVXt1whk2E4EJ5bpitMsEWZtmCyIf8=";
   };
+
+  nativeBuildInputs = [
+    setuptools
+  ];
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace "timeout = 20" "timeout = 300" \
+      --replace ', "setuptools-git-versioning<2"' "" \
+      --replace 'dynamic = ["version"]' 'version = "${version}"'
+  '';
 
   propagatedBuildInputs = [
     async-timeout
     coloredlogs
     jsonschema
-    pyserial
-    pyserial-asyncio
     voluptuous
     zigpy
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest-asyncio
     pytest-mock
+    pytest-rerunfailures
     pytest-timeout
     pytestCheckHook
-  ] ++ lib.optionals (pythonOlder "3.8") [
-    asynctest
   ];
 
   pytestFlagsArray = [
-    "--asyncio-mode=legacy"
+    "--reruns=3"
   ];
 
   pythonImportsCheck = [
@@ -60,6 +67,7 @@ buildPythonPackage rec {
   meta = with lib; {
     description = "Library for zigpy which communicates with TI ZNP radios";
     homepage = "https://github.com/zigpy/zigpy-znp";
+    changelog = "https://github.com/zigpy/zigpy-znp/releases/tag/v${version}";
     license = licenses.gpl3Plus;
     maintainers = with maintainers; [ mvnetbiz ];
     platforms = platforms.linux;

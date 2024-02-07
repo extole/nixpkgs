@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "rfc3339-validator";
   version = "0.1.4";
+  format = "setuptools";
 
   src = fetchPypi {
     pname = "rfc3339_validator";
@@ -19,7 +20,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ six ];
 
-  checkInputs = [ pytestCheckHook hypothesis strict-rfc3339 ];
+  nativeCheckInputs = [ pytestCheckHook hypothesis strict-rfc3339 ];
   pythonImportsCheck = [ "rfc3339_validator" ];
 
   meta = with lib; {

@@ -1,49 +1,52 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
-, six
 , requests
 , django
 , boto3
+, hatchling
 , python
 , mock
-, pytestCheckHook
-, pytest-django
+, responses
 }:
 
 buildPythonPackage rec {
   pname = "django-anymail";
-  version = "8.6";
+  version = "10.2";
+  pyproject = true;
 
   src = fetchFromGitHub {
     owner = "anymail";
     repo = pname;
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-hLNILUV7qzqHfh7l3SJAoFveUIRSCHTjEQ3ZC3PhZUY=";
+    hash = "sha256-k4C82OYm2SdjxeLScrkkitumjYgWkMNFlNeGW+C1Z8o=";
   };
 
+  nativeBuildInputs = [
+    hatchling
+  ];
+
   propagatedBuildInputs = [
-    six
     requests
     django
-    boto3
   ];
 
-  checkInputs = [
-    pytestCheckHook
-    pytest-django
+  nativeCheckInputs = [
     mock
-  ];
+    responses
+  ] ++ passthru.optional-dependencies.amazon-ses;
 
-  disabledTests = [
-    # Require networking
-    "test_debug_logging"
-    "test_no_debug_logging"
-  ];
+  passthru.optional-dependencies = {
+    amazon-ses = [ boto3 ];
+  };
+
+  checkPhase = ''
+    runHook preCheck
+    CONTINUOUS_INTEGRATION=1 ${python.interpreter} runtests.py
+    runHook postCheck
+  '';
 
   pythonImportsCheck = [ "anymail" ];
-
-  DJANGO_SETTINGS_MODULE = "tests.test_settings.settings_3_2";
 
   meta = with lib; {
     description = "Django email backends and webhooks for Mailgun";

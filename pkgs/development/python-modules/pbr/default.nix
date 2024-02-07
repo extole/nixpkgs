@@ -1,21 +1,24 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, pythonAtLeast
 , setuptools
 , callPackage
 }:
 
 buildPythonPackage rec {
   pname = "pbr";
-  version = "5.10.0";
+  version = "6.0.0";
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-z8xP+OaYJW/BfqP/eWR4sFCFJYWqW6557NBbKrezm5o=";
+    hash = "sha256-0TdxIqWgDi+UDuSCmZUY7+FtdF1COmcMJ3c9+8PJp9k=";
   };
 
-  # importlib-metadata could be added here if it wouldn't cause an infinite recursion
-  propagatedBuildInputs = [ setuptools ];
+  nativeBuildInputs = [
+    setuptools
+  ];
 
   # check in passthru.tests.pytest to escape infinite recursion with fixtures
   doCheck = false;
@@ -30,6 +33,7 @@ buildPythonPackage rec {
     description = "Python Build Reasonableness";
     homepage = "https://github.com/openstack/pbr";
     license = licenses.asl20;
+    broken = pythonAtLeast "3.12"; # uses removed distutils
     maintainers = teams.openstack.members;
   };
 }

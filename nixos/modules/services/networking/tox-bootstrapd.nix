@@ -29,7 +29,7 @@ in
           };
 
           port = mkOption {
-            type = types.int;
+            type = types.port;
             default = 33445;
             description = lib.mdDoc "Listening port (UDP).";
           };
@@ -47,7 +47,7 @@ in
               lib.mdDoc ''
                 Configuration for bootstrap daemon.
                 See <https://github.com/irungentoo/toxcore/blob/master/other/bootstrap_daemon/tox-bootstrapd.conf>
-                and <http://wiki.tox.im/Nodes>.
+                and <https://wiki.tox.chat/users/nodes>.
              '';
           };
       };

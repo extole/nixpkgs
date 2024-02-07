@@ -3,6 +3,7 @@
 buildPythonPackage rec {
   pname = "uvcclient";
   version = "0.11.0";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "kk7ds";
@@ -11,7 +12,7 @@ buildPythonPackage rec {
     sha256 = "0k8aswrk1n08w6pi6dg0zdzsmk23cafihkrss9ywg3i85w7q43x2";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     nose
     mock
   ];

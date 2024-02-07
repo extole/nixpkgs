@@ -1,9 +1,19 @@
-{ lib, buildPythonPackage, fetchPypi
-, pbr, python-ldap, prettytable, fixtures, testresources, testtools }:
+{ lib
+, buildPythonPackage
+, fetchPypi
+, pbr
+, python-ldap
+, prettytable
+, six
+, fixtures
+, testresources
+, testtools
+}:
 
 buildPythonPackage rec {
   pname = "ldappool";
   version = "3.0.0";
+  format = "setuptools";
 
   src = fetchPypi {
     pname = "ldappool";
@@ -20,9 +30,9 @@ buildPythonPackage rec {
 
   nativeBuildInputs = [ pbr ];
 
-  propagatedBuildInputs = [ python-ldap prettytable ];
+  propagatedBuildInputs = [ python-ldap prettytable six ];
 
-  checkInputs = [ fixtures testresources testtools ];
+  nativeCheckInputs = [ fixtures testresources testtools ];
 
   meta = with lib; {
     description = "A simple connector pool for python-ldap";

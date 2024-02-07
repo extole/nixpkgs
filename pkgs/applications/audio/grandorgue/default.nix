@@ -5,14 +5,14 @@
 
 stdenv.mkDerivation rec {
   pname = "grandorgue";
-  version = "3.8.0-1";
+  version = "3.11.0";
 
   src = fetchFromGitHub {
     owner = "GrandOrgue";
     repo = pname;
     rev = version;
     fetchSubmodules = true;
-    sha256 = "sha256-VXf2B5NK6lrcNXUiTTjYhfBVrTWusyadD+5ySkmelsI=";
+    sha256 = "sha256-l1KqER/vkNwgKLXIFUzHnYLw2ivGNP7hRiKhIOzn7pw=";
   };
 
   postPatch = ''
@@ -36,7 +36,7 @@ stdenv.mkDerivation rec {
     "-DINSTALL_DEPEND=OFF"
   ] ++ lib.optional (!includeDemo) "-DINSTALL_DEMO=OFF";
 
-  NIX_CFLAGS_COMPILE = lib.optional stdenv.isDarwin "-DTARGET_OS_IPHONE=0";
+  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.isDarwin "-DTARGET_OS_IPHONE=0";
 
   postInstall = lib.optionalString stdenv.isDarwin ''
     mkdir -p $out/{Applications,bin,lib}
@@ -49,8 +49,8 @@ stdenv.mkDerivation rec {
 
   meta = {
     description = "Virtual Pipe Organ Software";
-    homepage = "https://sourceforge.net/projects/ourorgan";
-    license = lib.licenses.gpl2;
+    homepage = "https://github.com/GrandOrgue/grandorgue";
+    license = lib.licenses.gpl2Plus;
     platforms = lib.platforms.unix;
     maintainers = [ lib.maintainers.puzzlewolf ];
   };

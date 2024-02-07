@@ -25,10 +25,11 @@ in
 buildPythonPackage rec {
   pname = "ansible-kernel";
   version = "1.0.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-UJjm9FpmXSznXtaIR2rVv5YJS/H83FvRkNz09vwoe0c=";
+    hash = "sha256-UJjm9FpmXSznXtaIR2rVv5YJS/H83FvRkNz09vwoe0c=";
   };
 
   propagatedBuildInputs = [ ipywidgets six docopt tqdm jupyter psutil pyyaml ansible-runner ansible ];
@@ -55,6 +56,6 @@ buildPythonPackage rec {
     description = "An Ansible kernel for Jupyter";
     homepage = "https://github.com/ansible/ansible-jupyter-kernel";
     license = licenses.asl20;
-    maintainers = [ maintainers.costrouc ];
+    maintainers = [ ];
   };
 }

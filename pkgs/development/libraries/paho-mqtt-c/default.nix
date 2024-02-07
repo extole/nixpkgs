@@ -2,13 +2,13 @@
 
 stdenv.mkDerivation rec {
   pname = "paho.mqtt.c";
-  version = "1.3.11";
+  version = "1.3.13";
 
   src = fetchFromGitHub {
     owner = "eclipse";
     repo = "paho.mqtt.c";
     rev = "v${version}";
-    hash = "sha256-TGCWA9tOOx0rCb/XQWqLFbXb9gOyGS8u6o9fvSRS6xI=";
+    hash = "sha256-dKQnepQAryAjImh2rX1jdgiKBtJQy9wzk/7rGQjUtPg=";
   };
 
   postPatch = ''

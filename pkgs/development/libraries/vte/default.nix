@@ -20,23 +20,24 @@
 , gperf
 , pango
 , pcre2
+, cairo
 , fribidi
 , zlib
 , icu
 , systemd
-, systemdSupport ? stdenv.hostPlatform.isLinux
+, systemdSupport ? lib.meta.availableOn stdenv.hostPlatform systemd
 , nixosTests
 }:
 
-stdenv.mkDerivation rec {
+stdenv.mkDerivation (finalAttrs: {
   pname = "vte";
-  version = "0.70.1";
+  version = "0.74.2";
 
   outputs = [ "out" "dev" "devdoc" ];
 
   src = fetchurl {
-    url = "mirror://gnome/sources/${pname}/${lib.versions.majorMinor version}/${pname}-${version}.tar.xz";
-    sha256 = "sha256-H0YBy/6lMCuWkCIIyPGF5bGLJZtTWLyTzzkr9ZhxxbY=";
+    url = "mirror://gnome/sources/vte/${lib.versions.majorMinor finalAttrs.version}/vte-${finalAttrs.version}.tar.xz";
+    sha256 = "sha256-pTX7Kpj+qKJEnNGgLMz1GQEx3d/1LnFa/azj/rU26uc=";
   };
 
   patches = [
@@ -64,6 +65,7 @@ stdenv.mkDerivation rec {
   ];
 
   buildInputs = [
+    cairo
     fribidi
     gnutls
     pcre2
@@ -82,18 +84,17 @@ stdenv.mkDerivation rec {
 
   mesonFlags = [
     "-Ddocs=true"
+    (lib.mesonBool "gtk3" (gtkVersion == "3"))
+    (lib.mesonBool "gtk4" (gtkVersion == "4"))
   ] ++ lib.optionals (!systemdSupport) [
     "-D_systemd=false"
-  ] ++ lib.optionals (gtkVersion == "4") [
-    "-Dgtk3=false"
-    "-Dgtk4=true"
   ] ++ lib.optionals stdenv.isDarwin [
     # -Bsymbolic-functions is not supported on darwin
     "-D_b_symbolic_functions=false"
   ];
 
   # error: argument unused during compilation: '-pie' [-Werror,-Wunused-command-line-argument]
-  NIX_CFLAGS_COMPILE = lib.optionalString stdenv.hostPlatform.isMusl "-Wno-unused-command-line-argument";
+  env.NIX_CFLAGS_COMPILE = lib.optionalString stdenv.hostPlatform.isMusl "-Wno-unused-command-line-argument";
 
   postPatch = ''
     patchShebangs perf/*
@@ -109,7 +110,7 @@ stdenv.mkDerivation rec {
 
   passthru = {
     updateScript = gnome.updateScript {
-      packageName = pname;
+      packageName = "vte";
       versionPolicy = "odd-unstable";
     };
     tests = {
@@ -132,4 +133,4 @@ stdenv.mkDerivation rec {
     maintainers = with maintainers; [ astsmtl antono ] ++ teams.gnome.members;
     platforms = platforms.unix;
   };
-}
+})

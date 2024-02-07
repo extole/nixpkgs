@@ -1,7 +1,7 @@
 { lib
 , buildPythonPackage
 , fetchPypi
-, PyGithub
+, pygithub
 , terminaltables
 , click
 , requests
@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "keep";
   version = "2.10.1";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -20,7 +21,7 @@ buildPythonPackage rec {
     click
     requests
     terminaltables
-    PyGithub
+    pygithub
   ];
 
   # no tests

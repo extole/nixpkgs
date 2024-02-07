@@ -5,6 +5,7 @@
 buildPythonPackage rec {
   pname = "ydiff";
   version = "1.2";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -25,7 +26,7 @@ buildPythonPackage rec {
     patchShebangs tests/*.sh
   '';
 
-  checkInputs = [ docutils pygments ];
+  nativeCheckInputs = [ docutils pygments ];
 
   checkPhase = ''
     runHook preCheck

@@ -57,14 +57,8 @@ in {
         and give commands interactively to kresd@1.service.
       '';
     };
-    package = mkOption {
-      type = types.package;
-      description = lib.mdDoc ''
-        knot-resolver package to use.
-      '';
-      default = pkgs.knot-resolver;
-      defaultText = literalExpression "pkgs.knot-resolver";
-      example = literalExpression "pkgs.knot-resolver.override { extraFeatures = true; }";
+    package = mkPackageOption pkgs "knot-resolver" {
+      example = "knot-resolver.override { extraFeatures = true; }";
     };
     extraConfig = mkOption {
       type = types.lines;
@@ -79,7 +73,7 @@ in {
       example = [ "53" ];
       description = lib.mdDoc ''
         What addresses and ports the server should listen on.
-        For detailed syntax see ListenStream in man systemd.socket.
+        For detailed syntax see ListenStream in {manpage}`systemd.socket(5)`.
       '';
     };
     listenTLS = mkOption {
@@ -88,7 +82,7 @@ in {
       example = [ "198.51.100.1:853" "[2001:db8::1]:853" "853" ];
       description = lib.mdDoc ''
         Addresses and ports on which kresd should provide DNS over TLS (see RFC 7858).
-        For detailed syntax see ListenStream in man systemd.socket.
+        For detailed syntax see ListenStream in {manpage}`systemd.socket(5)`.
       '';
     };
     listenDoH = mkOption {
@@ -97,7 +91,7 @@ in {
       example = [ "198.51.100.1:443" "[2001:db8::1]:443" "443" ];
       description = lib.mdDoc ''
         Addresses and ports on which kresd should provide DNS over HTTPS/2 (see RFC 8484).
-        For detailed syntax see ListenStream in man systemd.socket.
+        For detailed syntax see ListenStream in {manpage}`systemd.socket(5)`.
       '';
     };
     instances = mkOption {

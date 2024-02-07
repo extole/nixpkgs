@@ -9,6 +9,7 @@
 buildPythonPackage rec {
   pname = "dugong";
   version = "3.8.1";
+  format = "setuptools";
   disabled = pythonOlder "3.3";
 
   src = fetchFromGitHub {
@@ -18,7 +19,7 @@ buildPythonPackage rec {
     sha256 = "1063c1779idc5nrjzfv5w1xqvyy3crapb2a2xll9y6xphxclnkjc";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

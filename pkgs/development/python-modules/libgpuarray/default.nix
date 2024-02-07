@@ -8,14 +8,17 @@
 , numpy
 , six
 , nose
-, Mako
-, cudaSupport ? false, cudaPackages
+, mako
+, config
+, cudaSupport ? config.cudaSupport
+, cudaPackages ? { }
 , openclSupport ? true, ocl-icd, clblas
 }:
 
 buildPythonPackage rec {
   pname = "libgpuarray";
   version = "0.7.6";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "Theano";
@@ -59,7 +62,7 @@ buildPythonPackage rec {
   propagatedBuildInputs = [
     numpy
     six
-    Mako
+    mako
   ];
 
   nativeBuildInputs = [

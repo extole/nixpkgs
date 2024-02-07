@@ -12,12 +12,13 @@
 buildPythonPackage rec {
   pname = "aiomodernforms";
   version = "0.1.8";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "wonderslug";
     repo = "aiomodernforms";
     rev = "v${version}";
-    sha256 = "sha256-Vx51WBjjNPIfLlwMnAuwHnGNljhnjKkU0tWB9M9rjsw=";
+    hash = "sha256-Vx51WBjjNPIfLlwMnAuwHnGNljhnjKkU0tWB9M9rjsw=";
   };
 
   propagatedBuildInputs = [
@@ -26,7 +27,7 @@ buildPythonPackage rec {
     yarl
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aresponses
     pytest-asyncio
     pytestCheckHook

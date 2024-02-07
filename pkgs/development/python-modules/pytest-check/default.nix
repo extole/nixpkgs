@@ -1,25 +1,31 @@
 { lib
 , buildPythonPackage
 , fetchPypi
+, flit-core
 , pytest
 , pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "pytest-check";
-  version = "1.0.10";
-  format = "flit";
+  version = "2.2.4";
+  format = "pyproject";
 
   src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-ng7c10Dyxb5qbO22TDkNl5wAzXg2eYrLO21sjtEBoio=";
+    pname = "pytest_check";
+    inherit version;
+    hash = "sha256-0uaWYDFB9bLekFuTWD5FmE7DxhzscCZJ3rEL2XSFYLs=";
   };
 
-  buildInputs = [
+  nativeBuildInputs = [
+    flit-core
+  ];
+
+  propagatedBuildInputs = [
     pytest
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 

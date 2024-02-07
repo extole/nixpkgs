@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "sparklines";
   version = "0.4.2";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "deeplook";
@@ -18,7 +19,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ future ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
 
   pythonImportsCheck = [ "sparklines" ];
 

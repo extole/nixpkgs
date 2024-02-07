@@ -2,15 +2,18 @@
 , stdenv
 , fetchurl
 , cairo
+, expat
 , ffmpeg
 , libexif
 , pango
 , pkg-config
 , wxGTK
-# darwin deps
-, Cocoa
+, darwin
 }:
 
+let
+  inherit (darwin.apple_sdk.frameworks) Cocoa;
+in
 stdenv.mkDerivation rec {
   pname = "wxSVG";
   version = "1.5.24";
@@ -26,6 +29,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [
     cairo
+    expat
     ffmpeg
     libexif
     pango
@@ -33,7 +37,7 @@ stdenv.mkDerivation rec {
   ] ++ lib.optional stdenv.isDarwin Cocoa;
 
   meta = with lib; {
-    homepage = "http://wxsvg.sourceforge.net/";
+    homepage = "https://wxsvg.sourceforge.net/";
     description = "A SVG manipulation library built with wxWidgets";
     longDescription = ''
       wxSVG is C++ library to create, manipulate and render Scalable Vector

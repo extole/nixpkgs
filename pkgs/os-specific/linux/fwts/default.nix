@@ -1,17 +1,18 @@
-{ lib, stdenv, fetchzip, autoreconfHook, pkg-config, glib, pcre
+{ lib, stdenv, fetchzip, autoreconfHook, pkg-config, gnumake42, glib, pcre
 , json_c, flex, bison, dtc, pciutils, dmidecode, acpica-tools, libbsd }:
 
 stdenv.mkDerivation rec {
   pname = "fwts";
-  version = "22.09.00";
+  version = "23.11.00";
 
   src = fetchzip {
     url = "https://fwts.ubuntu.com/release/${pname}-V${version}.tar.gz";
-    sha256 = "sha256-BaaUvRbon8V8RvAgw+AC9MCHC65Y/NFT1iFZ+B8P2Hk=";
+    sha256 = "sha256-3cusxMFIYGKJ+ocQPc77bzHkyQhikLo1szSgE59aK9s=";
     stripRoot = false;
   };
 
-  nativeBuildInputs = [ autoreconfHook pkg-config ];
+  # fails with make 4.4
+  nativeBuildInputs = [ autoreconfHook pkg-config gnumake42 ];
   buildInputs = [ glib pcre json_c flex bison dtc pciutils dmidecode acpica-tools libbsd ];
 
   postPatch = ''
@@ -19,6 +20,10 @@ stdenv.mkDerivation rec {
       --replace "/usr/bin/lspci"      "${pciutils}/bin/lspci" \
       --replace "/usr/sbin/dmidecode" "${dmidecode}/bin/dmidecode" \
       --replace "/usr/bin/iasl"       "${acpica-tools}/bin/iasl"
+
+    substituteInPlace src/lib/src/fwts_devicetree.c \
+                      src/devicetree/dt_base/dt_base.c \
+      --replace "dtc -I" "${dtc}/bin/dtc -I"
   '';
 
   enableParallelBuilding = true;

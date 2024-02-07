@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "python-markdown-math";
   version = "0.8";
+  format = "setuptools";
   disabled = isPy27;
 
   src = fetchPypi {
@@ -15,7 +16,7 @@ buildPythonPackage rec {
     sha256 = "8564212af679fc18d53f38681f16080fcd3d186073f23825c7ce86fadd3e3635";
   };
 
-  checkInputs = [ markdown ];
+  nativeCheckInputs = [ markdown ];
 
   meta = {
     description = "Math extension for Python-Markdown";

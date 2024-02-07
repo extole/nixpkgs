@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   pname = "libksba";
-  version = "1.6.2";
+  version = "1.6.5";
 
   src = fetchurl {
     url = "mirror://gnupg/libksba/libksba-${version}.tar.bz2";
-    sha256 = "fce01ccac59812bddadffacff017dac2e4762bdb6ebc6ffe06f6ed4f6192c971";
+    hash = "sha256-pWRijFdMmSh5mHU/mNdQur2RpOnbRR9GrRQEZu8qbRY=";
   };
 
   outputs = [ "out" "dev" "info" ];

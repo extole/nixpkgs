@@ -13,6 +13,7 @@
 buildPythonPackage rec {
   pname = "coloredlogs";
   version = "15.0.1";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "xolox";
@@ -25,7 +26,7 @@ buildPythonPackage rec {
     humanfriendly
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     mock
     util-linux

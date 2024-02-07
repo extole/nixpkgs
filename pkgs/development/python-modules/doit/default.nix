@@ -19,12 +19,13 @@
 let doit = buildPythonPackage rec {
   pname = "doit";
   version = "0.36.0";
+  format = "setuptools";
 
   disabled = !isPy3k;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-cdB8zJUUyyL+WdmJmVd2ZeqrV+FvZE0EM2rgtLriNLw=";
+    hash = "sha256-cdB8zJUUyyL+WdmJmVd2ZeqrV+FvZE0EM2rgtLriNLw=";
   };
 
   propagatedBuildInputs = [
@@ -34,7 +35,7 @@ let doit = buildPythonPackage rec {
   ] ++ lib.optional stdenv.isLinux pyinotify
     ++ lib.optional stdenv.isDarwin macfsevents;
 
-  checkInputs = [
+  nativeCheckInputs = [
     configclass
     doit-py
     mergedict

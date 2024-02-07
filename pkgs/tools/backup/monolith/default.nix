@@ -5,24 +5,25 @@
 , openssl
 , libiconv
 , Security
+, SystemConfiguration
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "monolith";
-  version = "2.6.2";
+  version = "2.8.0";
 
   src = fetchFromGitHub {
     owner = "Y2Z";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-E+2D/oidqxRqKR70LN4uR1QkBa4oFfLiS8SoJkrgwtI=";
+    sha256 = "sha256-TYLQkVVjIFr6BrPaKJSHDnLAK0HQuI3Pmi2IkWVoIn4=";
   };
 
-  cargoSha256 = "sha256-Acmo0p+WihRg3dU3ptaFw6uf9OQegvPUCQ63b5Ucdmk=";
+  cargoHash = "sha256-NIKueum/BQEW21e8/DGadtwylXeT3Vl2TOVbbxxWkLY=";
 
   nativeBuildInputs = lib.optionals stdenv.isLinux [ pkg-config ];
   buildInputs = lib.optionals stdenv.isLinux [ openssl ]
-    ++ lib.optionals stdenv.isDarwin [ libiconv Security ];
+    ++ lib.optionals stdenv.isDarwin [ libiconv Security SystemConfiguration ];
 
   checkFlagsArray = [ "--skip=tests::cli" ];
 

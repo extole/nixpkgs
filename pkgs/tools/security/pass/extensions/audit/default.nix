@@ -33,7 +33,7 @@ in stdenv.mkDerivation rec {
 
   # Tests freeze on darwin with: pass-audit-1.1 (checkPhase): EOFError
   doCheck = !stdenv.isDarwin;
-  checkInputs = [ pythonPackages.green pass gnupg ];
+  nativeCheckInputs = [ pythonPackages.green pass gnupg ];
   checkPhase = ''
     ${pythonEnv}/bin/python3 setup.py green -q
   '';
@@ -46,7 +46,7 @@ in stdenv.mkDerivation rec {
   '';
 
   meta = with lib; {
-    description = "Pass extension for auditing your password repository.";
+    description = "Pass extension for auditing your password repository";
     homepage = "https://github.com/roddhjav/pass-audit";
     license = licenses.gpl3Plus;
     platforms = platforms.unix;

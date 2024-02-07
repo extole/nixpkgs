@@ -48,7 +48,7 @@ python3Packages.buildPythonApplication rec {
 
   nativeBuildInputs = [ qt5.wrapQtAppsHook ];
   buildInputs = [ python3Packages.numpy python3Packages.pyqt5 glew glm libpng libxml2 freetype msgpack netcdf ];
-  NIX_CFLAGS_COMPILE = "-I ${libxml2.dev}/include/libxml2";
+  env.NIX_CFLAGS_COMPILE = "-I ${libxml2.dev}/include/libxml2";
   hardeningDisable = [ "format" ];
 
   installPhase = ''
@@ -58,7 +58,7 @@ python3Packages.buildPythonApplication rec {
 
   postInstall = with python3Packages; ''
     wrapProgram $out/bin/pymol \
-      --prefix PYTHONPATH : ${lib.makeSearchPathOutput "lib" python3.sitePackages [ pyqt5 pyqt5.pyqt5_sip ]}
+      --prefix PYTHONPATH : ${lib.makeSearchPathOutput "lib" python3.sitePackages [ pyqt5 pyqt5.pyqt5-sip ]}
 
     mkdir -p "$out/share/icons/"
     ln -s ../../lib/python/pymol/pymol_path/data/pymol/icons/icon2.svg "$out/share/icons/pymol.svg"
@@ -70,7 +70,6 @@ python3Packages.buildPythonApplication rec {
   '';
 
   meta = with lib; {
-    broken = stdenv.isDarwin;
     inherit description;
     homepage = "https://www.pymol.org/";
     license = licenses.mit;

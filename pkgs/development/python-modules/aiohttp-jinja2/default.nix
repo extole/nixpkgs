@@ -10,14 +10,14 @@
 
 buildPythonPackage rec {
   pname = "aiohttp-jinja2";
-  version = "1.5";
+  version = "1.6";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-fDul6sBgtpH05QU0ry15/KKnVxLr0rJeb8sSlYWfkQs=";
+    hash = "sha256-o6f/UmTlvKUuiuVHu/0HYbcklSMNQ40FtsCRW+YZsOI=";
   };
 
   propagatedBuildInputs = [
@@ -25,7 +25,7 @@ buildPythonPackage rec {
     jinja2
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest-aiohttp
     pytestCheckHook
   ];
@@ -52,6 +52,6 @@ buildPythonPackage rec {
     description = "Jinja2 support for aiohttp";
     homepage = "https://github.com/aio-libs/aiohttp_jinja2";
     license = licenses.asl20;
-    maintainers = with maintainers; [ peterhoeg ];
+    maintainers = with maintainers; [ ];
   };
 }

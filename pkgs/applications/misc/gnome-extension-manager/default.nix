@@ -7,6 +7,7 @@
 , ninja
 , gettext
 , gtk4
+, appstream
 , appstream-glib
 , desktop-file-utils
 , gobject-introspection
@@ -16,32 +17,30 @@
 , libsoup_3
 , glib
 , libbacktrace
-, python3
 , text-engine
 }:
 
 stdenv.mkDerivation rec {
   pname = "gnome-extension-manager";
-  version = "0.4.0";
+  version = "0.4.3";
 
   src = fetchFromGitHub {
     owner = "mjakeman";
     repo = "extension-manager";
     rev = "v${version}";
-    sha256 = "sha256-M+jMEJXtzUP6dQp9vpyMhh1wuKG9YJ8i0ys92nbmmpw=";
+    hash = "sha256-e+s8iIUvW9Rw0Wq4aIn3IzBLGTQC6o0TmNXd5gz892Y=";
   };
 
   nativeBuildInputs = [
+    appstream
     appstream-glib
     desktop-file-utils
     gettext
     glib
     gobject-introspection
-    libadwaita
     meson
     ninja
     pkg-config
-    python3
     wrapGAppsHook4
   ];
 
@@ -49,19 +48,23 @@ stdenv.mkDerivation rec {
     blueprint-compiler
     gtk4
     json-glib
+    libadwaita
     libsoup_3
     libbacktrace
     text-engine
   ];
 
-  # See https://github.com/NixOS/nixpkgs/issues/36468.
-  mesonFlags = [ "-Dc_args=-I${glib.dev}/include/gio-unix-2.0" ];
+  mesonFlags = [
+    (lib.mesonOption "package" "Nix")
+    (lib.mesonOption "distributor" "nixpkgs")
+  ];
 
   meta = with lib; {
     description = "Desktop app for managing GNOME shell extensions";
     homepage = "https://github.com/mjakeman/extension-manager";
     license = licenses.gpl3Plus;
     platforms = platforms.linux;
+    mainProgram = "extension-manager";
     maintainers = with maintainers; [ foo-dogsquared ];
   };
 }

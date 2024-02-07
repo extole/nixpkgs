@@ -9,12 +9,13 @@
 buildPythonPackage rec {
   pname = "socketio-client";
   version = "0.7.2";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "invisibleroads";
     repo = "socketio-client";
     rev = version;
-    sha256 = "sha256-71sjiGJDDYElPGUNCH1HaVdvgMt8KeD/kXVDpF615ho=";
+    hash = "sha256-71sjiGJDDYElPGUNCH1HaVdvgMt8KeD/kXVDpF615ho=";
   };
 
   propagatedBuildInputs = [

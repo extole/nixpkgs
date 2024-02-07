@@ -8,6 +8,7 @@
 buildPythonPackage rec {
   pname = "asgineer";
   version = "0.8.1";
+  format = "setuptools";
 
   # PyPI tarball doesn't include tests directory
   src = fetchFromGitHub {
@@ -17,7 +18,7 @@ buildPythonPackage rec {
     sha256 = "0hd1i9pc8m7sc8bkn31q4ygkmnl5vklrcziq9zkdiqaqm8clyhcx";
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     requests
   ];

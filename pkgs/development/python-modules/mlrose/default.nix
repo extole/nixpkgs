@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "mlrose";
   version = "1.3.0";
+  format = "setuptools";
   disabled = isPy27;
 
   src = fetchFromGitHub {
@@ -29,7 +30,7 @@ buildPythonPackage rec {
   ];
 
   propagatedBuildInputs = [ scikit-learn ];
-  checkInputs = [ pytest-randomly pytestCheckHook ];
+  nativeCheckInputs = [ pytest-randomly pytestCheckHook ];
 
   postPatch = ''
     substituteInPlace setup.py --replace sklearn scikit-learn

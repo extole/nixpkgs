@@ -2,16 +2,23 @@
 
 buildGoModule rec {
   pname = "miller";
-  version = "6.4.0";
+  version = "6.10.0";
 
   src = fetchFromGitHub {
     owner = "johnkerl";
     repo = "miller";
     rev = "v${version}";
-    sha256 = "sha256-nxkJfbZ5zdAKtmhZiWhTV0cU+qvqimOADC9T0r+1iS0=";
+    sha256 = "sha256-q807J1VWzfdxz4/KAGGCDQ8Bb4T8wwRRiiIEl6M37Co=";
   };
 
-  vendorSha256 = "sha256-EF5hTtTGGOYg9TGIsR3UL2Sxc3FHGV2q5VNXlBNma/M=";
+  outputs = [ "out" "man" ];
+
+  vendorHash = "sha256-S8Ew7PaPhdf2QY6BYXTeLF64tn+PBSfNJhAhH9uTOvo=";
+
+  postInstall = ''
+    mkdir -p $man/share/man/man1
+    mv ./man/mlr.1 $man/share/man/man1
+  '';
 
   subPackages = [ "cmd/mlr" ];
 

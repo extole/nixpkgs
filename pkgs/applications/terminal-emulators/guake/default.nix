@@ -26,11 +26,6 @@ python3.pkgs.buildPythonApplication rec {
     sha256 = "sha256-BW13fBH26UqMPMjV8JC4QkpgzyoPfCpAfSkJD68uOZU=";
   };
 
-  # Strict deps breaks guake
-  # See https://github.com/NixOS/nixpkgs/issues/59930
-  # and https://github.com/NixOS/nixpkgs/issues/56943
-  strictDeps = false;
-
   nativeBuildInputs = [
     gobject-introspection
     wrapGAppsHook
@@ -56,8 +51,6 @@ python3.pkgs.buildPythonApplication rec {
     setuptools-scm
     pyyaml
   ];
-
-  SETUPTOOLS_SCM_PRETEND_VERSION = version;
 
   makeFlags = [
     "PREFIX=${placeholder "out"}"

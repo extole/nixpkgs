@@ -2,24 +2,38 @@
 , buildPythonPackage
 , fetchPypi
 , pythonOlder
+, cython_3
+, expandvars
+, setuptools
 , idna
 , multidict
 , typing-extensions
+, pytest-xdist
 , pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "yarl";
-  version = "1.8.1";
+  version = "1.9.4";
+
+  disabled = pythonOlder "3.7";
+
+  pyproject = true;
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-r4h4RbjC4GDrVgX/crby3SqrenYTeTc/2J0xT0dSq78=";
+    hash = "sha256-Vm24ZxfPgIC5m1iwg7dzqQiuQPBmgeh+WJqXb6+CRr8=";
   };
 
   postPatch = ''
-    sed -i '/^addopts/d' setup.cfg
+    sed -i '/cov/d' pytest.ini
   '';
+
+  nativeBuildInputs = [
+    cython_3
+    expandvars
+    setuptools
+  ];
 
   propagatedBuildInputs = [
     idna
@@ -33,7 +47,8 @@ buildPythonPackage rec {
     pushd tests
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
+    pytest-xdist
     pytestCheckHook
   ];
 
@@ -44,6 +59,7 @@ buildPythonPackage rec {
   pythonImportsCheck = [ "yarl" ];
 
   meta = with lib; {
+    changelog = "https://github.com/aio-libs/yarl/blob/v${version}/CHANGES.rst";
     description = "Yet another URL library";
     homepage = "https://github.com/aio-libs/yarl";
     license = licenses.asl20;

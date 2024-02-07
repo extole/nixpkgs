@@ -3,9 +3,8 @@
 , fetchFromGitHub
 , rustPlatform
 , installShellFiles
-, libiconv
 , cmake
-, fetchpatch
+, git
 , nixosTests
 , Security
 , Foundation
@@ -14,31 +13,40 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "starship";
-  version = "1.11.0";
+  version = "1.17.1";
 
   src = fetchFromGitHub {
     owner = "starship";
     repo = pname;
     rev = "v${version}";
-    sha256 = "sha256-90mh8C52uD68K5o1LE22gkbL1gy6FyMJTiiN9oV/3DE=";
+    hash = "sha256-e+vhisUzSYKUUoYfSaQwpfMz2OzNcZbeHgbvyPon18g=";
   };
 
   nativeBuildInputs = [ installShellFiles cmake ];
 
-  buildInputs = lib.optionals stdenv.isDarwin [ libiconv Security Foundation Cocoa ];
+  buildInputs = lib.optionals stdenv.isDarwin [ Security Foundation Cocoa ];
 
-  buildNoDefaultFeatures = true;
-  # the "notify" feature is currently broken on darwin
-  buildFeatures = if stdenv.isDarwin then [ "battery" ] else [ "default" ];
+  NIX_LDFLAGS = lib.optionals (stdenv.isDarwin && stdenv.isx86_64) [ "-framework" "AppKit" ];
+
+  # tries to access HOME only in aarch64-darwin environment when building mac-notification-sys
+  preBuild = lib.optionalString (stdenv.isDarwin && stdenv.isAarch64) ''
+    export HOME=$TMPDIR
+  '';
 
   postInstall = ''
     installShellCompletion --cmd starship \
       --bash <($out/bin/starship completions bash) \
       --fish <($out/bin/starship completions fish) \
       --zsh <($out/bin/starship completions zsh)
+
+    presetdir=$out/share/starship/presets/
+    mkdir -p $presetdir
+    cp docs/.vuepress/public/presets/toml/*.toml $presetdir
   '';
 
-  cargoSha256 = "sha256-Q1VY9RyHEsQAWRN/upeG5XJxJfrmzj5FQG6GBGrN0xU=";
+  cargoHash = "sha256-xLlZyLvS9AcXQHxjyL4Dden1rEwCLB8/comfRyqXXCI=";
+
+  nativeCheckInputs = [ git ];
 
   preCheck = ''
     HOME=$TMPDIR
@@ -52,6 +60,7 @@ rustPlatform.buildRustPackage rec {
     description = "A minimal, blazing fast, and extremely customizable prompt for any shell";
     homepage = "https://starship.rs";
     license = licenses.isc;
-    maintainers = with maintainers; [ bbigras danth davidtwco Br1ght0ne Frostman marsam ];
+    maintainers = with maintainers; [ danth davidtwco Br1ght0ne Frostman marsam ];
+    mainProgram = "starship";
   };
 }

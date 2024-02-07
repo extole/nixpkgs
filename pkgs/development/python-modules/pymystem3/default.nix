@@ -12,6 +12,7 @@
 buildPythonPackage rec {
   pname = "pymystem3";
   version = "0.2.0";
+  format = "setuptools";
 
   src = fetchPypi {
     inherit pname version;
@@ -19,7 +20,7 @@ buildPythonPackage rec {
   };
 
   propagatedBuildInputs = [ requests ];
-  checkInputs = [ flake8 mock pytest ];
+  nativeCheckInputs = [ flake8 mock pytest ];
   doCheck = isPy3k; # fails on linting
 
   postPatch = ''

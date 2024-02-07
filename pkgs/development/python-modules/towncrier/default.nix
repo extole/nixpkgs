@@ -1,54 +1,70 @@
-{ lib, buildPythonPackage, fetchPypi, isPy27
+{ lib
+, buildPythonPackage
 , click
-, click-default-group
+, fetchPypi
+, git # shells out to git
+, hatchling
+, importlib-resources
 , incremental
 , jinja2
 , mock
 , pytestCheckHook
-, toml
+, pythonOlder
+, tomli
 , twisted
-, setuptools
-, git # shells out to git
 }:
 
 buildPythonPackage rec {
   pname = "towncrier";
-  version = "22.8.0";
+  version = "23.11.0";
+  pyproject = true;
+
+  disabled = pythonOlder "3.8";
 
   src = fetchPypi {
     inherit pname version;
-    sha256 = "sha256-fTg5sDOFm0X7Vd+Ct0z9cCQxkzwMyfKHpafqPgXQQss=";
+    hash = "sha256-E5N8JH4/iuIKxE2JXPX5amCtRs/cwWcXWVMNeDfZ7l0=";
   };
+
+  postPatch = ''
+    substituteInPlace pyproject.toml \
+      --replace "hatchling ~= 1.17.1" "hatchling"
+  '';
+
+  nativeBuildInputs = [
+    hatchling
+  ];
 
   propagatedBuildInputs = [
     click
-    click-default-group
     incremental
     jinja2
-    toml
-    setuptools
+  ] ++ lib.optionals (pythonOlder "3.10") [
+    importlib-resources
+  ] ++ lib.optionals (pythonOlder "3.11") [
+    tomli
   ];
-
-  # zope.interface collision
-  doCheck = !isPy27;
 
   preCheck = ''
     export PATH=$out/bin:$PATH
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     git
     mock
     twisted
     pytestCheckHook
   ];
 
-  pythonImportsCheck = [ "towncrier" ];
+  pythonImportsCheck = [
+    "towncrier"
+  ];
 
   meta = with lib; {
     description = "Utility to produce useful, summarised news files";
     homepage = "https://github.com/twisted/towncrier/";
+    changelog = "https://github.com/twisted/towncrier/blob/${version}/NEWS.rst";
     license = licenses.mit;
-    maintainers = with maintainers; [  ];
+    maintainers = with maintainers; [ ];
   };
 }

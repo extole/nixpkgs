@@ -10,6 +10,7 @@
 buildPythonPackage rec {
   pname = "debts";
   version = "0.5";
+  format = "setuptools";
 
   # pypi does not ship tests
   src = fetchFromGitLab {
@@ -24,7 +25,7 @@ buildPythonPackage rec {
 
   propagatedBuildInputs = [ jinja2 ];
 
-  checkInputs = [ pytest ];
+  nativeCheckInputs = [ pytest ];
 
   # for some reason tests only work if the module is properly installed
   checkPhase = ''

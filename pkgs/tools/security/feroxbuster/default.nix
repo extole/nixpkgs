@@ -9,16 +9,21 @@
 
 rustPlatform.buildRustPackage rec {
   pname = "feroxbuster";
-  version = "2.7.1";
+  version = "2.10.1";
 
   src = fetchFromGitHub {
     owner = "epi052";
     repo = pname;
-    rev = version;
-    hash = "sha256-B6FeY5pWW5+y/0HlVedkm8ol2z9GXgEYe5j7/uMhqsw=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-AFh/IeB88NYPsyUqzaN92GoDbAgl+HG87cIy+Ni06Q8=";
   };
 
-  cargoSha256 = "sha256-OFgt8yu2wlvkP/wjlmRRl8UyD9MUx9/0Rcs6K8jLkjo=";
+  # disable linker overrides on aarch64-linux
+  postPatch = ''
+    rm .cargo/config
+  '';
+
+  cargoHash = "sha256-Fu3qw3qRK3TZlzK1WcmI/GQ5TM1j+gbGoedwp18SolY=";
 
   OPENSSL_NO_VENDOR = true;
 
@@ -38,8 +43,11 @@ rustPlatform.buildRustPackage rec {
   meta = with lib; {
     description = "Fast, simple, recursive content discovery tool";
     homepage = "https://github.com/epi052/feroxbuster";
+    changelog = "https://github.com/epi052/feroxbuster/releases/tag/v${version}";
     license = with licenses; [ mit ];
     maintainers = with maintainers; [ fab ];
+    platforms = platforms.unix;
+    mainProgram = "feroxbuster";
   };
 }
 

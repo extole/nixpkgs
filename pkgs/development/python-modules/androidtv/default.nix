@@ -1,6 +1,7 @@
 { lib
 , adb-shell
 , aiofiles
+, async-timeout
 , buildPythonPackage
 , fetchFromGitHub
 , mock
@@ -11,7 +12,7 @@
 
 buildPythonPackage rec {
   pname = "androidtv";
-  version = "0.0.69";
+  version = "0.0.73";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -20,11 +21,12 @@ buildPythonPackage rec {
     owner = "JeffLIrion";
     repo = "python-androidtv";
     rev = "v${version}";
-    hash = "sha256-GfwXYugDrxOe9ekC1M7mi0BuqmohHdgZVTO4J8+B5iI=";
+    hash = "sha256-FJUTJfS9jiC7KDf6XcGVRNXf75bVUOBPZe8y9M39Uak=";
   };
 
   propagatedBuildInputs = [
     adb-shell
+    async-timeout
     pure-python-adb
   ];
 
@@ -35,7 +37,7 @@ buildPythonPackage rec {
     inherit (adb-shell.optional-dependencies) usb;
   };
 
-  checkInputs = [
+  nativeCheckInputs = [
     mock
     pytestCheckHook
   ]

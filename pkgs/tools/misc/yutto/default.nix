@@ -1,7 +1,7 @@
 { lib
 , python3
+, fetchPypi
 , ffmpeg
-, makeWrapper
 , nix-update-script
 }:
 
@@ -9,14 +9,14 @@ with python3.pkgs;
 
 buildPythonApplication rec {
   pname = "yutto";
-  version = "2.0.0b16";
+  version = "2.0.0b33";
   format = "pyproject";
 
   disabled = pythonOlder "3.9";
 
   src = fetchPypi {
     inherit pname version;
-    hash = "sha256-aGmayZGXmEyVuUKDKrgcYuPKsib/c5ou5CZ+Sag6Evk=";
+    hash = "sha256-TUyjppAHmWCZxifeQeOpFMPBksqLRSYdqgG7NEMVILY=";
   };
 
   nativeBuildInputs = [
@@ -27,7 +27,7 @@ buildPythonApplication rec {
     aiohttp
     aiofiles
     biliass
-    dicttoxml
+    dict2xml
     colorama
   ];
 
@@ -37,14 +37,13 @@ buildPythonApplication rec {
 
   pythonImportsCheck = [ "yutto" ];
 
-  passthru.updateScript = nix-update-script {
-    attrPath = pname;
-  };
+  passthru.updateScript = nix-update-script { };
 
   meta = with lib; {
     description = "A Bilibili downloader";
     homepage = "https://github.com/yutto-dev/yutto";
     license = licenses.gpl3Only;
     maintainers = with maintainers; [ linsui ];
+    mainProgram = "yutto";
   };
 }

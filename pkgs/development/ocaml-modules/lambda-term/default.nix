@@ -2,8 +2,8 @@
 
 let params =
   if lib.versionAtLeast ocaml.version "4.08" then {
-    version = "3.3.1";
-    sha256 = "sha256-C124bhdrY+XzL93zzNEbCr+U+7CYBZDm0hlAw+iqat4=";
+    version = "3.3.2";
+    sha256 = "sha256-T2DDpHqLar1sgmju0PLvhAZef5VzOpPWcFVhuZlPQmM=";
   } else {
     version = "3.1.0";
     sha256 = "1k0ykiz0vhpyyj9fkss29ajas4fh1xh449j702xkvayqipzj1mkg";
@@ -16,8 +16,6 @@ buildDunePackage rec {
 
   duneVersion = if lib.versionAtLeast ocaml.version "4.08" then "3" else "2";
 
-  strictDeps = true;
-
   src = fetchFromGitHub {
     owner = "ocaml-community";
     repo = pname;
@@ -26,7 +24,7 @@ buildDunePackage rec {
   };
 
   propagatedBuildInputs = [ zed lwt_log lwt_react mew_vi ]
-    ++ lib.optional (lib.versionAtLeast version "3.3.1") [ uucp logs ] ;
+    ++ lib.optionals (lib.versionAtLeast version "3.3.1") [ uucp logs ] ;
 
   meta = {
     description = "Terminal manipulation library for OCaml";

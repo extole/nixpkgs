@@ -1,65 +1,85 @@
 { lib
+, stdenv
 , buildPythonPackage
-, fetchPypi
-, cmake
-, numba
-, numpy
-, pytestCheckHook
 , pythonOlder
-, pyyaml
-, rapidjson
+, fetchFromGitHub
+, hatch-fancy-pypi-readme
+, hatchling
+, awkward-cpp
+, importlib-metadata
+, numpy
+, packaging
+, typing-extensions
+, fsspec
+, jax
+, jaxlib
+, numba
 , setuptools
+, numexpr
+, pandas
+, pyarrow
+, pytest-xdist
+, pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "awkward";
-  version = "1.10.1";
-  format = "setuptools";
+  version = "2.5.2";
+  pyproject = true;
 
-  disabled = pythonOlder "3.7";
+  disabled = pythonOlder "3.8";
 
-  src = fetchPypi {
-    inherit pname version;
-    hash = "sha256-xjlO0l+xSghtY2IdnYT9wij11CpkWG8hVzGzb94XA0s=";
+  src = fetchFromGitHub {
+    owner = "scikit-hep";
+    repo = "awkward";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-n50REyU/aWx6rj+9TZ52S3sZS25/hIaNfOe+AQGaXVA=";
   };
 
   nativeBuildInputs = [
-    cmake
-  ];
-
-  buildInputs = [
-    pyyaml
-    rapidjson
+    hatch-fancy-pypi-readme
+    hatchling
   ];
 
   propagatedBuildInputs = [
+    awkward-cpp
+    importlib-metadata
     numpy
-    setuptools
+    packaging
+  ] ++ lib.optionals (pythonOlder "3.11") [
+    typing-extensions
+  ] ++ lib.optionals (pythonOlder "3.12") [
+    importlib-metadata
   ];
 
   dontUseCmakeConfigure = true;
 
-  checkInputs = [
-    pytestCheckHook
+  pythonImportsCheck = [ "awkward" ];
+
+  nativeCheckInputs = [
+    fsspec
     numba
+    setuptools
+    numexpr
+    pandas
+    pyarrow
+    pytest-xdist
+    pytestCheckHook
+  ] ++ lib.optionals (!stdenv.isDarwin) [
+    # no support for darwin
+    jax
+    jaxlib
   ];
 
-  disabledTests = [
-    # incomatible with numpy 1.23
-    "test_numpyarray"
-  ];
-
+  # The following tests have been disabled because they need to be run on a GPU platform.
   disabledTestPaths = [
     "tests-cuda"
-  ];
-
-  pythonImportsCheck = [
-    "awkward"
   ];
 
   meta = with lib; {
     description = "Manipulate JSON-like data with NumPy-like idioms";
     homepage = "https://github.com/scikit-hep/awkward";
+    changelog = "https://github.com/scikit-hep/awkward/releases/tag/v${version}";
     license = licenses.bsd3;
     maintainers = with maintainers; [ veprbl ];
   };

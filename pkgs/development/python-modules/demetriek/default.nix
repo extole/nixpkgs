@@ -5,6 +5,7 @@
 , buildPythonPackage
 , pydantic
 , fetchFromGitHub
+, fetchpatch
 , poetry-core
 , yarl
 , aresponses
@@ -24,8 +25,18 @@ buildPythonPackage rec {
     owner = "frenck";
     repo = "python-demetriek";
     rev = "refs/tags/v${version}";
-    sha256 = "sha256-LCHHBcZgO9gw5jyaJiiS4lKyb0ut+PJvKTylIvIKHhc=";
+    hash = "sha256-LCHHBcZgO9gw5jyaJiiS4lKyb0ut+PJvKTylIvIKHhc=";
   };
+
+  patches = [
+    # https://github.com/frenck/python-demetriek/pull/531
+    (fetchpatch {
+      name = "pydantic_2-compatibility.patch";
+      url = "https://github.com/frenck/python-demetriek/commit/e677fe5b735b6b28572e3e5fd6aab56fc056f5e6.patch";
+      excludes = [ "pyproject.toml" "poetry.lock" ];
+      hash = "sha256-oMVR45KHDhcPId/0X9obJXCPE8s1gk5IgsGsgZesdZw=";
+    })
+  ];
 
   postPatch = ''
     # Upstream doesn't set a version for the pyproject.toml
@@ -46,7 +57,7 @@ buildPythonPackage rec {
     yarl
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     aresponses
     pytest-asyncio
     pytestCheckHook
@@ -55,6 +66,8 @@ buildPythonPackage rec {
   pythonImportsCheck = [
     "demetriek"
   ];
+
+  __darwinAllowLocalNetworking = true;
 
   meta = with lib; {
     description = "Python client for LaMetric TIME devices";

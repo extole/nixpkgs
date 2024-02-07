@@ -11,19 +11,22 @@
 , uvloop
 , watchfiles
 , websockets
+, hatchling
 , pythonOlder
 }:
 
 buildPythonPackage rec {
   pname = "uvicorn";
-  version = "0.18.2";
-  disabled = pythonOlder "3.6";
+  version = "0.24.0.post1";
+  disabled = pythonOlder "3.8";
+
+  format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "encode";
     repo = pname;
-    rev = version;
-    hash = "sha256-nxtDqYh2OmDtoV10CEBGYQrQBf+Xtuf5k9yR6UfCgYc=";
+    rev = "refs/tags/${version}";
+    hash = "sha256-WMXOmQOTj/yPazPEAuteho4UH9enXcIa1mMDDl2eaIk=";
   };
 
   outputs = [
@@ -31,10 +34,12 @@ buildPythonPackage rec {
     "testsout"
   ];
 
+  nativeBuildInputs = [ hatchling ];
+
   propagatedBuildInputs = [
     click
     h11
-  ] ++ lib.optionals (pythonOlder "3.8") [
+  ] ++ lib.optionals (pythonOlder "3.11") [
     typing-extensions
   ];
 

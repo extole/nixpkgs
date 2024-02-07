@@ -1,33 +1,27 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
-, poetry-core
+, hatchling
 , pytestCheckHook
 }:
 
 buildPythonPackage rec {
   pname = "filecheck";
-  version = "0.0.22";
+  version = "0.0.24";
   format = "pyproject";
 
   src = fetchFromGitHub {
     owner = "mull-project";
     repo = "FileCheck.py";
-    rev = "v${version}";
-    sha256 = "sha256-I2SypKkgcVuLyLiwNw5oWDb9qT56TbC6vbui8PEcziI=";
+    rev = "refs/tags/v${version}";
+    hash = "sha256-VbMlCqGd3MVpj0jEKjSGC2L0s/3e/d53b+2eZcXZneo=";
   };
 
-  postPatch = ''
-    substituteInPlace pyproject.toml \
-      --replace "poetry>=0.12" "poetry-core" \
-      --replace "poetry.masonry.api" "poetry.core.masonry.api"
-  '';
-
   nativeBuildInputs = [
-    poetry-core
+    hatchling
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
   ];
 
@@ -36,6 +30,7 @@ buildPythonPackage rec {
   ];
 
   meta = with lib; {
+    changelog = "https://github.com/mull-project/FileCheck.py/releases/tag/v${version}";
     homepage = "https://github.com/mull-project/FileCheck.py";
     license = licenses.asl20;
     description = "Python port of LLVM's FileCheck, flexible pattern matching file verifier";

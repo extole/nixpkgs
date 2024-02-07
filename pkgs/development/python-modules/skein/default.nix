@@ -15,6 +15,7 @@
 buildPythonPackage rec {
   pname = "skein";
   version = "0.8.2";
+  format = "setuptools";
   src = fetchPypi {
     inherit pname version;
     hash = "sha256-nXTqsJNX/LwAglPcPZkmdYPfF+vDLN+nNdZaDFTrHzE=";
@@ -40,7 +41,7 @@ buildPythonPackage rec {
 
   pythonImportsCheck = [ "skein" ];
 
-  checkInputs = [ pytestCheckHook ];
+  nativeCheckInputs = [ pytestCheckHook ];
   # These tests require connecting to a YARN cluster. They could be done through NixOS tests later.
   disabledTests = [
     "test_ui"

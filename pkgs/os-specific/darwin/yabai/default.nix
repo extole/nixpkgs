@@ -3,22 +3,21 @@
 , stdenvNoCC
 , fetchFromGitHub
 , fetchzip
-, writeShellScript
 , installShellFiles
 , testers
 , yabai
 , xxd
 , xcodebuild
+  # These all need to be from SDK 11.0 or later starting with yabai 5.0.0
 , Carbon
 , Cocoa
 , ScriptingBridge
-  # This needs to be from SDK 10.13 or higher, SLS APIs introduced in that version get used
 , SkyLight
 }:
 
 let
   pname = "yabai";
-  version = "4.0.4";
+  version = "6.0.6";
 
   test-version = testers.testVersion {
     package = yabai;
@@ -37,10 +36,12 @@ let
     changelog = "https://github.com/koekeishiya/yabai/blob/v${version}/CHANGELOG.md";
     license = licenses.mit;
     platforms = platforms.darwin;
+    mainProgram = "yabai";
     maintainers = with maintainers; [
       cmacrae
       shardy
       ivar
+      khaneliman
     ];
   };
 in
@@ -52,7 +53,7 @@ in
 
     src = fetchzip {
       url = "https://github.com/koekeishiya/yabai/releases/download/v${version}/yabai-v${version}.tar.gz";
-      sha256 = "sha256-NS8tMUgovhWqc6WdkNI4wKee411i/e/OE++JVc86kFE=";
+      hash = "sha256-G4BbYU4mgV8Jap8a872/YtoXU/hwUhFyLXdcuT1jldI=";
     };
 
     nativeBuildInputs = [
@@ -81,14 +82,14 @@ in
     };
   };
 
-  x86_64-darwin = stdenv.mkDerivation rec {
+  x86_64-darwin = stdenv.mkDerivation {
     inherit pname version;
 
     src = fetchFromGitHub {
       owner = "koekeishiya";
       repo = "yabai";
       rev = "v${version}";
-      sha256 = "sha256-TeT+8UAV2jR60XvTs4phkp611Gi0nzLmQnezLA0xb44=";
+      hash = "sha256-wqGYVUDEDkrLSr0IoAO17wbtwaDeainnkDeR8O8oFqc=";
     };
 
     nativeBuildInputs = [
@@ -106,6 +107,11 @@ in
 
     dontConfigure = true;
     enableParallelBuilding = true;
+
+    env = {
+      # silence service.h error
+      NIX_CFLAGS_COMPILE = "-Wno-implicit-function-declaration";
+    };
 
     postPatch = ''
       # aarch64 code is compiled on all targets, which causes our Apple SDK headers to error out.
@@ -128,50 +134,15 @@ in
       mkdir -p $out/{bin,share/icons/hicolor/scalable/apps}
 
       cp ./bin/yabai $out/bin/yabai
-      ln -s ${loadScriptingAddition} $out/bin/yabai-load-sa
       cp ./assets/icon/icon.svg $out/share/icons/hicolor/scalable/apps/yabai.svg
       installManPage ./doc/yabai.1
 
       runHook postInstall
     '';
 
-    # Defining this here exposes it as a passthru attribute, which is useful because it allows us to run `builtins.hashFile` on it in pure-eval mode.
-    # With that we can programatically generate an `/etc/sudoers.d` entry which disables the password requirement, so that a user-agent can run it at login.
-    loadScriptingAddition = writeShellScript "yabai-load-sa" ''
-      # For whatever reason the regular commands to load the scripting addition do not work, yabai will throw an error.
-      # The installation command mutably installs binaries to '/System', but then fails to start them. Manually running
-      # the bins as root does start the scripting addition, so this serves as a more user-friendly way to do that.
-
-      set -euo pipefail
-
-      if [[ "$EUID" != 0 ]]; then
-          echo "error: the scripting-addition loader must ran as root. try 'sudo $0'"
-          exit 1
-      fi
-
-      loaderPath="/Library/ScriptingAdditions/yabai.osax/Contents/MacOS/mach_loader";
-
-      if ! test -x "$loaderPath"; then
-          echo "could not locate the scripting-addition loader at '$loaderPath', installing it..."
-          echo "note: this may display an error"
-
-          eval "$(dirname "''${BASH_SOURCE[0]}")/yabai --install-sa" || true
-          sleep 1
-      fi
-
-      echo "executing loader..."
-      eval "$loaderPath"
-      echo "scripting-addition started"
-    '';
-
     passthru.tests.version = test-version;
 
     meta = _meta // {
-      longDescription = _meta.longDescription + ''
-        Note that due to a nix-only bug the scripting addition cannot be launched using the regular
-        procedure. Instead, you can use the provided `yabai-load-sa` script.
-      '';
-
       sourceProvenance = with lib.sourceTypes; [
         fromSource
       ];

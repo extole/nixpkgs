@@ -1,7 +1,8 @@
 { config, lib, pkgs, ... }:
 
 let
-  inherit (lib) mkBefore mkDefault mkEnableOption mkIf mkOption mkRemovedOptionModule types;
+  inherit (lib) mkBefore mkDefault mkEnableOption mkPackageOption
+                mkIf mkOption mkRemovedOptionModule types;
   inherit (lib) concatStringsSep literalExpression mapAttrsToList;
   inherit (lib) optional optionalAttrs optionalString;
 
@@ -51,12 +52,8 @@ in
     services.redmine = {
       enable = mkEnableOption (lib.mdDoc "Redmine");
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.redmine;
-        defaultText = literalExpression "pkgs.redmine";
-        description = lib.mdDoc "Which Redmine package to use.";
-        example = literalExpression "pkgs.redmine.override { ruby = pkgs.ruby_2_7; }";
+      package = mkPackageOption pkgs "redmine" {
+        example = "redmine.override { ruby = pkgs.ruby_3_2; }";
       };
 
       user = mkOption {
@@ -161,7 +158,7 @@ in
         };
 
         port = mkOption {
-          type = types.int;
+          type = types.port;
           default = if cfg.database.type == "postgresql" then 5432 else 3306;
           defaultText = literalExpression "3306";
           description = lib.mdDoc "Database host port.";
@@ -206,6 +203,57 @@ in
           description = lib.mdDoc "Create the database and database user locally.";
         };
       };
+
+      components = {
+        subversion = mkOption {
+          type = types.bool;
+          default = false;
+          description = lib.mdDoc "Subversion integration.";
+        };
+
+        mercurial = mkOption {
+          type = types.bool;
+          default = false;
+          description = lib.mdDoc "Mercurial integration.";
+        };
+
+        git = mkOption {
+          type = types.bool;
+          default = false;
+          description = lib.mdDoc "git integration.";
+        };
+
+        cvs = mkOption {
+          type = types.bool;
+          default = false;
+          description = lib.mdDoc "cvs integration.";
+        };
+
+        breezy = mkOption {
+          type = types.bool;
+          default = false;
+          description = lib.mdDoc "bazaar integration.";
+        };
+
+        imagemagick = mkOption {
+          type = types.bool;
+          default = false;
+          description = lib.mdDoc "Allows exporting Gant diagrams as PNG.";
+        };
+
+        ghostscript = mkOption {
+          type = types.bool;
+          default = false;
+          description = lib.mdDoc "Allows exporting Gant diagrams as PDF.";
+        };
+
+        minimagick_font_path = mkOption {
+          type = types.str;
+          default = "";
+          description = lib.mdDoc "MiniMagick font path";
+          example = "/run/current-system/sw/share/X11/fonts/LiberationSans-Regular.ttf";
+        };
+      };
     };
   };
 
@@ -219,22 +267,30 @@ in
       { assertion = cfg.database.createLocally -> cfg.database.user == cfg.user;
         message = "services.redmine.database.user must be set to ${cfg.user} if services.redmine.database.createLocally is set true";
       }
+      { assertion = pgsqlLocal -> cfg.database.user == cfg.database.name;
+        message = "services.redmine.database.user and services.redmine.database.name must be the same when using a local postgresql database";
+      }
       { assertion = cfg.database.createLocally -> cfg.database.socket != null;
         message = "services.redmine.database.socket must be set if services.redmine.database.createLocally is set to true";
       }
       { assertion = cfg.database.createLocally -> cfg.database.host == "localhost";
         message = "services.redmine.database.host must be set to localhost if services.redmine.database.createLocally is set to true";
       }
+      { assertion = cfg.components.imagemagick -> cfg.components.minimagick_font_path != "";
+        message = "services.redmine.components.minimagick_font_path must be configured with a path to a font file if services.redmine.components.imagemagick is set to true.";
+      }
     ];
 
     services.redmine.settings = {
       production = {
-        scm_subversion_command = "${pkgs.subversion}/bin/svn";
-        scm_mercurial_command = "${pkgs.mercurial}/bin/hg";
-        scm_git_command = "${pkgs.git}/bin/git";
-        scm_cvs_command = "${pkgs.cvs}/bin/cvs";
-        scm_bazaar_command = "${pkgs.breezy}/bin/bzr";
-        scm_darcs_command = "${pkgs.darcs}/bin/darcs";
+        scm_subversion_command = optionalString cfg.components.subversion "${pkgs.subversion}/bin/svn";
+        scm_mercurial_command = optionalString cfg.components.mercurial "${pkgs.mercurial}/bin/hg";
+        scm_git_command = optionalString cfg.components.git "${pkgs.git}/bin/git";
+        scm_cvs_command = optionalString cfg.components.cvs "${pkgs.cvs}/bin/cvs";
+        scm_bazaar_command = optionalString cfg.components.breezy "${pkgs.breezy}/bin/bzr";
+        imagemagick_convert_command = optionalString cfg.components.imagemagick "${pkgs.imagemagick}/bin/convert";
+        gs_command = optionalString cfg.components.ghostscript "${pkgs.ghostscript}/bin/gs";
+        minimagick_font_path = "${cfg.components.minimagick_font_path}";
       };
     };
 
@@ -259,7 +315,7 @@ in
       ensureDatabases = [ cfg.database.name ];
       ensureUsers = [
         { name = cfg.database.user;
-          ensurePermissions = { "DATABASE ${cfg.database.name}" = "ALL PRIVILEGES"; };
+          ensureDBOwnership = true;
         }
       ];
     };
@@ -296,14 +352,15 @@ in
       environment.REDMINE_LANG = "en";
       environment.SCHEMA = "${cfg.stateDir}/cache/schema.db";
       path = with pkgs; [
-        imagemagick
-        breezy
-        cvs
-        darcs
-        git
-        mercurial
-        subversion
-      ];
+      ]
+      ++ optional cfg.components.subversion subversion
+      ++ optional cfg.components.mercurial mercurial
+      ++ optional cfg.components.git git
+      ++ optional cfg.components.cvs cvs
+      ++ optional cfg.components.breezy breezy
+      ++ optional cfg.components.imagemagick imagemagick
+      ++ optional cfg.components.ghostscript ghostscript;
+
       preStart = ''
         rm -rf "${cfg.stateDir}/plugins/"*
         rm -rf "${cfg.stateDir}/public/themes/"*
@@ -362,7 +419,7 @@ in
         Group = cfg.group;
         TimeoutSec = "300";
         WorkingDirectory = "${cfg.package}/share/redmine";
-        ExecStart="${bundle} exec rails server webrick -e production -p ${toString cfg.port} -P '${cfg.stateDir}/redmine.pid'";
+        ExecStart="${bundle} exec rails server -u webrick -e production -p ${toString cfg.port} -P '${cfg.stateDir}/redmine.pid'";
       };
 
     };

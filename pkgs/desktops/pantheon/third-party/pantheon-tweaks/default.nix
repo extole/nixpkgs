@@ -14,13 +14,13 @@
 
 stdenv.mkDerivation rec {
   pname = "pantheon-tweaks";
-  version = "1.0.4";
+  version = "1.1.2";
 
   src = fetchFromGitHub {
     owner = "pantheon-tweaks";
     repo = pname;
     rev = version;
-    sha256 = "sha256-L/3PrkfWOGYtqeH/DajGEGCsF5yYnWuESxUTfROSHQ4=";
+    sha256 = "sha256-E9YSRfh9bLAHn2y4p3aKwR5NOtexKokLWj3RwtDnLsQ=";
   };
 
   patches = [
@@ -51,9 +51,7 @@ stdenv.mkDerivation rec {
   '';
 
   passthru = {
-    updateScript = nix-update-script {
-      attrPath = pname;
-    };
+    updateScript = nix-update-script { };
   };
 
   meta = with lib; {

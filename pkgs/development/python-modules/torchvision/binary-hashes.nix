@@ -6,61 +6,66 @@
 # To add a new version, run "prefetch.sh 'new-version'" to paste the generated file as follows.
 
 version : builtins.getAttr version {
-  "0.13.1" = {
-    x86_64-linux-37 = {
-      name = "torchvision-0.13.1-cp37-cp37m-linux_x86_64.whl";
-      url = "https://download.pytorch.org/whl/cu116/torchvision-0.13.1%2Bcu116-cp37-cp37m-linux_x86_64.whl";
-      hash = "sha256-3PMvbZmEk+duwho4u7hWt0Ailc96Z/sJzlvefn5yV1Y=";
-    };
+  "0.16.2" = {
     x86_64-linux-38 = {
-      name = "torchvision-0.13.1-cp38-cp38-linux_x86_64.whl";
-      url = "https://download.pytorch.org/whl/cu116/torchvision-0.13.1%2Bcu116-cp38-cp38-linux_x86_64.whl";
-      hash = "sha256-w86ys/RW8MmEr3HvVfhjfxeKKdw+E6ZvuwEM7q0okeE=";
+      name = "torchvision-0.16.2-cp38-cp38-linux_x86_64.whl";
+      url = "https://download.pytorch.org/whl/cu121/torchvision-0.16.2%2Bcu121-cp38-cp38-linux_x86_64.whl";
+      hash = "sha256-AmZyfQifUSqpAK6tKQhTD1TZB3eEveHnykb2a49Wfpg=";
     };
     x86_64-linux-39 = {
-      name = "torchvision-0.13.1-cp39-cp39-linux_x86_64.whl";
-      url = "https://download.pytorch.org/whl/cu116/torchvision-0.13.1%2Bcu116-cp39-cp39-linux_x86_64.whl";
-      hash = "sha256-dZhqvlchOCWOuXlctM1z9Asr34N0/voa9v9rsNvJcsY=";
+      name = "torchvision-0.16.2-cp39-cp39-linux_x86_64.whl";
+      url = "https://download.pytorch.org/whl/cu121/torchvision-0.16.2%2Bcu121-cp39-cp39-linux_x86_64.whl";
+      hash = "sha256-qhMlpuBBYD3uzvxWnmS4x1psmhuHbimi3vKYuoRWR00=";
     };
     x86_64-linux-310 = {
-      name = "torchvision-0.13.1-cp310-cp310-linux_x86_64.whl";
-      url = "https://download.pytorch.org/whl/cu116/torchvision-0.13.1%2Bcu116-cp310-cp310-linux_x86_64.whl";
-      hash = "sha256-DJorYFrDD89HXWD3m6N4rwBzoi3lhUU/jD3WwUUqubw=";
+      name = "torchvision-0.16.2-cp310-cp310-linux_x86_64.whl";
+      url = "https://download.pytorch.org/whl/cu121/torchvision-0.16.2%2Bcu121-cp310-cp310-linux_x86_64.whl";
+      hash = "sha256-uqeXDGtUNzEuXdC9DyVxogt4bD4oW6/W7T5PYqXDx24=";
     };
-    x86_64-darwin-37 = {
-      name = "torchvision-0.13.1-cp37-cp37m-macosx_10_9_x86_64.whl";
-      url = "https://download.pytorch.org/whl/torchvision-0.13.1-cp37-cp37m-macosx_10_9_x86_64.whl";
-      hash = "sha256-XmMSQb7jZh3mT4NhZlYiSvLjUS6yWA2nwI4IuMllqKw=";
+    x86_64-linux-311 = {
+      name = "torchvision-0.16.2-cp311-cp311-linux_x86_64.whl";
+      url = "https://download.pytorch.org/whl/cu121/torchvision-0.16.2%2Bcu121-cp311-cp311-linux_x86_64.whl";
+      hash = "sha256-CS1ZEQqf7PfDtE0YsbWqELqJjiVB4HtnT+WSaFIeuMs=";
     };
     x86_64-darwin-38 = {
-      name = "torchvision-0.13.1-cp38-cp38-macosx_10_9_x86_64.whl";
-      url = "https://download.pytorch.org/whl/torchvision-0.13.1-cp38-cp38-macosx_10_9_x86_64.whl";
-      hash = "sha256-8jChpA7XDVHkY85D3yQ+xSCQL4cl3iUC5IXvxe6p2GQ=";
+      name = "torchvision-0.16.2-cp38-cp38-macosx_10_9_x86_64.whl";
+      url = "https://download.pytorch.org/whl/cpu/torchvision-0.16.2-cp38-cp38-macosx_10_13_x86_64.whl";
+      hash = "sha256-uCcy3Ph2o3yFJ3I0KqbuNIDAO7PiqAKuEJ/F9+KNJuk=";
     };
     x86_64-darwin-39 = {
-      name = "torchvision-0.13.1-cp39-cp39-macosx_10_9_x86_64.whl";
-      url = "https://download.pytorch.org/whl/torchvision-0.13.1-cp39-cp39-macosx_10_9_x86_64.whl";
-      hash = "sha256-Api647Caw2GGYIhDQAjYK5nWRY/oiIyN+Qcg70s0fUQ=";
+      name = "torchvision-0.16.2-cp39-cp39-macosx_10_9_x86_64.whl";
+      url = "https://download.pytorch.org/whl/cpu/torchvision-0.16.2-cp39-cp39-macosx_10_13_x86_64.whl";
+      hash = "sha256-VhFSaLN/C3U2TjZU5HrZq8Zqw0wfnl49+omiLWpAAXo=";
     };
     x86_64-darwin-310 = {
-      name = "torchvision-0.13.1-cp310-cp310-macosx_10_9_x86_64.whl";
-      url = "https://download.pytorch.org/whl/torchvision-0.13.1-cp310-cp310-macosx_10_9_x86_64.whl";
-      hash = "sha256-GShqczxp3L1Be4Z5PfgHvSJ9tXhu14fBcpd0GpsND8c=";
+      name = "torchvision-0.16.2-cp310-cp310-macosx_10_9_x86_64.whl";
+      url = "https://download.pytorch.org/whl/cpu/torchvision-0.16.2-cp310-cp310-macosx_10_13_x86_64.whl";
+      hash = "sha256-vIbygAyywMGgnFgUCc3Wv/ZuYvED3IP8Y/czRiZMN1Y=";
+    };
+    x86_64-darwin-311 = {
+      name = "torchvision-0.16.2-cp311-cp311-macosx_10_9_x86_64.whl";
+      url = "https://download.pytorch.org/whl/cpu/torchvision-0.16.2-cp311-cp311-macosx_10_13_x86_64.whl";
+      hash = "sha256-Z7Gq+LjLAs513URfKRonyANqUC+MCqduKMN6D6rC4VM=";
     };
     aarch64-darwin-38 = {
-      name = "torchvision-0.13.1-cp38-cp38-macosx_11_0_arm64.whl";
-      url = "https://download.pytorch.org/whl/cpu/torchvision-0.13.1-cp38-cp38-macosx_11_0_arm64.whl";
-      hash = "sha256-6aVjiU+fpAaS4k0apYw+8EBFABfP7TWY/5Y39ATz/js=";
+      name = "torchvision-0.16.2-cp38-cp38-macosx_11_0_arm64.whl";
+      url = "https://download.pytorch.org/whl/cpu/torchvision-0.16.2-cp38-cp38-macosx_11_0_arm64.whl";
+      hash = "sha256-SwZRQ9GnIP6KkHf9S+NdSR+YgZ7ICz27w+xk0LcHqQY=";
     };
     aarch64-darwin-39 = {
-      name = "torchvision-0.13.1-cp39-cp39-macosx_11_0_arm64.whl";
-      url = "https://download.pytorch.org/whl/cpu/torchvision-0.13.1-cp39-cp39-macosx_11_0_arm64.whl";
-      hash = "sha256-xe1gnIvIjFdSJkALIjLgMJCUR3yCrziVLgNz7e8AA/0=";
+      name = "torchvision-0.16.2-cp39-cp39-macosx_11_0_arm64.whl";
+      url = "https://download.pytorch.org/whl/cpu/torchvision-0.16.2-cp39-cp39-macosx_11_0_arm64.whl";
+      hash = "sha256-goBfhEWwlPnR53A5DubMhoVeiZVeCM40ry4idPwOXEU=";
     };
     aarch64-darwin-310 = {
-      name = "torchvision-0.13.1-cp310-cp310-macosx_11_0_arm64.whl";
-      url = "https://download.pytorch.org/whl/cpu/torchvision-0.13.1-cp310-cp310-macosx_11_0_arm64.whl";
-      hash = "sha256-CPWS6mGDbr7Otcl/TXqBO519xlG7985EAVY8z65qIfw=";
+      name = "torchvision-0.16.2-cp310-cp310-macosx_11_0_arm64.whl";
+      url = "https://download.pytorch.org/whl/cpu/torchvision-0.16.2-cp310-cp310-macosx_11_0_arm64.whl";
+      hash = "sha256-sCS9QS3206AH3OvzEaiU6zxcIeGvgNEr44K7ywl6fDo=";
+    };
+    aarch64-darwin-311 = {
+      name = "torchvision-0.16.2-cp311-cp311-macosx_11_0_arm64.whl";
+      url = "https://download.pytorch.org/whl/cpu/torchvision-0.16.2-cp311-cp311-macosx_11_0_arm64.whl";
+      hash = "sha256-vvMNA+HRxil2H03KUdO32KDcCszm9AaKsqFjTo57ZOA=";
     };
   };
 }

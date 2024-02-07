@@ -11,6 +11,7 @@
 buildPythonPackage rec {
   pname = "remi";
   version = "2022.7.27";
+  format = "setuptools";
 
   src = fetchFromGitHub {
     owner = "rawpython";
@@ -39,7 +40,7 @@ buildPythonPackage rec {
         "self.assertEqual("
   '';
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytestCheckHook
     python-snap7
     opencv4

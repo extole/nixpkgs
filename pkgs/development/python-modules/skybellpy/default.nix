@@ -13,6 +13,7 @@
 buildPythonPackage rec {
   pname = "skybellpy";
   version = "0.6.3";
+  format = "setuptools";
   disabled = pythonOlder "3.6";
 
   src = fetchFromGitHub {
@@ -27,7 +28,7 @@ buildPythonPackage rec {
     requests
   ];
 
-  checkInputs = [
+  nativeCheckInputs = [
     pytest-sugar
     pytest-timeout
     pytestCheckHook

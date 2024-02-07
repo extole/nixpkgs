@@ -48,7 +48,7 @@ in {
       };
 
       port = mkOption {
-        type = types.int;
+        type = types.port;
         default = 4040;
         description = lib.mdDoc ''
           The port on which Airsonic will listen for
@@ -85,15 +85,12 @@ in {
         '';
       };
 
-      jre = mkOption {
-        type = types.package;
-        default = pkgs.jre8;
-        defaultText = literalExpression "pkgs.jre8";
-        description = lib.mdDoc ''
-          JRE package to use.
-
+      jre = mkPackageOption pkgs "jre8" {
+        extraDescription = ''
+          ::: {.note}
           Airsonic only supports Java 8, airsonic-advanced requires at least
           Java 11.
+          :::
         '';
       };
 

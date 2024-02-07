@@ -10,6 +10,7 @@
 buildPythonPackage {
   pname = "adb-homeassistant";
   version = "1.3.1";
+  format = "setuptools";
 
   # pypi does not contain tests, using github sources instead
   src = fetchFromGitHub {
@@ -26,7 +27,7 @@ buildPythonPackage {
     pycryptodome
   ];
 
-  checkInputs = [ pytest mock ];
+  nativeCheckInputs = [ pytest mock ];
   checkPhase = ''
     py.test test
   '';
