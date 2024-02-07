@@ -21,7 +21,7 @@
 
 buildPythonPackage rec {
   pname = "graphite-web";
-  version = "1.1.10";
+  version = "0ec7201c42ac2c14485c4c7eaab8a644082dc687";
   format = "setuptools";
 
   disabled = pythonOlder "3.7";
@@ -30,7 +30,7 @@ buildPythonPackage rec {
     owner = "graphite-project";
     repo = pname;
     rev = version;
-    hash = "sha256-2HgCBKwLfxJLKMopoIdsEW5k/j3kNAiifWDnJ98a7Qo=";
+    hash = "";
   };
 
   patches = [
