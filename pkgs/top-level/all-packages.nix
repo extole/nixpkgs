@@ -16196,6 +16196,7 @@ with pkgs;
   apacheKafka_3_1 = callPackage ../servers/apache-kafka { majorVersion = "3.1"; };
   apacheKafka_3_2 = callPackage ../servers/apache-kafka { majorVersion = "3.2"; };
   apacheKafka_3_3 = callPackage ../servers/apache-kafka { majorVersion = "3.3"; };
+  apacheKafka_3_9 = callPackage ../servers/apache-kafka { majorVersion = "3.9"; };
 
   kt = callPackage ../tools/misc/kt {};
 
