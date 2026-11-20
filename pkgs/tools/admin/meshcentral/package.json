@@ -96,7 +96,7 @@
     "svg-captcha": "1.4.0",
     "image-size": "1.1.1",
     "acme-client": "4.2.5",
-    "aedes": "0.39.0",
+    "aedes": "1.1.1",
     "mysql2": "3.11.4",
     "@mysql/xdevapi": "8.0.33",
     "mongodb": "4.13.0",
